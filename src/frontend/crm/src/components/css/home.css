@@ -1,4 +1,3 @@
-/* --- CSS Variables for Easy Theming --- */
 :root {
   --primary-color: #a37551;
   --secondary-color: #75543a;
@@ -16,14 +15,22 @@
   --font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* --- Caixa do formulário --- */
+/* --- Container para centralizar o formulário de login na tela --- */
+.login-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--background-lighter);
+}
+
+/* --- Caixa do formulário de login --- */
 .container-login {
   background: var(--form-background);
   border-radius: var(--border-radius-large);
   padding: 50px 40px;
   width: 100%;
   max-width: 400px;
-  margin: auto;
   box-shadow: 0 10px 25px var(--shadow-light);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -33,12 +40,12 @@
   box-shadow: 0 15px 30px var(--shadow-dark);
 }
 
-/* --- Títulos e texto --- */
+/* --- Títulos e texto do formulário --- */
 .container-login h3 {
-  font-size: 28px; /* Slightly larger for emphasis */
+  font-size: 28px;
   font-weight: 700;
   color: var(--text-dark);
-  margin-bottom: 8px; /* Reduced margin for tighter spacing */
+  margin-bottom: 8px;
   text-align: center;
 }
 
@@ -49,16 +56,15 @@
   text-align: center;
 }
 
-/* --- Labels --- */
+/* --- Labels e Inputs --- */
 .form-label {
   display: block;
   font-size: 14px;
   font-weight: 600;
-  margin-bottom: 8px; /* Slightly increased margin for better separation */
+  margin-bottom: 8px;
   color: var(--text-dark);
 }
 
-/* --- Inputs --- */
 .form-control {
   width: 100%;
   height: 48px;
@@ -68,7 +74,7 @@
   font-size: 14px;
   transition: border 0.3s ease, box-shadow 0.3s ease;
   margin-bottom: 20px;
-  box-sizing: border-box; /* Crucial for consistent sizing */
+  box-sizing: border-box;
 }
 
 .form-control:focus {
@@ -77,7 +83,7 @@
   outline: none;
 }
 
-/* --- Botão --- */
+/* --- Botão de login --- */
 .btn-login {
   background-color: var(--primary-color);
   border: none;
@@ -94,11 +100,11 @@
 .btn-login:hover {
   background-color: var(--secondary-color);
   transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Added subtle shadow on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .btn-login:focus {
-  outline: 2px solid var(--primary-color); /* Accessible focus state */
+  outline: 2px solid var(--primary-color);
   outline-offset: 2px;
 }
 

@@ -1,83 +1,100 @@
-/* Layout geral */
-.layout {
-  padding: 20px;
-  font-family: Arial, Helvetica, sans-serif;
-  background-color: #f5f5f5;
-  min-height: 100vh;
-}
-
-.content {
-  max-width: 900px;
-  margin: auto;
-  background-color: #fff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+/* Correção no page.css */
+.main-content .content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  flex-grow: 1; /* Permite que o .content preencha o espaço disponível verticalmente */
+  display: flex; /* Adicionado para alinhar o conteúdo interno */
+  flex-direction: column; /* Adicionado para alinhar o conteúdo interno */
 }
 
 /* Título */
-h2 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 25px;
+.content h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #1f2937;
+  text-align: center; /* Centraliza o texto do título */
 }
 
 /* Formulário */
 .user-form {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin-bottom: 30px;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .user-form input {
-  padding: 12px;
-  border: 1px solid #ccc;
+  padding: 0.75rem 1rem;
   border-radius: 8px;
-  font-size: 14px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 0.95rem;
+  transition: all 0.2s;
 }
 
+/* Botão */
 .user-form button {
   grid-column: span 2;
-  padding: 12px;
-  background-color: #007bff;
-  color: #fff;
-  font-weight: bold;
+  padding: 0.9rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  background: #2563eb;
+  color: #fff;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.2s, transform 0.1s;
 }
 
 .user-form button:hover {
-  background-color: #0056b3;
+  background: #1e40af;
+  transform: scale(1.02);
 }
 
-/* Tabela de usuários */
+.user-form button:active {
+  transform: scale(0.98);
+}
+
+/* Tabela */
 .user-table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.user-table thead {
+  background: #2563eb;
+  text-align: left;
 }
 
 .user-table th,
 .user-table td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
+  padding: 0.9rem 1rem;
 }
 
-.user-table th {
-  background-color: #007bff;
-  color: #fff;
-  text-transform: uppercase;
+.user-table tbody tr:nth-child(even) {
+  background: #f8f8f8;
 }
 
-.user-table tr:hover {
-  background-color: #f1f1f1;
+.user-table tbody tr:hover {
+  background: #f0f0f0;
+  transition: background 0.2s;
 }
 
-/* Mensagem de vazio */
-.user-table + p {
-  text-align: center;
-  color: #666;
+/* Responsividade */
+@media (max-width: 768px) {
+  .user-form {
+    grid-template-columns: 1fr;
+  }
+
+  .user-form button {
+    grid-column: span 1;
+  }
 }

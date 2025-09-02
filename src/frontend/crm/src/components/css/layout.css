@@ -1,0 +1,55 @@
+.app-layout {
+  display: flex;
+  background: #f3f4f6;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh; /* Garante que o layout ocupe a altura total da viewport */
+  width: 100vw; /* Garante que o layout ocupe a largura total da viewport */
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  background: #1e3a8a;
+  color: #fff;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar .logo {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar nav ul li {
+  padding: 0.9rem 1rem;
+  margin: 0.4rem 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sidebar nav ul li:hover {
+  background: #2563eb;
+}
+
+.sidebar nav ul li.active {
+  background: #2563eb;
+  font-weight: 600;
+}
+
+/* Conteúdo */
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  box-sizing: border-box; /* Inclui padding na largura/altura total */
+  display: flex; /* Adicionado para permitir que o conteúdo interno se alinhe */
+  flex-direction: column; /* Adicionado para permitir que o conteúdo interno se alinhe */
+}
