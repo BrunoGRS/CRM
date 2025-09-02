@@ -1,0 +1,83 @@
+/* Layout geral */
+.layout {
+  padding: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.content {
+  max-width: 900px;
+  margin: auto;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Título */
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 25px;
+}
+
+/* Formulário */
+.user-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.user-form input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.user-form button {
+  grid-column: span 2;
+  padding: 12px;
+  background-color: #007bff;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.user-form button:hover {
+  background-color: #0056b3;
+}
+
+/* Tabela de usuários */
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.user-table th,
+.user-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.user-table th {
+  background-color: #007bff;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.user-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Mensagem de vazio */
+.user-table + p {
+  text-align: center;
+  color: #666;
+}

@@ -4,11 +4,13 @@ import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "./css/home.css";
 import "react-toastify/dist/ReactToastify.css";
+import { Eye, EyeOff } from "lucide-react";
 
 export const Home = () => {
   const [logado, setLogado] = useState(false);
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
+  const [mostrarSenha, setMostrarSenha] = useState(false);
   const navigate = useNavigate();
 
   const validarUsuario = async () => {
@@ -39,7 +41,7 @@ export const Home = () => {
     const status = await validarUsuario();
     if (status == 200) {
       setLogado(true);
-      navigate("/page"); // navega para a página desejada
+      navigate("/page"); 
     } else {
       toast.error("Usuário ou Senha Inválidos.");
     }
@@ -67,18 +69,29 @@ export const Home = () => {
                   />
                 </div>
                 <div className="mb-70">
-                  <label htmlFor="senha" className="form-label">
-                    Senha
-                  </label>
-                  <input
-                    type="password"
-                    name="senha"
-                    className="form-control"
-                    placeholder="Digite sua senha"
-                    value={senha}
-                    onChange={(e) => setSenha(e.target.value)}
-                    required
-                  />
+                   <label htmlFor="senha" className="form-label">
+        Senha
+      </label>
+      <input
+        type={mostrarSenha ? "text" : "password"}
+        name="senha"
+        className="form-control"
+        placeholder="Digite sua senha"
+        value={senha}
+        onChange={(e) => setSenha(e.target.value)}
+        required
+      />
+      <span
+        onClick={() => setMostrarSenha(!mostrarSenha)}
+        style={{
+          position: "absolute",
+          right: "10px",
+          top: "38px",
+          cursor: "pointer",
+        }}
+      >
+        {mostrarSenha ? <EyeOff size={20} /> : <Eye size={20} />}
+      </span>
                 </div>
                 <button
                   className="btn btn-login"
