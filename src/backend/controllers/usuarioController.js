@@ -1,6 +1,8 @@
 import { db } from "../database/database.js";
 import modelUsuario from "../models/modelUsuario.js";
 import { Sequelize } from "sequelize";
+import crypto from "crypto";
+import { enviarEmail } from "../emailServer.js";
 
 async function criarUser(req, res) {
   try {
@@ -41,11 +43,9 @@ async function editarUser(req, res) {
             (dado.telefone = req.body.telefone || null);
 
           if (dado.save() != null) {
-            res
-              .status(200)
-              .send({
-                msg: `Usuario atualizado com sucesso. Usuario: ${dado.id} - ${dado.nome}`,
-              });
+            res.status(200).send({
+              msg: `Usuario atualizado com sucesso. Usuario: ${dado.id} - ${dado.nome}`,
+            });
           }
         },
         (error) => {
@@ -130,4 +130,50 @@ async function validarUser(req, res) {
   }
 }
 
-export default { criarUser, deleteUser, editarUser, mostrarUser, validarUser };
+async function forgotPassword(req, res) {
+  try {
+    const { email } = req.body;
+
+    const user = await modelUsuario.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(200).json({
+        message:
+          "Se um usuário com este e-mail existir, um link de redefinição foi enviado.",
+      });
+    }
+
+    const resetToken = crypto.randomBytes(20).toString("hex");
+
+    const expires = new Date();
+    expires.setHours(expires.getHours() + 1);
+
+    user.reset_password_token = resetToken;
+    user.reset_password_expires = expires;
+    await user.save();
+
+    const resetLink = `http://localhost:3000/reset-password/${resetToken}`;
+
+    const assunto = "Redefinição de Senha - CoffeeCRM";
+    const texto = `Olá, ${user.nome}.\n\nVocê solicitou a redefinição da sua senha. Clique no link a seguir para continuar: ${resetLink}\n\nEste link é válido por 1 hora.\n\nSe não foi você, ignore este e-mail.`;
+
+    await enviarEmail(user.email, assunto, texto);
+
+    res.status(200).json({
+      message:
+        "Se um usuário com este e-mail existir, um link de redefinição foi enviado.",
+    });
+  } catch (error) {
+    console.error("Erro em forgotPassword:", error);
+    res.status(500).json({ error: "Ocorreu um erro interno no servidor." });
+  }
+}
+
+export default {
+  criarUser,
+  deleteUser,
+  editarUser,
+  mostrarUser,
+  validarUser,
+  forgotPassword,
+};

@@ -48,6 +48,29 @@ export const Home = () => {
     }
   };
 
+  const token = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/usuario/forgot-password",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+          }),
+        }
+      );
+
+      return response.status;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+
   return (
     <div className="container-fluid box-login">
       <div className="row">
@@ -102,7 +125,7 @@ export const Home = () => {
                   Entrar
                 </button>
                 <div className="box-esqueceu">
-                  <a href="#">Esqueceu sua senha?</a>
+                  <a>Esqueceu a Senha?</a>
                 </div>
               </form>
             </div>
