@@ -1,55 +1,87 @@
-.app-layout {
-  display: flex;
-  background: #f3f4f6;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  min-height: 100vh; /* Garante que o layout ocupe a altura total da viewport */
-  width: 100vw; /* Garante que o layout ocupe a largura total da viewport */
+:root {
+    --cor-fundo: #f9f6f2;
+    --cor-sidebar: #3c2a20;
+    --cor-texto-claro: #fff;
+    --cor-hover: rgba(255, 255, 255, 0.1);
+    --cor-titulo: #4b2c20;
+    --cor-thead: #f1ece6;
 }
 
-/* Sidebar */
+body {
+    font-family: "Nunito", sans-serif;
+    background: var(--cor-fundo);
+}
+
 .sidebar {
-  width: 240px;
-  background: #1e3a8a;
-  color: #fff;
-  padding: 1.5rem 1rem;
-  display: flex;
-  flex-direction: column;
+    height: 100vh;
+    background: var(--cor-sidebar);
+    color: var(--cor-texto-claro);
+    transition: all 0.3s;
+    width: 240px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 16px;
+    overflow-y: auto;
 }
 
-.sidebar .logo {
-  font-size: 1.3rem;
-  font-weight: bold;
-  margin-bottom: 2rem;
-  text-align: center;
+.sidebar.collapsed {
+    width: 70px;
+    padding: 16px 8px;
 }
 
-.sidebar nav ul {
-  list-style: none;
-  padding: 0;
+.sidebar .brand {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.sidebar nav ul li {
-  padding: 0.9rem 1rem;
-  margin: 0.4rem 0;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
+.sidebar.collapsed .brand h4 {
+    display: none;
 }
 
-.sidebar nav ul li:hover {
-  background: #2563eb;
+.sidebar .nav-link {
+    color: var(--cor-texto-claro);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
 }
 
-.sidebar nav ul li.active {
-  background: #2563eb;
-  font-weight: 600;
+/* quando recolhido, some o texto */
+.sidebar.collapsed .nav-link span {
+    display: none;
 }
 
-/* Conteúdo */
-.main-content {
-  flex: 1;
-  padding: 2rem;
-  box-sizing: border-box; /* Inclui padding na largura/altura total */
-  display: flex; /* Adicionado para permitir que o conteúdo interno se alinhe */
-  flex-direction: column; /* Adicionado para permitir que o conteúdo interno se alinhe */
+.sidebar .nav-link:hover {
+    background: var(--cor-hover);
+    border-radius: 6px;
+}
+
+.titulo {
+    color: var(--cor-titulo);
+    font-weight: 700;
+}
+
+.content {
+    margin-left: 240px;
+    padding: 32px;
+    transition: margin-left 0.3s;
+}
+
+.collapsed ~ .content {
+    margin-left: 70px;
+}
+
+.toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--cor-texto-claro);
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.table thead {
+    background: var(--cor-thead);
 }

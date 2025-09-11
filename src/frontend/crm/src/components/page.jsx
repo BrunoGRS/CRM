@@ -14,6 +14,8 @@ export const Page = () => {
     senha: "",
     telefone: "",
   });
+  const [botao, setBotao] = useState(true);
+  const [IdUser, setIdUser] = useState("");
 
   const criarUsuario = async (e) => {
     e.preventDefault();
@@ -58,10 +60,10 @@ export const Page = () => {
     fetchUsuarios();
   }, []);
 
-  const excluirUsuario = async (id) => {
+  const excluirUsuario = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/usuario/delete/${id}`,
+        `http://localhost:3000/api/usuario/delete/${IdUser}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -83,9 +85,38 @@ export const Page = () => {
     fetchUsuarios();
   }, []);
 
+ const editarUsuario = async (e, id) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:3000/api/usuario/editar/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      console.log(id)
+
+      if (response.status === 200) {
+        toast.success("Usuário atualizado com sucesso!");
+        setFormData({
+          nome: "",
+          usuario: "",
+          email: "",
+          senha: "",
+          telefone: "",
+        });
+        fetchUsuarios();
+      } else {
+        toast.error("Erro ao atualizar usuário");
+      }
+    } catch (err) {
+      toast.error("Erro ao atualizar usuário");
+    }
+  };
+
+
   return (
     <div className="layout">
-      <Layout />
       <main className="content">
         <h2>Gerenciamento de Usuários</h2>
 
@@ -133,7 +164,18 @@ export const Page = () => {
               setFormData({ ...formData, telefone: e.target.value })
             }
           />
-          <button onClick={criarUsuario}>Criar Usuário</button>
+         {botao ? (
+                    <button onClick={criarUsuario}>Criar Usuário</button>
+                  ) : (
+                   <button
+                        onClick={(e) => { // Adicione uma arrow function para passar os parâmetros
+                          editarUsuario(e, IdUser); // Chame a função passando o evento e o IdUser
+                          setBotao(true); // Opcional: Volte o botão para "Criar Usuário" após a edição
+                        }}
+                      >
+                        Editar Usuário
+                      </button>
+                  )}      
         </form>
 
         {/* Lista de usuários */}
@@ -148,6 +190,7 @@ export const Page = () => {
                 <th>Usuário</th>
                 <th>Email</th>
                 <th>Telefone</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -158,21 +201,23 @@ export const Page = () => {
                   <td>{u.usuario}</td>
                   <td>{u.email}</td>
                   <td>{u.telefone || "-"}</td>
-                  <button
-                    className="button-editar"
-                    onClick={(e) =>
-                      setFormData({
-                        ...formData,
-                        nome: u.nome,
-                        usuario: u.usuario,
-                        email: u.email,
-                        senha: u.senha,
-                        telefone: u.telefone || "",
-                      })
-                    }
-                  >
-                    Editar
-                  </button>
+                   <button
+                        className="button-editar"
+                        onClick={(e) => {
+                          setFormData({
+                            ...formData,
+                            nome: u.nome,
+                            usuario: u.usuario,
+                            email: u.email,
+                            senha: u.senha,
+                            telefone: u.telefone || "",
+                          });
+                          setBotao(false);
+                          setIdUser(u.id);
+                        }}
+                      >
+                        Editar
+                      </button>
                   <button
                     className="button-excluir"
                     onClick={(e) => excluirUsuario(u.id)}

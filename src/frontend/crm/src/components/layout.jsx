@@ -19,41 +19,82 @@ export const Layout = () => {
   };
 
   return (
-    <div className="app-layout">
-      <aside className="sidebar">
-        <h2 className="logo">Meu Sistema</h2>
-        <nav>
-          <ul>
-            <li
-              className={selectedMenu === "dashboard" ? "active" : ""}
-              onClick={() => setSelectedMenu("dashboard")}
-            >
-              Dashboard
+    <section>
+      {/* Bootstrap e fontes */}
+      <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        crossOrigin="anonymous"
+      />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Raleway:wght@400;600;700&display=swap"
+        rel="stylesheet"
+      />
+
+      {/* Sidebar */}
+      <div id="sidebar" className="sidebar">
+        <div className="brand mb-3">
+          <h4 className="m-0">CoffeeCRM</h4>
+          <button className="toggle-btn" onClick={() => alert("futuramente toggle do sidebar")}>
+            ☰
+          </button>
+        </div>
+
+        <ul className="nav flex-column">
+          <li className="nav-item">
+            <a href="#" className="nav-link">
+              🏠 <span>Inicial</span>
+            </a>
+          </li>
+          <li className="nav-item">
+            <a href="#" className="nav-link">
+              🗺️ <span>Mapa</span>
+            </a>
+          </li>
+          <li className="nav-item">
+            <a href="#" className="nav-link">
+              📅 <span>Agenda</span>
+            </a>
+          </li>
+          <li className="nav-item">
+              <a
+                href="#"
+                className="nav-link"
+                onClick={() => setSelectedMenu("usuarios")}
+              >
+                👤 <span>Usuários</span>
+              </a>
             </li>
-            <li
-              className={selectedMenu === "usuarios" ? "active" : ""}
-              onClick={() => setSelectedMenu("usuarios")}
-            >
-              Usuários
-            </li>
-            <li
-              className={selectedMenu === "relatorios" ? "active" : ""}
+          <li className="nav-item">
+            <a href="#" className="nav-link">
+              🏷️ <span>Marcas</span>
+            </a>
+          </li>
+          <li className="nav-item">
+            <a href="#" className="nav-link">
+              📦 <span>Produtos</span>
+            </a>
+          </li>
+          <li className="nav-item">
+            <a href="#" className="nav-link">
+              📊 <span>Estatísticas</span>
+            </a>
+          </li>
+          <li className="nav-item">
+            <a
+              href="#"
+              className="nav-link"
               onClick={() => setSelectedMenu("relatorios")}
             >
-              Relatórios
-            </li>
-            <li
-              className={selectedMenu === "config" ? "active" : ""}
-              onClick={() => setSelectedMenu("config")}
-            >
-              Configurações
-            </li>
-          </ul>
-        </nav>
-      </aside>
+              📑 <span>Relatórios</span>
+            </a>
+          </li>
+        </ul>
+      </div>
 
-      <main className="main-content">{renderContent()}</main>
-    </div>
+      {/* Área de conteúdo */}
+      <div className="content p-3">{renderContent()}</div>
+    </section>
   );
 };
 
