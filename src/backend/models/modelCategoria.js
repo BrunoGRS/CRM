@@ -1,8 +1,10 @@
 import { Sequelize } from "sequelize";
 import { db } from "../database/database.js";
 
-export default db.define("categorias_produtos",{
- id: {
+export default db.define(
+  "categoriasprodutos",
+  {
+    id: {
       type: Sequelize.INTEGER.UNSIGNED,
       primaryKey: true,
       autoIncrement: true,
@@ -12,7 +14,8 @@ export default db.define("categorias_produtos",{
       type: Sequelize.STRING,
       allowNull: false,
     },
-},
-{
-    timestamps: false
-})
+  },
+  {
+    timestamps: false,
+  }
+);

@@ -1,8 +1,9 @@
 import { Sequelize } from "sequelize";
 import { db } from "../database/database.js";
 
-export default db.define("produtos",{
-    
+export default db.define(
+  "produto",
+  {
     id: {
       type: Sequelize.INTEGER.UNSIGNED,
       primaryKey: true,
@@ -37,6 +38,8 @@ export default db.define("produtos",{
       type: Sequelize.INTEGER,
       allowNull: true,
     },
-},{
-    timestamps: false
-})
+  },
+  {
+    timestamps: false,
+  }
+);
