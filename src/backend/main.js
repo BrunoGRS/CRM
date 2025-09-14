@@ -19,9 +19,11 @@ app.use((req, res, next) => {
 
 const routerUsuario = expressRouter;
 const routerCategoria = expressRouter;
+const routerCliente = expressRouter;
 
 app.use("/api", routerUsuario);
-app.use("/api", routerCategoria)
+app.use("/api", routerCategoria);
+app.use("/api", routerCliente);
 
 app.listen(3000, () => {
   console.log("Servidor rodando em <http://localhost:3000>");
