@@ -1,0 +1,16 @@
+:root {
+    --cor-fundo: #f9f6f2;
+    --cor-sidebar: #3c2a20;
+    --cor-texto-claro: #fff;
+    --cor-conteudo: #988269;
+    --cor-hover: rgba(255, 255, 255, 0.1);
+    --cor-titulo: #4b2c20;
+    --cor-thead: #f1ece6;
+}
+
+body {
+    font-family: "Nunito", sans-serif;
+    background: var(--cor-fundo);
+    height: 100%;
+    margin: 0;
+}

@@ -1,0 +1,405 @@
+:root {
+    --cor-fundo: #f9f6f2;
+    --cor-sidebar: #3c2a20;
+    --cor-texto-claro: #fff;
+    --cor-conteudo: #988269;
+    --cor-hover: rgba(255, 255, 255, 0.1);
+    --cor-titulo: #4b2c20;
+    --cor-thead: #f1ece6;
+}
+
+body {
+    font-family: "Nunito", sans-serif;
+    background: var(--cor-fundo);
+    height: 100%;
+    margin: 0;
+}
+
+.sidebar {
+    height: 100vh;
+    background: var(--cor-sidebar);
+    color: var(--cor-texto-claro);
+    transition: all 0.3s;
+    width: 240px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.sidebar.collapsed {
+    width: 70px;
+    padding: 16px 8px;
+}
+
+.sidebar .brand {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar.collapsed .brand h4 {
+    display: none;
+}
+
+.sidebar .nav-link {
+    color: var(--cor-texto-claro);
+    font-weight: 500 !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+/* quando recolhido, some o texto */
+.sidebar.collapsed .nav-link span {
+    display: none;
+}
+
+.sidebar .nav-link:hover {
+    background: var(--cor-hover);
+    border-radius: 6px;
+    color: var(--cor-texto-claro);
+}
+
+.titulo {
+    color: var(--cor-titulo);
+    font-weight: 700;
+}
+
+.content {
+    margin-left: 240px;
+    padding: 50px 25px;
+    transition: margin-left 0.3s;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.collapsed ~ .content {
+    margin-left: 70px;
+}
+
+.toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--cor-texto-claro);
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.table thead {
+    background: red;
+}
+
+.bg-success {
+    background-color: #6abf6a !important;
+}
+
+.bg-danger {
+    background-color: #e55b68 !important;
+}
+
+.rounded-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.rounded-table thead th {
+    border-top: none;
+}
+
+.rounded-table thead th:first-child {
+    border-top-left-radius: 12px;
+}
+.rounded-table thead th:last-child {
+    border-top-right-radius: 12px;
+}
+
+.rounded-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 12px;
+}
+.rounded-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 12px;
+}
+
+/* CALENDARIO */
+#calendar {
+    background: var(--cor-fundo);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.fc-toolbar-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.fc-daygrid-day-number {
+    color: var(--cor-conteudo);
+    text-decoration: none;
+    cursor: default;
+}
+
+.fc-daygrid-day-number:hover {
+    color: var(--cor-conteudo);
+    text-decoration: none;
+    cursor: default;
+}
+.fc-event-title {
+    color: red;
+}
+
+.fc-col-header-cell-cushion {
+    color: var(--cor-conteudo);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a .fc-col-header-cell-cushion:hover {
+    color: var(--cor-conteudo);
+    text-decoration: none;
+    cursor: default;
+}
+
+.fc-event {
+    border-radius: 6px;
+    padding: 2px 4px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.filters {
+    margin-bottom: 15px;
+}
+
+.filters button {
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin-right: 5px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.filters .active {
+    background: #8B4513;
+    color: #fff;
+}
+
+.filters .realizadas { background: #6abf6a; color: #fff; }
+.filters .atraso { background: #e55b68; color: #fff; }
+.filters .futuras { background: #eabf52; color: #fff; }
+
+#map {
+    flex-grow: 1 !important;
+    height: calc(100vh - 100px); /* desconta a altura da topbar */
+    width: 100%;
+}
+
+.topbar {
+    background: #f9f6f2;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.topbar h3 {
+    margin: 0;
+}
+
+.search-bar {
+    display: flex;
+    gap: 5px;
+}
+
+.kanban-container {
+    background: var(--cor-fundo);
+    color: var(--cor-titulo);
+}
+
+.btn-brown {
+    background-color: #8b5e3c;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+.btn-brown:hover {
+    background-color: #6f4628;
+    color: #fff;
+}
+
+.btn-outline-brown {
+    border: 1.5px solid #8b5e3c;
+    color: #8b5e3c;
+    border-radius: 8px;
+    font-weight: 600;
+}
+.btn-outline-brown:hover {
+    background-color: #8b5e3c;
+    color: #fff;
+}
+
+.btn-padrao {
+    background-color: #8b5e3c;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+.btn-padrao:hover {
+    background-color: #6f4628;
+    color: #fff;
+}
+
+.btn-outline-padrao {
+    border: 1.5px solid #8b5e3c;
+    color: #8b5e3c;
+    border-radius: 8px;
+    font-weight: 600;
+}
+.btn-outline-padrao:hover {
+    background-color: #8b5e3c;
+    color: #fff;
+}
+
+/* Estrutura do quadro Kanban */
+.kanban-board {
+    display: grid;
+    grid-template-columns: repeat(4, 380px);
+    gap: 24px;
+}
+
+.kanban-column {
+    background-color: #f1eee9;
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 70vh;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.kanban-title {
+    font-weight: 700;
+    color: var(--cor-titulo);
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+}
+
+/* Cartões */
+.kanban-card {
+    background-color: #dfdfdf;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    transition: all 0.2s ease-in-out;
+}
+.kanban-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.kanban-card-header {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--cor-titulo);
+}
+
+.kanban-card-subtitle {
+    font-size: 0.9rem;
+    color: #7b6a5b;
+    margin-bottom: 8px;
+}
+
+.kanban-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.kanban-value {
+    font-weight: 700;
+    color: #4b2c20;
+}
+
+.kanban-avatar {
+    background-color: #b58b68;
+    color: #fff;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.kanban-card.dragging { 
+    opacity: 0.5; 
+    transform: rotate(2deg);
+} 
+
+.kanban-column.kanban-hover { 
+    background-color: #f3ece4; 
+    transition: background-color 0.2s;
+    border: 2px dashed #b58b68; 
+}
+
+.text-brown {
+    color: #8b5e3c !important;
+}
+
+.table thead th {
+    color: var(--cor-titulo);
+    font-weight: 700;
+    border-bottom: 2px solid #e1d7ce;
+}
+
+.table tbody td {
+    color: #5c4a3a;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f9f5f0;
+}
+
+.page-link {
+    color: #8b5e3c;
+}
+.page-item.active .page-link {
+    background-color: #8b5e3c;
+    border-color: #8b5e3c;
+    color: #fff;
+}
+
+.card-body {
+    background-color: #dfdfdf;
+    border-radius: 11px;
+}
+
+.circulo-notf {
+    background:#e55b68; 
+    color:#fff; width:48px; 
+    height:48px; 
+    font-weight:700; 
+    font-size:1.2rem;
+}
+
+.admin-dashboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.box-kabann {
+    margin-top: 25px;
+}

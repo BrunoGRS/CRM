@@ -1,0 +1,161 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM - Oportunidades de Negócio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<div id="sidebar-container"></div>
+
+<div class="container-fluid content kanban-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="titulo">Oportunidades de Negócio</h3>
+        <div>
+            <button class="btn btn-outline-brown me-2">Filtros</button>
+            <button class="btn btn-brown">+ Nova Oportunidade</button>
+        </div>
+    </div>
+    <div class="kanban-board">
+        <div class="kanban-column">
+            <h5 class="kanban-title">Prospecção</h5>
+
+            <div class="kanban-card" draggable="true">
+                <div class="kanban-card-header">Expansão de frota</div>
+                <div class="kanban-card-subtitle">Expresso Rápido</div>
+                <div class="kanban-card-footer">
+                    <span class="kanban-value">R$ 25.000</span>
+                    <span class="kanban-avatar">AS</span>
+                </div>
+            </div>
+
+            <div class="kanban-card" draggable="true">
+                <div class="kanban-card-header">Novo fornecedor de grãos</div>
+                <div class="kanban-card-subtitle">Fazenda Sol Nascente</div>
+                <div class="kanban-card-footer">
+                    <span class="kanban-value">R$ 15.000</span>
+                    <span class="kanban-avatar">BC</span>
+                </div>
+            </div>
+        </div>
+
+      <div class="kanban-column">
+        <h5 class="kanban-title">Qualificação</h5>
+
+        <div class="kanban-card" draggable="true">
+          <div class="kanban-card-header">Contrato de fornecimento</div>
+          <div class="kanban-card-subtitle">Café & Grãos Ltda.</div>
+          <div class="kanban-card-footer">
+            <span class="kanban-value">R$ 80.000</span>
+            <span class="kanban-avatar">AS</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kanban-column">
+        <h5 class="kanban-title">Proposta Enviada</h5>
+
+        <div class="kanban-card" draggable="true">
+          <div class="kanban-card-header">Sistema de gestão</div>
+          <div class="kanban-card-subtitle">Aroma & Sabor S.A.</div>
+          <div class="kanban-card-footer">
+            <span class="kanban-value">R$ 42.000</span>
+            <span class="kanban-avatar">DG</span>
+          </div>
+        </div>
+
+        <div class="kanban-card" draggable="true">
+          <div class="kanban-card-header">Consultoria de branding</div>
+          <div class="kanban-card-subtitle">Café Imperial</div>
+          <div class="kanban-card-footer">
+            <span class="kanban-value">R$ 18.000</span>
+            <span class="kanban-avatar">DG</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kanban-column">
+        <h5 class="kanban-title">Fechamento</h5>
+        <p class="text-muted">Sem oportunidades no momento</p>
+      </div>
+    </div>
+  </div>
+
+<script src="/assets/scripts.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script>
+fetch('/assets/sidebar.html')
+.then(response => response.text())
+.then(data => {
+    document.getElementById('sidebar-container').innerHTML = data;
+    const currentPage = window.location.pathname.split("/").pop();
+    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+    const linkPage = link.getAttribute('href');
+    if (linkPage === currentPage) link.classList.add('active');
+    });
+})
+.catch(error => console.error('Erro ao carregar sidebar:', error));
+
+document.addEventListener("DOMContentLoaded", () => {
+  const cards = document.querySelectorAll(".kanban-card");
+  const columns = document.querySelectorAll(".kanban-column");
+
+  // Garante que cada card tenha um ID único
+  cards.forEach((card, index) => {
+    if (!card.id) card.id = `card-${index}`;
+    card.addEventListener("dragstart", e => {
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", card.id);
+      card.classList.add("dragging");
+    });
+    card.addEventListener("dragend", () => {
+      card.classList.remove("dragging");
+    });
+  });
+
+  columns.forEach(col => {
+    col.addEventListener("dragover", e => {
+      e.preventDefault();
+      const draggingCard = document.querySelector(".dragging");
+      const afterElement = getDragAfterElement(col, e.clientY);
+      if (afterElement == null) {
+        col.appendChild(draggingCard);
+      } else {
+        col.insertBefore(draggingCard, afterElement);
+      }
+    });
+
+    col.addEventListener("dragenter", () => col.classList.add("kanban-hover"));
+    col.addEventListener("dragleave", () => col.classList.remove("kanban-hover"));
+    col.addEventListener("drop", e => {
+      e.preventDefault();
+      col.classList.remove("kanban-hover");
+    });
+  });
+
+  function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll(".kanban-card:not(.dragging)")];
+    return draggableElements.reduce(
+      (closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      },
+      { offset: Number.NEGATIVE_INFINITY }
+    ).element;
+  }
+});
+
+    
+</script>
+</body>
+</html>
