@@ -1,0 +1,32 @@
+<div id="sidebar" class="sidebar">
+    <div class="brand mb-3" style="margin-left: 5px;">
+        <h4 class="m-0">CoffeeCRM</h4>
+        <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+    </div>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a href="/home.html" class="nav-link"><i class="fa fa-dashboard"></i> <span>Inicio</span></a>
+        </li>
+        <li class="nav-item">
+            <a href="/mapa.html" class="nav-link"><i class="fa fa-map"></i><span>Mapa</span></a>
+        </li>
+        <li class="nav-item">
+            <a href="/agenda.html" class="nav-link"><i class="fa fa-calendar"></i><span>Agenda</span></a>
+        </li>
+        <li class="nav-item">
+            <a href="#submenuCadastros" class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" aria-expanded="false">
+                    <span><i class="fa fa-book me-2"></i> Cadastros</span>
+                    <i class="fa fa-angle-down toggle-icon"></i>
+            </a>
+            <ul class="collapse list-unstyled ps-4" id="submenuCadastros">
+                <li><a href="cadastro/usuario.html" class="nav-link"><i class="fa fa-group me-2"></i> Clientes</a></li>
+                <li><a href="cadastro/despesa.html" class="nav-link"><i class="fa fa-money me-2"></i> Despesas</a></li>
+                <li><a href="cadastro/marca.html" class="nav-link"><i class="fa fa-tags me-2"></i> Marcas</a></li>
+                <li><a href="cadastro/oportunidade.html" class="nav-link"><i class="fa fa-lightbulb-o me-2"></i> Oportunidades</a></li>
+                <li><a href="cadastro/produto.html" class="nav-link"><i class="fa fa-dropbox me-2"></i> Produtos</a></li>
+            </ul>
+        </li>
+        <li class="nav-item"><a href="#" class="nav-link"><i class="fa fa-area-chart"></i> <span>Estatísticas</span></a></li>
+        <li class="nav-item"><a href="#" class="nav-link"><i class="fa fa-file-pdf-o"></i> <span>Relatórios</span></a></li>
+    </ul>
+</div>
