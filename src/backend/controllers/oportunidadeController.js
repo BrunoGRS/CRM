@@ -29,66 +29,66 @@ async function editarOportunidade(req, res) {
   try {
     let oportunidade = modelOportunidade.findByPk(id);
 
-    if(oportunidade){
-         oportunidade.then((dado) => {
-                  (dado.tiutulo = dado.req.body),
-                  (dado.valor_estimado = dado.req.valor_estimado),
-                  (dado.etapa = dado.req.etapa),
-                  (dado.cliente_id = dado.req.cliente_id),
-                  (dado.responsavel_id = dado.req.responsavel_id)
+    if (oportunidade) {
+      oportunidade
+        .then((dado) => {
+          (dado.tiutulo = dado.req.body),
+            (dado.valor_estimado = dado.req.valor_estimado),
+            (dado.etapa = dado.req.etapa),
+            (dado.cliente_id = dado.req.cliente_id),
+            (dado.responsavel_id = dado.req.responsavel_id);
 
-                  if(dado.save() !=){
-                    res.status(200).send({
-                      msg:'Oportunidade Atualizada!'
-                    })
-                  }
-                })
-                .catch(() => {
-                  res.status(500).send({ msg: "Erro ao editar oportunidade" });
-                });
-      } 
-  }catch (error) {
+          if (dado.save()) {
+            res.status(200).send({
+              msg: "Oportunidade Atualizada!",
+            });
+          }
+        })
+        .catch(() => {
+          res.status(500).send({ msg: "Erro ao editar oportunidade" });
+        });
+    }
+  } catch (error) {
     toast.error(error);
   }
 }
-     
 
 async function mostrarOportunidades(req, res) {
   try {
+    const oportunidades = modelOportunidade.findAll();
 
-    const oportunidades = modelOportunidade.findAll()
-
-    oportunidades.then((dados) =>{
-          res.status(200).send({msg:dados})
-    }).catch(() => {
-          res.status(500).send({ msg: "Erro ao editar oportunidade" });
-    });
-
-    
+    oportunidades
+      .then((dados) => {
+        res.status(200).send({ msg: dados });
+      })
+      .catch(() => {
+        res.status(500).send({ msg: "Erro ao editar oportunidade" });
+      });
   } catch (error) {
-    toast.error('Erro ao mostrar oportunidades', error)
-  } 
+    toast.error("Erro ao mostrar oportunidades", error);
+  }
 }
-
 
 async function deletarOportunidade(params) {
   try {
-
-    const oportunidade = modelOportunidade.findByPk(id)
+    const oportunidade = modelOportunidade.findByPk(id);
 
     if (oportunidade) {
-      oportunidade.then(
-        (dado) => {
-          if (dado.destroy()) {
-            res
-              .status(200)
-              .send({ msg: `oportunidade ${dado.nome} deletada com sucesso!` });
-          }
+      oportunidade.then((dado) => {
+        if (dado.destroy()) {
+          res
+            .status(200)
+            .send({ msg: `oportunidade ${dado.nome} deletada com sucesso!` });
         }
-      );
+      });
     }
   } catch (error) {
-    toast.error('Erro ao deletar oportunidade', error)
+    toast.error("Erro ao deletar oportunidade", error);
   }
 }
-export default { criarOportunidade, editarOportunidade, mostrarOportunidades, deletarOportunidade };
+export default {
+  criarOportunidade,
+  editarOportunidade,
+  mostrarOportunidades,
+  deletarOportunidade,
+};
