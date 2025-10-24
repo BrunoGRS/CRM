@@ -1,11 +1,9 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Home } from "./components/home.jsx";
-import { Page } from "./components/page.jsx";
-import { Layout } from "./components/layout.jsx";
+import { Usuarios } from "./components/usuario.jsx";
+import { Body } from "./components/body.jsx";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -14,7 +12,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/page" element={<Layout />} />
+        <Route path="/home" element={<Body />} />
+        <Route path="/usuarios" element={<Usuarios />} />
       </Routes>
     </Router>
   );

@@ -9,9 +9,9 @@ body {
 /* Container principal - alinhado à esquerda */
 .main-content .content {
   background: transparent;
-  padding: 1rem 0;         /* menos espaçamento */
-  width: 100%;             /* ocupa toda largura */
-  margin: 0;               /* remove centralização */
+  padding: 1rem 0; /* menos espaçamento */
+  width: 100%; /* ocupa toda largura */
+  margin: 0; /* remove centralização */
   flex-grow: 1;
   display: flex;
   flex-direction: column;

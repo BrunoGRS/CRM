@@ -1,0 +1,60 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border-radius: 20px;
+}
+
+body {
+  font-family: Verdana;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+ul {
+  margin-right: 50px;
+}
+
+.logo img {
+  width: 80px;
+  height: 80px;
+  margin-right: 10px;
+  margin-left: 50px;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+}
+
+.nav-links li {
+  margin-left: 20px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #484848;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 8px 12px; /* Espaçamento interno para dar forma ao botão */
+  border-radius: 10px; /* Borda arredondada */
+  transition: background-color 0.3s ease; /* Efeito suave na transição */
+}
+
+.nav-links a:hover {
+  background-color: #30d5c8; /* Cor de fundo clara ao passar o mouse */
+}

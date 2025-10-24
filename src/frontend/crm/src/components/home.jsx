@@ -5,7 +5,6 @@ import { toast, ToastContainer } from "react-toastify";
 import "./css/home.css";
 import "react-toastify/dist/ReactToastify.css";
 import { Eye, EyeOff } from "lucide-react";
-import { Layout } from "lucide-react";
 
 export const Home = () => {
   const [logado, setLogado] = useState(false);

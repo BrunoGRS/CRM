@@ -1,0 +1,188 @@
+/* General Body Container */
+.body-container {
+  font-family: "Verdana", sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* --- Initial Banner Section --- */
+.inicio {
+  background-image: url("https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop"); /* Replace with your desired image */
+  background-size: cover;
+  background-position: center;
+  height: 80vh; /* Takes up 80% of the viewport height */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Aligns content to the left */
+  padding: 0 5%;
+  position: relative;
+  color: white;
+}
+
+/* Adds a dark overlay for better text readability */
+.inicio::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.imagem-prof {
+  position: relative; /* Ensures text is on top of the overlay */
+  z-index: 2;
+  max-width: 600px;
+}
+
+.imagem-prof h2 {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.imagem-prof p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.btn {
+  background-color: #30d5c8; /* A nice teal color */
+  color: white;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+  background-color: #28b8ad;
+  transform: translateY(-2px); /* Slight lift effect */
+}
+
+/* --- Universal Section Padding --- */
+.about-us,
+.how-works,
+.benefits {
+  padding: 60px 5%;
+}
+
+/* --- About Us Section --- */
+.about-us {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  background-color: #f9f9f9;
+}
+
+.about-text {
+  flex: 1; /* Takes up half the space */
+}
+
+.about-text h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.about-text p {
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+}
+
+.foto {
+  flex: 1; /* Takes up the other half */
+  height: 400px;
+  background-image: url("https://images.unsplash.com/photo-1550831107-1553da8c8464?q=80&w=1887&auto=format&fit=crop"); /* Replace with a picture of your team or office */
+  background-size: cover;
+  background-position: center;
+  border-radius: 20px;
+}
+
+/* --- How It Works Section --- */
+.how-works {
+  text-align: center;
+  background-color: #ffffff;
+}
+
+.how-works-title h2 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+.highlight {
+  border-bottom: 4px solid #30d5c8;
+  padding-bottom: 5px;
+}
+
+.how-works-text {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: left;
+  font-size: 1.1rem;
+}
+
+.how-works-text ul {
+  list-style-type: "✓ "; /* Custom list bullet */
+  padding-left: 20px;
+  margin-top: 20px;
+}
+
+.how-works-text li {
+  margin-bottom: 10px;
+  padding-left: 10px;
+}
+
+.highlight-cliente {
+  background-color: #e0f7fa; /* Light blue highlight */
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.highlight-prestador {
+  background-color: #e8f5e9; /* Light green highlight */
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+/* --- Benefits Section --- */
+.benefits {
+  text-align: center;
+  background-color: #f9f9f9;
+}
+
+.benefits h2 {
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+}
+
+.benefits-list {
+  display: flex;
+  justify-content: space-around;
+  gap: 30px;
+}
+
+.benefit-item {
+  flex: 1; /* Each item takes equal space */
+  background-color: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.benefit-item:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.benefit-item h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #30d5c8;
+}
