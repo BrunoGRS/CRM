@@ -1,10 +1,3 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  border-radius: 20px;
-}
-
 body {
   font-family: Verdana;
 }
@@ -14,26 +7,12 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  background-color: white;
+  background-color: #472610;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  font-weight: bold;
-  font-size: 1.5rem;
 }
 
 ul {
   margin-right: 50px;
-}
-
-.logo img {
-  width: 80px;
-  height: 80px;
-  margin-right: 10px;
-  margin-left: 50px;
 }
 
 .nav-links {
@@ -47,7 +26,7 @@ ul {
 
 .nav-links a {
   text-decoration: none;
-  color: #484848;
+  color: #ccc8c8;
   font-weight: bold;
   font-size: 1rem;
   padding: 8px 12px; /* Espaçamento interno para dar forma ao botão */
@@ -56,5 +35,5 @@ ul {
 }
 
 .nav-links a:hover {
-  background-color: #30d5c8; /* Cor de fundo clara ao passar o mouse */
+  background-color: #a75b38; /* Cor de fundo clara ao passar o mouse */
 }

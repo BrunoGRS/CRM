@@ -4,70 +4,83 @@ import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { Navbar } from "./navbar";
 
-export const Usuarios = () => {
+export const Prospect = () => {
   const { id } = useParams();
-  const [users, setUsers] = useState([]);
+  const [prospects, setProspects] = useState([]);
   const [formData, setFormData] = useState({
-    nome: "",
-    usuario: "",
+    nome_contato: "",
+    fantasiaEmpresa: "",
+    razaoSocialEmpresa: "",
     email: "",
-    senha: "",
     telefone: "",
+    status: "",
+    cidade: "",
+    bairro: "",
+    ruaEndereco: "",
+    numeroEndereco: "",
+    complemento: "",
+    cnpj_cpf: "",
   });
   const [botao, setBotao] = useState(true);
-  const [IdUser, setIdUser] = useState("");
+  const [IdProspect, setIdProspect] = useState("");
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
   // Criar Usuário
-  const criarUsuario = async (e) => {
+  const criarProspect = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/api/usuario/criar", {
+      const response = await fetch("http://localhost:3000/api/cliente/criar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       if (response.status === 201) {
-        toast.success("Usuário criado com sucesso!");
+        toast.success("Cliente criado com sucesso!");
         setFormData({
-          nome: "",
-          usuario: "",
+          nome_contato: "",
+          fantasiaEmpresa: "",
+          razaoSocialEmpresa: "",
           email: "",
-          senha: "",
           telefone: "",
+          status: "",
+          cidade: "",
+          bairro: "",
+          ruaEndereco: "",
+          numeroEndereco: "",
+          complemento: "",
+          cnpj_cpf: "",
         });
-        fetchUsuarios();
+        fetchProspect();
         setMostrarFormulario(false);
       } else {
-        toast.error("Erro ao criar usuário");
+        toast.error("Erro ao criar cliente");
       }
     } catch {
-      toast.error("Erro ao criar usuário");
+      toast.error("Erro ao criar cliente");
     }
   };
 
-  // Listar Usuários
-  const fetchUsuarios = async () => {
+  const fetchProspect = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/usuario/listar");
+      const response = await fetch("http://localhost:3000/api/cliente/listar");
       const inf = await response.json();
-      const listaUsuarios = Array.isArray(inf.msg) ? inf.msg : [];
-      setUsers(listaUsuarios);
+      const listaProdutos = Array.isArray(inf.msg) ? inf.msg : [];
+      setProspects(listaProdutos);
     } catch {
-      toast.error("Erro ao listar usuários");
+      toast.error("Erro ao listar prospects");
     }
   };
 
   useEffect(() => {
-    fetchUsuarios();
+    fetchProspect();
   }, []);
 
   // Excluir
-  const excluirUsuario = async (id) => {
+  const excluirProspect = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/usuario/delete/${id}`,
+        `http://localhost:3000/api/cliente/delete/${id}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -75,22 +88,22 @@ export const Usuarios = () => {
       );
 
       if (response.status === 200) {
-        toast.success("Usuário deletado com sucesso!");
-        fetchUsuarios();
+        toast.success("Prospect deletado com sucesso!");
+        fetchProspect();
       } else {
-        toast.error("Erro ao deletar usuário");
+        toast.error("Erro ao deletar Prospect");
       }
     } catch {
-      toast.error("Erro ao deletar usuário");
+      toast.error("Erro ao deletar Prospect");
     }
   };
 
   // Editar
-  const editarUsuario = async (e, id) => {
+  const editarProspect = async (e, id) => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `http://localhost:3000/api/usuario/editar/${id}`,
+        `http://localhost:3000/api/cliente/editar/${id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -99,22 +112,29 @@ export const Usuarios = () => {
       );
 
       if (response.status === 200) {
-        toast.success("Usuário atualizado com sucesso!");
+        toast.success("Prospect atualizado com sucesso!");
         setFormData({
-          nome: "",
-          usuario: "",
+          nome_contato: "",
+          fantasiaEmpresa: "",
+          razaoSocialEmpresa: "",
           email: "",
-          senha: "",
           telefone: "",
+          status: "",
+          cidade: "",
+          bairro: "",
+          ruaEndereco: "",
+          numeroEndereco: "",
+          complemento: "",
+          cnpj_cpf: "",
         });
         setBotao(true);
-        fetchUsuarios();
+        fetchProspect();
         setMostrarFormulario(false);
       } else {
-        toast.error("Erro ao atualizar usuário");
+        toast.error("Erro ao atualizar produto");
       }
     } catch {
-      toast.error("Erro ao atualizar usuário");
+      toast.error("Erro ao atualizar produto");
     }
   };
 
@@ -122,7 +142,7 @@ export const Usuarios = () => {
     <div className="layout">
       <Navbar />
       <main className="content">
-        <h2>Gerenciamento de Usuários</h2>
+        <h2>Gerenciamento de Produtos</h2>
 
         {/* Botão principal */}
         {!mostrarFormulario && (
@@ -132,23 +152,32 @@ export const Usuarios = () => {
               setMostrarFormulario(true);
               setBotao(true);
               setFormData({
-                nome: "",
-                usuario: "",
+                nome_contato: "",
+                fantasiaEmpresa: "",
+                razaoSocialEmpresa: "",
                 email: "",
-                senha: "",
                 telefone: "",
+                status: "",
+                cidade: "",
+                bairro: "",
+                ruaEndereco: "",
+                numeroEndereco: "",
+                complemento: "",
+                cnpj_cpf: "",
               });
             }}
           >
-            + Criar Novo Usuário
+            + Criar Novo Produto
           </button>
         )}
 
         {/* Formulário aparece apenas quando clicar */}
         {mostrarFormulario && (
           <form
-            className="user-form"
-            onSubmit={botao ? criarUsuario : (e) => editarUsuario(e, IdUser)}
+            className="produto-form"
+            onSubmit={
+              botao ? criarProspect : (e) => editarProspect(e, IdProspect)
+            }
           >
             <input
               type="text"
@@ -160,44 +189,44 @@ export const Usuarios = () => {
               required
             />
             <input
-              type="text"
-              placeholder="Usuário"
-              value={formData.usuario}
+              type="number"
+              step="0.01"
+              placeholder="Preço"
+              value={formData.preco}
               onChange={(e) =>
-                setFormData({ ...formData, usuario: e.target.value })
+                setFormData({ ...formData, preco: e.target.value })
               }
               required
             />
             <input
-              type="email"
-              placeholder="Email"
-              value={formData.email}
+              type="number"
+              placeholder="Estoque"
+              value={formData.estoque}
               onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              required
-            />
-            <input
-              type="password"
-              placeholder="Senha"
-              value={formData.senha}
-              onChange={(e) =>
-                setFormData({ ...formData, senha: e.target.value })
+                setFormData({ ...formData, estoque: e.target.value })
               }
               required
             />
             <input
               type="text"
-              placeholder="Telefone"
-              value={formData.telefone}
+              placeholder="Categoria"
+              value={formData.categoria_id}
               onChange={(e) =>
-                setFormData({ ...formData, telefone: e.target.value })
+                setFormData({ ...formData, categoria_id: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Marca"
+              value={formData.marca_id}
+              onChange={(e) =>
+                setFormData({ ...formData, marca_id: e.target.value })
               }
             />
 
             <div className="botoes-form">
               <button type="submit">
-                {botao ? "Criar Usuário" : "Salvar Alterações"}
+                {botao ? "Criar Produto" : "Salvar Alterações"}
               </button>
               <button
                 type="button"
@@ -210,42 +239,39 @@ export const Usuarios = () => {
           </form>
         )}
 
-        {/* Lista de usuários */}
-        {users.length === 0 ? (
-          <p>Nenhum usuário encontrado.</p>
+        {prospects.length === 0 ? (
+          <p>Nenhum Produto encontrado.</p>
         ) : (
           <table className="user-table">
             <thead>
               <tr>
                 <th>Código</th>
                 <th>Nome</th>
-                <th>Usuário</th>
-                <th>Email</th>
-                <th>Telefone</th>
+                <th>Preço</th>
+                <th>Estoque</th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((u) => (
-                <tr key={u.id}>
-                  <td>{u.id}</td>
-                  <td>{u.nome}</td>
-                  <td>{u.usuario}</td>
-                  <td>{u.email}</td>
-                  <td>{u.telefone || "-"}</td>
+              {prospects.map((p) => (
+                <tr key={p.id}>
+                  <td>{p.id}</td>
+                  <td>{p.nome}</td>
+                  <td>{p.preco}</td>
+                  <td>{p.estoque}</td>
                   <td>
                     <button
                       className="button-editar"
                       onClick={() => {
                         setFormData({
-                          nome: u.nome,
-                          usuario: u.usuario,
-                          email: u.email,
-                          senha: u.senha,
-                          telefone: u.telefone || "",
+                          nome: p.nome,
+                          preco: p.preco,
+                          estoque: p.estoque,
+                          categoria_id: p.categoria_id || "",
+                          marca_id: p.marca_id || "",
                         });
                         setBotao(false);
-                        setIdUser(u.id);
+                        setIdProspect(p.id);
                         setMostrarFormulario(true);
                       }}
                     >
@@ -253,7 +279,7 @@ export const Usuarios = () => {
                     </button>
                     <button
                       className="button-excluir"
-                      onClick={() => excluirUsuario(u.id)}
+                      onClick={() => excluirProspect(p.id)}
                     >
                       Excluir
                     </button>
@@ -268,4 +294,4 @@ export const Usuarios = () => {
   );
 };
 
-export default Usuarios;
+export default Prospect;

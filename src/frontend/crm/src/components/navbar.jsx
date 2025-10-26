@@ -9,16 +9,16 @@ export function Navbar() {
         <div className="logo"></div>
         <ul className="nav-links">
           <li>
-            <Link to="/">Máquinas</Link>
+            <Link to="/home">Máquinas</Link>
           </li>
           <li>
             <Link to="/usuarios">Usuarios</Link>
           </li>
           <li>
-            <Link to="/Blog">Prospect</Link>
+            <Link to="/home">Prospect</Link>
           </li>
           <li>
-            <Link to="/sou-profissional">Produtos</Link>
+            <Link to="/produtos">Produtos</Link>
           </li>
         </ul>
       </nav>

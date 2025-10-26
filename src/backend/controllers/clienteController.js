@@ -112,7 +112,7 @@ async function deleteCliente(req, res) {
 
 export default {
   criarCliente,
-  modelCliente,
+  mostrarCliente,
   editarCliente,
   deleteCliente,
 };

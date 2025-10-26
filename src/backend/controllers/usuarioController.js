@@ -7,18 +7,11 @@ import { enviarEmail } from "../emailServer.js";
 async function criarUser(req, res) {
   try {
     const user = {
-      nome_contato: req.body.nome,
-      fantasiaEmpresa: req.body.usuario,
-      razaoSocialEmpresa: req.body.razaoSocialEmpresa || null,
+      nome: req.body.nome,
+      usuario: req.body.usuario,
+      senha: req.body.senha,
       email: req.body.email,
       telefone: req.body.telefone || null,
-      status: req.body.status,
-      cidade: req.body.cidade || null,
-      bairro: req.body.bairro || null,
-      ruaEndereço: req.body.ruaEndereço || null,
-      nomeEndereço: req.body.nomeEndereço || null,
-      complemento: req.body.complemento || null,
-      cnpj_cpf: req.body.cnpj_cpf,
     };
 
     if (!modelUsuario.sync().isPendig) {

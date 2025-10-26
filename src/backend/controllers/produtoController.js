@@ -60,10 +60,15 @@ async function listarProdutos(req, res) {
   try {
     const result = modelProduto.findAll();
 
-    if ((await result).length > 0) {
-      res.status(200).send({
-        msg: result,
-      });
+    if (result) {
+      result.then(
+        (dados) => {
+          res.status(200).send({ msg: dados });
+        },
+        (error) => {
+          onsole.error("Erro ao mostrar Usuários", error);
+        }
+      );
     } else {
       res.status(500).send({
         msg: `Erro ao listar produto, ${error}`,

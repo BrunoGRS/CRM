@@ -1,0 +1,122 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+/* Centraliza na tela */
+.login-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f9f7f3;
+}
+
+/* Caixa do login */
+.container-login {
+  background: #fff;
+  border-radius: 20px;
+  padding: 50px 40px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.container-login:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Textos */
+.container-login h3 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2d2d2d;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.container-login p {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+/* Inputs */
+.form-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #2d2d2d;
+}
+
+.form-control {
+  width: 100%;
+  height: 48px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0 15px;
+  font-size: 14px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #32d6c4;
+  box-shadow: 0 0 6px rgba(50, 214, 196, 0.4);
+  outline: none;
+}
+
+/* Senha + Ícone */
+.senha-container {
+  position: relative;
+}
+
+.toggle-senha {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  cursor: pointer;
+  color: #888;
+}
+
+/* Botão */
+.btn-login {
+  background-color: #472610;
+  border: none;
+  width: 100%;
+  height: 50px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-login:hover {
+  background-color: #a86436;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Link */
+.box-esqueceu {
+  text-align: center;
+  margin-top: 18px;
+}
+
+.box-esqueceu a {
+  font-size: 14px;
+  color: #27b4a8;
+  text-decoration: none;
+}
+
+.box-esqueceu a:hover {
+  text-decoration: underline;
+  color: #32d6c4;
+}

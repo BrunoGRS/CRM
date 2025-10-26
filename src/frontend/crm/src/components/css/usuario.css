@@ -1,0 +1,187 @@
+/* ===== Estilos Globais ===== */
+body {
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  background-color: #f6f7fb;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== Área Principal ===== */
+.main-content .content {
+  padding: 2rem;
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* ===== Título ===== */
+.content h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+  margin-left: 50px;
+}
+
+/* ===== Formulário ===== */
+.user-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1.5rem;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.user-form input {
+  flex: 1 1 180px;
+  padding: 0.7rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.user-form input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+/* ===== Botão de Ação ===== */
+.user-form button {
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.user-form button:hover {
+  background: #1e40af;
+  transform: scale(1.03);
+}
+
+/* ===== Tabela ===== */
+.user-table {
+  width: 70%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-left: 250px;
+}
+
+.user-table thead {
+  background: #f1f5f9;
+  color: #111827;
+  font-weight: 600;
+}
+
+.user-table th,
+.user-table td {
+  padding: 0.9rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.user-table tbody tr:hover {
+  background: #f9fafb;
+  transition: background 0.2s;
+}
+
+/* ===== Botões da Tabela ===== */
+.btn-criar-novo {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-left: 50px;
+  background-color: rgb(127, 247, 127);
+  margin-bottom: 20px;
+}
+
+.btn-criar-novo:hover {
+  background-color: rgb(65, 194, 65);
+  color: #fff;
+}
+
+.button-editar,
+.button-excluir {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Editar */
+.button-editar {
+  background-color: #eff6ff;
+  border: 1px solid #3b82f6;
+  color: #2563eb;
+}
+.button-editar:hover {
+  background-color: #2563eb;
+  color: #fff;
+}
+
+/* Excluir */
+.button-excluir {
+  background-color: #fef2f2;
+  border: 1px solid #ef4444;
+  color: #dc2626;
+  margin-left: 6px;
+}
+.button-excluir:hover {
+  background-color: #ef4444;
+  color: #fff;
+}
+
+/* ===== Mensagem Vazia ===== */
+.empty-message {
+  margin-top: 1rem;
+  color: #6b7280;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+/* ===== Responsividade ===== */
+@media (max-width: 768px) {
+  .user-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .user-form button {
+    width: 100%;
+  }
+
+  .user-table th,
+  .user-table td {
+    font-size: 0.8rem;
+    padding: 0.6rem;
+  }
+}

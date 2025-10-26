@@ -20,4 +20,4 @@ expressRouter.use("/categoria", routerCategoria);
 expressRouter.use("/marca", routerMarca);
 expressRouter.use("/produto", routerProduto);
 expressRouter.use("/cliente", routerCliente);
-expressRouter.use("/cliente", routerOportunidade);
+expressRouter.use("/oportunidade", routerOportunidade);
