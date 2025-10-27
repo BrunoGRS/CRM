@@ -5,6 +5,7 @@ import { Login } from "./components/login.jsx";
 import { Usuarios } from "./components/usuario.jsx";
 import { Body } from "./components/body.jsx";
 import { Produtos } from "./components/produtos.jsx";
+import { Prospect } from "./components/prospect.jsx";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -16,6 +17,7 @@ function App() {
         <Route path="/home" element={<Body />} />
         <Route path="/usuarios" element={<Usuarios />} />
         <Route path="/produtos" element={<Produtos />} />
+        <Route path="/prospect" element={<Prospect />} />
       </Routes>
     </Router>
   );

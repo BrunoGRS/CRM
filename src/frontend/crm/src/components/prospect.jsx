@@ -25,7 +25,6 @@ export const Prospect = () => {
   const [IdProspect, setIdProspect] = useState("");
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
-  // Criar Usuário
   const criarProspect = async (e) => {
     e.preventDefault();
     try {
@@ -36,7 +35,7 @@ export const Prospect = () => {
       });
 
       if (response.status === 201) {
-        toast.success("Cliente criado com sucesso!");
+        toast.success("Prospect criado com sucesso!");
         setFormData({
           nome_contato: "",
           fantasiaEmpresa: "",
@@ -54,10 +53,10 @@ export const Prospect = () => {
         fetchProspect();
         setMostrarFormulario(false);
       } else {
-        toast.error("Erro ao criar cliente");
+        toast.error("Erro ao criar prospects");
       }
     } catch {
-      toast.error("Erro ao criar cliente");
+      toast.error("Erro ao criar prospects");
     }
   };
 
@@ -131,10 +130,10 @@ export const Prospect = () => {
         fetchProspect();
         setMostrarFormulario(false);
       } else {
-        toast.error("Erro ao atualizar produto");
+        toast.error("Erro ao atualizar Prospect");
       }
     } catch {
-      toast.error("Erro ao atualizar produto");
+      toast.error("Erro ao atualizar Prospect");
     }
   };
 
@@ -142,7 +141,7 @@ export const Prospect = () => {
     <div className="layout">
       <Navbar />
       <main className="content">
-        <h2>Gerenciamento de Produtos</h2>
+        <h2>Gerenciamento de Prospect</h2>
 
         {/* Botão principal */}
         {!mostrarFormulario && (
@@ -167,7 +166,7 @@ export const Prospect = () => {
               });
             }}
           >
-            + Criar Novo Produto
+            + Criar Novo Prospect
           </button>
         )}
 
@@ -181,52 +180,109 @@ export const Prospect = () => {
           >
             <input
               type="text"
-              placeholder="Nome"
+              placeholder="CNPJ/CPF"
+              value={formData.cnpj_cpf}
+              onChange={(e) =>
+                setFormData({ ...formData, cnpj_cpf: e.target.value })
+              }
+            />
+
+            <input
+              type="text"
+              placeholder="Nome do Contato"
               value={formData.nome}
               onChange={(e) =>
-                setFormData({ ...formData, nome: e.target.value })
+                setFormData({ ...formData, nome_contato: e.target.value })
               }
               required
             />
             <input
-              type="number"
+              type="text"
               step="0.01"
-              placeholder="Preço"
-              value={formData.preco}
+              placeholder="Nome Fantasia"
+              value={formData.fantasiaEmpresa}
               onChange={(e) =>
-                setFormData({ ...formData, preco: e.target.value })
-              }
-              required
-            />
-            <input
-              type="number"
-              placeholder="Estoque"
-              value={formData.estoque}
-              onChange={(e) =>
-                setFormData({ ...formData, estoque: e.target.value })
+                setFormData({ ...formData, fantasiaEmpresa: e.target.value })
               }
               required
             />
             <input
               type="text"
-              placeholder="Categoria"
-              value={formData.categoria_id}
+              placeholder="Razão Social"
+              value={formData.razaoSocialEmpresa}
               onChange={(e) =>
-                setFormData({ ...formData, categoria_id: e.target.value })
+                setFormData({ ...formData, razaoSocialEmpresa: e.target.value })
+              }
+              required
+            />
+            <input
+              type="email"
+              placeholder="email"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+            />
+            <input
+              type="Number"
+              placeholder="Telefone"
+              value={formData.telefone}
+              onChange={(e) =>
+                setFormData({ ...formData, telefone: e.target.value })
               }
             />
             <input
               type="text"
-              placeholder="Marca"
-              value={formData.marca_id}
+              placeholder="Telefone"
+              value={formData.status}
               onChange={(e) =>
-                setFormData({ ...formData, marca_id: e.target.value })
+                setFormData({ ...formData, status: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Cidade"
+              value={formData.cidade}
+              onChange={(e) =>
+                setFormData({ ...formData, cidade: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Bairro"
+              value={formData.bairro}
+              onChange={(e) =>
+                setFormData({ ...formData, bairro: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Rua/Avenida"
+              value={formData.ruaEndereco}
+              onChange={(e) =>
+                setFormData({ ...formData, ruaEndereco: e.target.value })
+              }
+            />
+            <input
+              type="Number"
+              placeholder="Número"
+              value={formData.numeroEndereco}
+              onChange={(e) =>
+                setFormData({ ...formData, numeroEndereco: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Complemento"
+              value={formData.complemento}
+              onChange={(e) =>
+                setFormData({ ...formData, complemento: e.target.value })
               }
             />
 
             <div className="botoes-form">
               <button type="submit">
-                {botao ? "Criar Produto" : "Salvar Alterações"}
+                {botao ? "Criar Prospect" : "Salvar Alterações"}
               </button>
               <button
                 type="button"
@@ -240,35 +296,46 @@ export const Prospect = () => {
         )}
 
         {prospects.length === 0 ? (
-          <p>Nenhum Produto encontrado.</p>
+          <p>Nenhum Prospect encontrado.</p>
         ) : (
           <table className="user-table">
             <thead>
               <tr>
-                <th>Código</th>
-                <th>Nome</th>
-                <th>Preço</th>
-                <th>Estoque</th>
+                <th>CNPJ/CPF</th>
+                <th>Razão Social</th>
+                <th>Email</th>
+                <th>Telefone</th>
+                <th>Cidade</th>
+                <th>Bairro</th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody>
               {prospects.map((p) => (
                 <tr key={p.id}>
-                  <td>{p.id}</td>
-                  <td>{p.nome}</td>
-                  <td>{p.preco}</td>
-                  <td>{p.estoque}</td>
+                  <td>{p.cnpj_cpf}</td>
+                  <td>{p.razaoSocialEmpresa}</td>
+                  <td>{p.email}</td>
+                  <td>{p.telefone}</td>
+                  <td>{p.cidade}</td>
+                  <td>{p.bairro}</td>
                   <td>
                     <button
                       className="button-editar"
                       onClick={() => {
                         setFormData({
-                          nome: p.nome,
-                          preco: p.preco,
-                          estoque: p.estoque,
-                          categoria_id: p.categoria_id || "",
-                          marca_id: p.marca_id || "",
+                          nome_contato: p.nome_contato || "",
+                          fantasiaEmpresa: p.fantasiaEmpresa || "",
+                          razaoSocialEmpresa: p.razaoSocialEmpresa,
+                          email: p.email || "",
+                          telefone: p.telefone || "",
+                          status: p.status,
+                          cidade: p.cidade || "",
+                          bairro: p.bairro || "",
+                          ruaEndereco: p.ruaEndereco || "",
+                          numeroEndereco: p.numeroEndereco || "",
+                          complemento: p.complemento || "",
+                          cnpj_cpf: p.cnpj_cpf,
                         });
                         setBotao(false);
                         setIdProspect(p.id);
