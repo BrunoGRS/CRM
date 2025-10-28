@@ -16,9 +16,9 @@ export const Produtos = () => {
   });
   const [botao, setBotao] = useState(true);
   const [IdProduto, setIdProduto] = useState("");
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [mostrarModal, setMostrarModal] = useState(false);
 
-  // Criar Usuário
+  // Criar Produto
   const criarProduto = async (e) => {
     e.preventDefault();
     try {
@@ -37,8 +37,8 @@ export const Produtos = () => {
           categoria_id: "",
           marca_id: "",
         });
-        fetchUsuarios();
-        setMostrarFormulario(false);
+        fetchProdutos();
+        setMostrarModal(false);
       } else {
         toast.error("Erro ao criar produto");
       }
@@ -75,7 +75,7 @@ export const Produtos = () => {
 
       if (response.status === 200) {
         toast.success("Produto deletado com sucesso!");
-        fetchUsuarios();
+        fetchProdutos();
       } else {
         toast.error("Erro ao deletar produto");
       }
@@ -108,7 +108,7 @@ export const Produtos = () => {
         });
         setBotao(true);
         fetchProdutos();
-        setMostrarFormulario(false);
+        setMostrarModal(false);
       } else {
         toast.error("Erro ao atualizar produto");
       }
@@ -124,91 +124,24 @@ export const Produtos = () => {
         <h2>Gerenciamento de Produtos</h2>
 
         {/* Botão principal */}
-        {!mostrarFormulario && (
-          <button
-            className="btn-criar-novo"
-            onClick={() => {
-              setMostrarFormulario(true);
-              setBotao(true);
-              setFormData({
-                nome: "",
-                preco: "",
-                estoque: "",
-                categoria_id: "",
-                marca_id: "",
-              });
-            }}
-          >
-            + Criar Novo Produto
-          </button>
-        )}
+        <button
+          className="btn-criar-novo"
+          onClick={() => {
+            setMostrarModal(true);
+            setBotao(true);
+            setFormData({
+              nome: "",
+              preco: "",
+              estoque: "",
+              categoria_id: "",
+              marca_id: "",
+            });
+          }}
+        >
+          + Criar Novo Produto
+        </button>
 
-        {/* Formulário aparece apenas quando clicar */}
-        {mostrarFormulario && (
-          <form
-            className="produto-form"
-            onSubmit={botao ? criarProduto : (e) => editarProduto(e, IdProduto)}
-          >
-            <input
-              type="text"
-              placeholder="Nome"
-              value={formData.nome}
-              onChange={(e) =>
-                setFormData({ ...formData, nome: e.target.value })
-              }
-              required
-            />
-            <input
-              type="number"
-              step="0.01"
-              placeholder="Preço"
-              value={formData.preco}
-              onChange={(e) =>
-                setFormData({ ...formData, preco: e.target.value })
-              }
-              required
-            />
-            <input
-              type="number"
-              placeholder="Estoque"
-              value={formData.estoque}
-              onChange={(e) =>
-                setFormData({ ...formData, estoque: e.target.value })
-              }
-              required
-            />
-            <input
-              type="text"
-              placeholder="Categoria"
-              value={formData.categoria_id}
-              onChange={(e) =>
-                setFormData({ ...formData, categoria_id: e.target.value })
-              }
-            />
-            <input
-              type="text"
-              placeholder="Marca"
-              value={formData.marca_id}
-              onChange={(e) =>
-                setFormData({ ...formData, marca_id: e.target.value })
-              }
-            />
-
-            <div className="botoes-form">
-              <button type="submit">
-                {botao ? "Criar Produto" : "Salvar Alterações"}
-              </button>
-              <button
-                type="button"
-                className="btn-cancelar"
-                onClick={() => setMostrarFormulario(false)}
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
-        )}
-
+        {/* Tabela */}
         {produtos.length === 0 ? (
           <p>Nenhum Produto encontrado.</p>
         ) : (
@@ -242,7 +175,7 @@ export const Produtos = () => {
                         });
                         setBotao(false);
                         setIdProduto(p.id);
-                        setMostrarFormulario(true);
+                        setMostrarModal(true);
                       }}
                     >
                       Editar
@@ -258,6 +191,92 @@ export const Produtos = () => {
               ))}
             </tbody>
           </table>
+        )}
+
+        {/* MODAL */}
+        {mostrarModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h3>{botao ? "Novo Produto" : "Editar Produto"}</h3>
+                <button
+                  className="modal-close"
+                  onClick={() => setMostrarModal(false)}
+                >
+                  ×
+                </button>
+              </div>
+
+              <form
+                className="produto-form"
+                onSubmit={
+                  botao ? criarProduto : (e) => editarProduto(e, IdProduto)
+                }
+              >
+                <label>Nome</label>
+                <input
+                  type="text"
+                  value={formData.nome}
+                  onChange={(e) =>
+                    setFormData({ ...formData, nome: e.target.value })
+                  }
+                  required
+                />
+
+                <label>Preço</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formData.preco}
+                  onChange={(e) =>
+                    setFormData({ ...formData, preco: e.target.value })
+                  }
+                  required
+                />
+
+                <label>Estoque</label>
+                <input
+                  type="number"
+                  value={formData.estoque}
+                  onChange={(e) =>
+                    setFormData({ ...formData, estoque: e.target.value })
+                  }
+                  required
+                />
+
+                <label>Categoria</label>
+                <input
+                  type="text"
+                  value={formData.categoria_id}
+                  onChange={(e) =>
+                    setFormData({ ...formData, categoria_id: e.target.value })
+                  }
+                />
+
+                <label>Marca</label>
+                <input
+                  type="text"
+                  value={formData.marca_id}
+                  onChange={(e) =>
+                    setFormData({ ...formData, marca_id: e.target.value })
+                  }
+                />
+
+                <div className="botoes-form">
+                  <button type="submit">
+                    {botao ? "Salvar Produto" : "Salvar Alterações"}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-cancelar"
+                    onClick={() => setMostrarModal(false)}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         )}
       </main>
     </div>

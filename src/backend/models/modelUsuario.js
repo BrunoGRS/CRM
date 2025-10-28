@@ -30,6 +30,10 @@ export default db.define(
       type: Sequelize.STRING,
       allowNull: true,
     },
+    IdPermissao: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
   },
   {
     timestamps: true,

@@ -13,19 +13,46 @@ export const Usuarios = () => {
     email: "",
     senha: "",
     telefone: "",
+    IdPermissao: "",
   });
   const [botao, setBotao] = useState(true);
   const [IdUser, setIdUser] = useState("");
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [value, setValue] = useState("");
 
-  // Criar Usuário
+  // --- Funções auxiliares ---
+  const onlyNumbers = (value) => value.replace(/\D/g, "");
+
+  // Máscara simples de telefone (aceita formatos 8 e 9 dígitos)
+  const formatPhone = (value) => {
+    const digits = onlyNumbers(value);
+
+    if (digits.length <= 10) {
+      // (99) 9999-9999
+      return digits
+        .replace(/^(\d{2})(\d)/, "($1) $2")
+        .replace(/(\d{4})(\d)/, "$1-$2");
+    } else {
+      // (99) 99999-9999
+      return digits
+        .replace(/^(\d{2})(\d)/, "($1) $2")
+        .replace(/(\d{5})(\d)/, "$1-$2");
+    }
+  };
+
+  // --- Criar Usuário ---
   const criarUsuario = async (e) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...formData,
+        telefone: onlyNumbers(formData.telefone), // envia só números
+      };
+
       const response = await fetch("http://localhost:3000/api/usuario/criar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (response.status === 201) {
@@ -36,6 +63,7 @@ export const Usuarios = () => {
           email: "",
           senha: "",
           telefone: "",
+          IdPermissao: "",
         });
         fetchUsuarios();
         setMostrarFormulario(false);
@@ -47,7 +75,7 @@ export const Usuarios = () => {
     }
   };
 
-  // Listar Usuários
+  // --- Listar Usuários ---
   const fetchUsuarios = async () => {
     try {
       const response = await fetch("http://localhost:3000/api/usuario/listar");
@@ -63,7 +91,7 @@ export const Usuarios = () => {
     fetchUsuarios();
   }, []);
 
-  // Excluir
+  // --- Excluir Usuário ---
   const excluirUsuario = async (id) => {
     try {
       const response = await fetch(
@@ -85,16 +113,21 @@ export const Usuarios = () => {
     }
   };
 
-  // Editar
+  // --- Editar Usuário ---
   const editarUsuario = async (e, id) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...formData,
+        telefone: onlyNumbers(formData.telefone),
+      };
+
       const response = await fetch(
         `http://localhost:3000/api/usuario/editar/${id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload),
         }
       );
 
@@ -106,6 +139,7 @@ export const Usuarios = () => {
           email: "",
           senha: "",
           telefone: "",
+          IdPermissao: "",
         });
         setBotao(true);
         fetchUsuarios();
@@ -137,6 +171,7 @@ export const Usuarios = () => {
                 email: "",
                 senha: "",
                 telefone: "",
+                IdPermissao: "",
               });
             }}
           >
@@ -146,68 +181,97 @@ export const Usuarios = () => {
 
         {/* Formulário aparece apenas quando clicar */}
         {mostrarFormulario && (
-          <form
-            className="user-form"
-            onSubmit={botao ? criarUsuario : (e) => editarUsuario(e, IdUser)}
-          >
-            <input
-              type="text"
-              placeholder="Nome"
-              value={formData.nome}
-              onChange={(e) =>
-                setFormData({ ...formData, nome: e.target.value })
-              }
-              required
-            />
-            <input
-              type="text"
-              placeholder="Usuário"
-              value={formData.usuario}
-              onChange={(e) =>
-                setFormData({ ...formData, usuario: e.target.value })
-              }
-              required
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              required
-            />
-            <input
-              type="password"
-              placeholder="Senha"
-              value={formData.senha}
-              onChange={(e) =>
-                setFormData({ ...formData, senha: e.target.value })
-              }
-              required
-            />
-            <input
-              type="text"
-              placeholder="Telefone"
-              value={formData.telefone}
-              onChange={(e) =>
-                setFormData({ ...formData, telefone: e.target.value })
-              }
-            />
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h3>{botao ? "Novo Usuário" : "Editar Usuário"}</h3>
 
-            <div className="botoes-form">
-              <button type="submit">
-                {botao ? "Criar Usuário" : "Salvar Alterações"}
-              </button>
-              <button
-                type="button"
-                className="btn-cancelar"
-                onClick={() => setMostrarFormulario(false)}
+              <form
+                className="produto-form"
+                onSubmit={
+                  botao ? criarUsuario : (e) => editarUsuario(e, IdUser)
+                }
               >
-                Cancelar
-              </button>
+                <input
+                  type="text"
+                  placeholder="Nome"
+                  value={formData.nome}
+                  onChange={(e) =>
+                    setFormData({ ...formData, nome: e.target.value })
+                  }
+                  required
+                />
+
+                <input
+                  type="text"
+                  placeholder="Usuário"
+                  value={formData.usuario}
+                  onChange={(e) =>
+                    setFormData({ ...formData, usuario: e.target.value })
+                  }
+                  required
+                />
+
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  required
+                />
+
+                <input
+                  type="password"
+                  placeholder="Senha"
+                  value={formData.senha}
+                  onChange={(e) =>
+                    setFormData({ ...formData, senha: e.target.value })
+                  }
+                  required
+                />
+
+                <input
+                  type="text"
+                  placeholder="Telefone"
+                  value={formData.telefone}
+                  maxLength={15}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      telefone: formatPhone(e.target.value),
+                    })
+                  }
+                />
+
+                <select
+                  value={formData.IdPermissao || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, IdPermissao: e.target.value })
+                  }
+                  required
+                >
+                  <option value="">Selecione uma permissão</option>
+                  <option value="1">Administrador</option>
+                  <option value="2">Vendedor</option>
+                  <option value="3">Cliente</option>
+                </select>
+
+                <div className="botoes-form">
+                  <button type="submit">
+                    {botao ? "Criar Usuário" : "Salvar Alterações"}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-cancelar"
+                    onClick={() => setMostrarFormulario(false)}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         )}
 
         {/* Lista de usuários */}
@@ -222,6 +286,7 @@ export const Usuarios = () => {
                 <th>Usuário</th>
                 <th>Email</th>
                 <th>Telefone</th>
+                <th>Permissão</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -232,7 +297,8 @@ export const Usuarios = () => {
                   <td>{u.nome}</td>
                   <td>{u.usuario}</td>
                   <td>{u.email}</td>
-                  <td>{u.telefone || "-"}</td>
+                  <td>{u.telefone ? formatPhone(u.telefone) : "-"}</td>
+                  <th>{u.Permissao}</th>
                   <td>
                     <button
                       className="button-editar"
@@ -242,7 +308,8 @@ export const Usuarios = () => {
                           usuario: u.usuario,
                           email: u.email,
                           senha: u.senha,
-                          telefone: u.telefone || "",
+                          telefone: formatPhone(u.telefone || ""),
+                          IdPermissao: u.IdPermissao,
                         });
                         setBotao(false);
                         setIdUser(u.id);

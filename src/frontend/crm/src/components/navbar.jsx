@@ -20,6 +20,15 @@ export function Navbar() {
           <li>
             <Link to="/produtos">Produtos</Link>
           </li>
+          <li>
+            <Link to="/produtos">Venda</Link>
+          </li>
+          <li>
+            <Link to="/produtos">Dashboard</Link>
+          </li>
+          <li>
+            <Link to="/produtos">Relatórios</Link>
+          </li>
         </ul>
       </nav>
     </section>

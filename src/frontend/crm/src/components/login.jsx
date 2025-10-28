@@ -32,7 +32,7 @@ export const Login = () => {
     e.preventDefault();
     const status = await validarUsuario();
     if (status === 200) {
-      navigate("/page");
+      navigate("/home");
     } else {
       toast.error("Usuário ou Senha Inválidos.");
     }

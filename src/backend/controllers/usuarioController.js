@@ -3,6 +3,7 @@ import modelUsuario from "../models/modelUsuario.js";
 import { Sequelize } from "sequelize";
 import crypto from "crypto";
 import { enviarEmail } from "../emailServer.js";
+import { info } from "console";
 
 async function criarUser(req, res) {
   try {
@@ -12,6 +13,7 @@ async function criarUser(req, res) {
       senha: req.body.senha,
       email: req.body.email,
       telefone: req.body.telefone || null,
+      IdPermissao: req.body.IdPermissao,
     };
 
     if (!modelUsuario.sync().isPendig) {
@@ -40,7 +42,8 @@ async function editarUser(req, res) {
             (dado.usuario = req.body.usuario),
             (dado.senha = req.body.senha),
             (dado.email = req.body.email),
-            (dado.telefone = req.body.telefone || null);
+            (dado.telefone = req.body.telefone || null),
+            (dado.IdPermissao = req.body.IdPermissao);
 
           if (dado.save() != null) {
             res.status(200).send({
@@ -60,20 +63,20 @@ async function editarUser(req, res) {
 
 async function mostrarUser(req, res) {
   try {
-    let user = modelUsuario.findAll();
+    const [rows] = await db.query(`
+      SELECT u.id, u.nome, u.usuario, u.senha, u.email, u.telefone, p.nome AS Permissao
+      FROM usuario u
+      LEFT JOIN permissao p ON p.Id = u.IdPermissao
+    `);
 
-    if (user) {
-      user.then(
-        (dados) => {
-          res.status(200).send({ msg: dados });
-        },
-        (error) => {
-          onsole.error("Erro ao mostrar Usuários", error);
-        }
-      );
+    if (rows.length > 0) {
+      res.status(200).send({ msg: rows });
+    } else {
+      res.status(404).send({ msg: false });
     }
   } catch (error) {
     console.error("Erro ao mostrar Usuários", error);
+    res.status(404).send({ msg: false });
   }
 }
 
@@ -116,8 +119,6 @@ async function validarUser(req, res) {
         type: Sequelize.QueryTypes.SELECT,
       }
     );
-
-    console.log(info);
 
     if (info.length > 0) {
       res.status(200).send({ msg: true });

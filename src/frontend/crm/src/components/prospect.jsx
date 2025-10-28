@@ -24,48 +24,81 @@ export const Prospect = () => {
   const [botao, setBotao] = useState(true);
   const [IdProspect, setIdProspect] = useState("");
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [value, setValue] = useState("");
+
+  function formatCpfCnpj(value) {
+    // Remove tudo que não é número
+    const onlyNumbers = value.replace(/\D/g, "");
+
+    // CPF: 11 dígitos, CNPJ: 14 dígitos
+    if (onlyNumbers.length <= 11) {
+      // Formata como CPF: 999.999.999-99
+      return onlyNumbers
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    } else {
+      // Formata como CNPJ: 99.999.999/9999-99
+      return onlyNumbers
+        .replace(/^(\d{2})(\d)/, "$1.$2")
+        .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+        .replace(/\.(\d{3})(\d)/, ".$1/$2")
+        .replace(/(\d{4})(\d{1,2})$/, "$1-$2");
+    }
+  }
+
+  const onlyNumbers = (value) => value.replace(/\D/g, "");
 
   const criarProspect = async (e) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...formData,
+        cnpj_cpf: onlyNumbers(formData.cnpj_cpf),
+      };
+
       const response = await fetch("http://localhost:3000/api/cliente/criar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (response.status === 201) {
-        toast.success("Prospect criado com sucesso!");
-        setFormData({
-          nome_contato: "",
-          fantasiaEmpresa: "",
-          razaoSocialEmpresa: "",
-          email: "",
-          telefone: "",
-          status: "",
-          cidade: "",
-          bairro: "",
-          ruaEndereco: "",
-          numeroEndereco: "",
-          complemento: "",
-          cnpj_cpf: "",
-        });
+        limparFormulario();
         fetchProspect();
         setMostrarFormulario(false);
+        toast.success("Prospect criado com sucesso!");
       } else {
-        toast.error("Erro ao criar prospects");
+        toast.error("Erro ao criar prospect");
       }
     } catch {
-      toast.error("Erro ao criar prospects");
+      toast.error("Erro ao criar prospect");
     }
+  };
+
+  const limparFormulario = () => {
+    setFormData({
+      nome_contato: "",
+      fantasiaEmpresa: "",
+      razaoSocialEmpresa: "",
+      email: "",
+      telefone: "",
+      status: "",
+      cidade: "",
+      bairro: "",
+      ruaEndereco: "",
+      numeroEndereco: "",
+      complemento: "",
+      cnpj_cpf: "",
+    });
   };
 
   const fetchProspect = async () => {
     try {
       const response = await fetch("http://localhost:3000/api/cliente/listar");
       const inf = await response.json();
-      const listaProdutos = Array.isArray(inf.msg) ? inf.msg : [];
-      setProspects(listaProdutos);
+      const lista = Array.isArray(inf.msg) ? inf.msg : [];
+      setProspects(lista);
     } catch {
       toast.error("Erro ao listar prospects");
     }
@@ -75,65 +108,52 @@ export const Prospect = () => {
     fetchProspect();
   }, []);
 
-  // Excluir
   const excluirProspect = async (id) => {
     try {
       const response = await fetch(
         `http://localhost:3000/api/cliente/delete/${id}`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        }
+        { method: "DELETE", headers: { "Content-Type": "application/json" } }
       );
 
       if (response.status === 200) {
         toast.success("Prospect deletado com sucesso!");
         fetchProspect();
       } else {
-        toast.error("Erro ao deletar Prospect");
+        toast.error("Erro ao deletar prospect");
       }
     } catch {
-      toast.error("Erro ao deletar Prospect");
+      toast.error("Erro ao deletar prospect");
     }
   };
 
-  // Editar
   const editarProspect = async (e, id) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...formData,
+        cnpj_cpf: onlyNumbers(formData.cnpj_cpf),
+      };
+
       const response = await fetch(
         `http://localhost:3000/api/cliente/editar/${id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload),
         }
       );
 
       if (response.status === 200) {
         toast.success("Prospect atualizado com sucesso!");
-        setFormData({
-          nome_contato: "",
-          fantasiaEmpresa: "",
-          razaoSocialEmpresa: "",
-          email: "",
-          telefone: "",
-          status: "",
-          cidade: "",
-          bairro: "",
-          ruaEndereco: "",
-          numeroEndereco: "",
-          complemento: "",
-          cnpj_cpf: "",
-        });
+        limparFormulario();
         setBotao(true);
         fetchProspect();
         setMostrarFormulario(false);
       } else {
-        toast.error("Erro ao atualizar Prospect");
+        toast.error("Erro ao atualizar prospect");
       }
     } catch {
-      toast.error("Erro ao atualizar Prospect");
+      toast.error("Erro ao atualizar prospect");
     }
   };
 
@@ -144,155 +164,155 @@ export const Prospect = () => {
         <h2>Gerenciamento de Prospect</h2>
 
         {/* Botão principal */}
-        {!mostrarFormulario && (
-          <button
-            className="btn-criar-novo"
-            onClick={() => {
-              setMostrarFormulario(true);
-              setBotao(true);
-              setFormData({
-                nome_contato: "",
-                fantasiaEmpresa: "",
-                razaoSocialEmpresa: "",
-                email: "",
-                telefone: "",
-                status: "",
-                cidade: "",
-                bairro: "",
-                ruaEndereco: "",
-                numeroEndereco: "",
-                complemento: "",
-                cnpj_cpf: "",
-              });
-            }}
-          >
-            + Criar Novo Prospect
-          </button>
-        )}
+        <button
+          className="btn-criar-novo"
+          onClick={() => {
+            setMostrarFormulario(true);
+            setBotao(true);
+            limparFormulario();
+          }}
+        >
+          + Criar Novo Prospect
+        </button>
 
-        {/* Formulário aparece apenas quando clicar */}
+        {/* Modal do formulário */}
         {mostrarFormulario && (
-          <form
-            className="produto-form"
-            onSubmit={
-              botao ? criarProspect : (e) => editarProspect(e, IdProspect)
-            }
-          >
-            <input
-              type="text"
-              placeholder="CNPJ/CPF"
-              value={formData.cnpj_cpf}
-              onChange={(e) =>
-                setFormData({ ...formData, cnpj_cpf: e.target.value })
-              }
-            />
-
-            <input
-              type="text"
-              placeholder="Nome do Contato"
-              value={formData.nome}
-              onChange={(e) =>
-                setFormData({ ...formData, nome_contato: e.target.value })
-              }
-              required
-            />
-            <input
-              type="text"
-              step="0.01"
-              placeholder="Nome Fantasia"
-              value={formData.fantasiaEmpresa}
-              onChange={(e) =>
-                setFormData({ ...formData, fantasiaEmpresa: e.target.value })
-              }
-              required
-            />
-            <input
-              type="text"
-              placeholder="Razão Social"
-              value={formData.razaoSocialEmpresa}
-              onChange={(e) =>
-                setFormData({ ...formData, razaoSocialEmpresa: e.target.value })
-              }
-              required
-            />
-            <input
-              type="email"
-              placeholder="email"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-            />
-            <input
-              type="Number"
-              placeholder="Telefone"
-              value={formData.telefone}
-              onChange={(e) =>
-                setFormData({ ...formData, telefone: e.target.value })
-              }
-            />
-            <input
-              type="text"
-              placeholder="Telefone"
-              value={formData.status}
-              onChange={(e) =>
-                setFormData({ ...formData, status: e.target.value })
-              }
-            />
-            <input
-              type="text"
-              placeholder="Cidade"
-              value={formData.cidade}
-              onChange={(e) =>
-                setFormData({ ...formData, cidade: e.target.value })
-              }
-            />
-            <input
-              type="text"
-              placeholder="Bairro"
-              value={formData.bairro}
-              onChange={(e) =>
-                setFormData({ ...formData, bairro: e.target.value })
-              }
-            />
-            <input
-              type="text"
-              placeholder="Rua/Avenida"
-              value={formData.ruaEndereco}
-              onChange={(e) =>
-                setFormData({ ...formData, ruaEndereco: e.target.value })
-              }
-            />
-            <input
-              type="Number"
-              placeholder="Número"
-              value={formData.numeroEndereco}
-              onChange={(e) =>
-                setFormData({ ...formData, numeroEndereco: e.target.value })
-              }
-            />
-            <input
-              type="text"
-              placeholder="Complemento"
-              value={formData.complemento}
-              onChange={(e) =>
-                setFormData({ ...formData, complemento: e.target.value })
-              }
-            />
-
-            <div className="botoes-form">
-              <button type="submit">
-                {botao ? "Criar Prospect" : "Salvar Alterações"}
-              </button>
-              <button
-                type="button"
-                className="btn-cancelar"
-                onClick={() => setMostrarFormulario(false)}
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h3>{botao ? "Novo Prospect" : "Editar Prospect"}</h3>
+              <form
+                className="produto-form"
+                onSubmit={
+                  botao ? criarProspect : (e) => editarProspect(e, IdProspect)
+                }
               >
-                Cancelar
-              </button>
+                <input
+                  type="text"
+                  placeholder="CPF/CNPJ"
+                  value={formData.cnpj_cpf}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      cnpj_cpf: formatCpfCnpj(e.target.value),
+                    })
+                  }
+                  maxLength={18}
+                  required
+                />
+
+                <input
+                  type="text"
+                  placeholder="Nome do Contato"
+                  value={formData.nome_contato}
+                  onChange={(e) =>
+                    setFormData({ ...formData, nome_contato: e.target.value })
+                  }
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Nome Fantasia"
+                  value={formData.fantasiaEmpresa}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      fantasiaEmpresa: e.target.value,
+                    })
+                  }
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Razão Social"
+                  value={formData.razaoSocialEmpresa}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      razaoSocialEmpresa: e.target.value,
+                    })
+                  }
+                  required
+                />
+                <input
+                  type="email"
+                  placeholder="E-mail"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                />
+                <input
+                  type="number"
+                  placeholder="Telefone"
+                  value={formData.telefone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, telefone: e.target.value })
+                  }
+                />
+                <input
+                  type="text"
+                  placeholder="Status"
+                  value={formData.status}
+                  onChange={(e) =>
+                    setFormData({ ...formData, status: e.target.value })
+                  }
+                />
+                <input
+                  type="text"
+                  placeholder="Cidade"
+                  value={formData.cidade}
+                  onChange={(e) =>
+                    setFormData({ ...formData, cidade: e.target.value })
+                  }
+                />
+                <input
+                  type="text"
+                  placeholder="Bairro"
+                  value={formData.bairro}
+                  onChange={(e) =>
+                    setFormData({ ...formData, bairro: e.target.value })
+                  }
+                />
+                <input
+                  type="text"
+                  placeholder="Rua/Avenida"
+                  value={formData.ruaEndereco}
+                  onChange={(e) =>
+                    setFormData({ ...formData, ruaEndereco: e.target.value })
+                  }
+                />
+                <input
+                  type="number"
+                  placeholder="Número"
+                  value={formData.numeroEndereco}
+                  onChange={(e) =>
+                    setFormData({ ...formData, numeroEndereco: e.target.value })
+                  }
+                />
+                <input
+                  type="text"
+                  placeholder="Complemento"
+                  value={formData.complemento}
+                  onChange={(e) =>
+                    setFormData({ ...formData, complemento: e.target.value })
+                  }
+                />
+
+                <div className="botoes-form">
+                  <button type="submit">
+                    {botao ? "Criar Prospect" : "Salvar Alterações"}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-cancelar"
+                    onClick={() => setMostrarFormulario(false)}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         )}
 
         {prospects.length === 0 ? (
