@@ -254,7 +254,7 @@ export const Usuarios = () => {
                   <option value="">Selecione uma permissão</option>
                   <option value="1">Administrador</option>
                   <option value="2">Vendedor</option>
-                  <option value="3">Cliente</option>
+                  <option value="3">Manutenção</option>
                 </select>
 
                 <div className="botoes-form">

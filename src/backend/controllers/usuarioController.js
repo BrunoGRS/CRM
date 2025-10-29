@@ -113,7 +113,7 @@ async function validarUser(req, res) {
     };
 
     info = await db.query(
-      `SELECT usuario, senha FROM usuario WHERE usuario = ? AND senha = ?`,
+      `SELECT usuario, senha FROM usuario WHERE usuario = ? AND senha = ? and IdPermissao = 1`,
       {
         replacements: [user.usuario, user.senha],
         type: Sequelize.QueryTypes.SELECT,
