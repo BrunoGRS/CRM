@@ -7,31 +7,31 @@ export function Body() {
   return (
     <section className="body-container">
       <Navbar />
+
       {/* Banner Inicial */}
       <section className="inicio">
         <div className="imagem-prof">
-          <h2>Profissionais de Saúde Online</h2>
+          <h2>CRM Brasitalia</h2>
           <p>
-            Encontre o atendimento ideal para você de forma rápida e segura.
+            Tecnologia e relacionamento unindo tradição e excelência no mercado de café.
           </p>
-          <Link to="/profissionais">
-            <button className="btn">Encontrar Agora</button>
+          <Link to="/clientes">
+            <button className="btn">Acessar Plataforma</button>
           </Link>
         </div>
       </section>
 
-      {/* Sobre Nós */}
+      {/* Sobre o CRM */}
       <section className="about-us">
         <div className="about-text">
-          <h2>Sobre Nós</h2>
+          <h2>Sobre o CRM</h2>
           <p>
-            Nossa plataforma conecta você aos melhores médicos, psicólogos,
-            fisioterapeutas e muitos outros profissionais da área da saúde.
-            Garantimos qualidade, acessibilidade e facilidade no agendamento.
+            O CRM Brasitalia é uma plataforma desenvolvida para aprimorar a gestão de relacionamentos
+            com clientes, distribuidores e parceiros da marca. 
           </p>
           <p>
-            Mais de <strong>10.000 atendimentos</strong> já realizados com
-            satisfação comprovada!
+            Integrando dados, comunicação e histórico de vendas, o sistema oferece uma visão completa do cliente
+            e fortalece o compromisso da Brasitalia com qualidade e proximidade no atendimento.
           </p>
         </div>
         <div className="foto"></div>
@@ -41,43 +41,44 @@ export function Body() {
       <section className="how-works">
         <div className="how-works-title">
           <h2>
-            <span className="highlight">Como funciona nosso atendimento?</span>
+            <span className="highlight">Como o CRM impulsiona a Brasitalia</span>
           </h2>
         </div>
         <div className="how-works-text">
           <p>
-            Nossa plataforma facilita a interação entre{" "}
-            <span className="highlight-cliente">clientes</span> e{" "}
-            <span className="highlight-prestador">profissionais de saúde</span>.
-            Você pode:
+            A plataforma foi desenvolvida para integrar os processos de relacionamento e vendas,
+            facilitando o trabalho de toda a equipe comercial. Com o CRM, é possível:
           </p>
           <ul>
-            <li>Pesquisar profissionais por especialidade ou localização;</li>
-            <li>Visualizar avaliações e recomendações de outros usuários;</li>
-            <li>Agendar consultas de forma simples e rápida;</li>
-            <li>Participar de atendimentos online via vídeo ou chat.</li>
+            <li>Registrar informações detalhadas de clientes e contatos;</li>
+            <li>Gerenciar pedidos, histórico e acompanhamento de vendas;</li>
+            <li>Organizar oportunidades e tarefas da equipe comercial;</li>
+            <li>Gerar relatórios estratégicos e indicadores de desempenho.</li>
           </ul>
         </div>
       </section>
 
       {/* Benefícios */}
       <section className="benefits">
-        <h2>Por que escolher a nossa plataforma?</h2>
+        <h2>Principais Benefícios</h2>
         <div className="benefits-list">
           <div className="benefit-item">
-            <h3>Atendimento Rápido</h3>
-            <p>Agende consultas em poucos minutos, sem burocracia.</p>
-          </div>
-          <div className="benefit-item">
-            <h3>Profissionais Qualificados</h3>
+            <h3>Gestão Integrada</h3>
             <p>
-              Trabalhamos apenas com especialistas verificados e com
-              experiência.
+              Todos os dados centralizados em um único ambiente, facilitando a tomada de decisões.
             </p>
           </div>
           <div className="benefit-item">
-            <h3>Flexibilidade de Horários</h3>
-            <p>Escolha o melhor horário conforme sua disponibilidade.</p>
+            <h3>Produtividade e Eficiência</h3>
+            <p>
+              Automatiza tarefas e simplifica o fluxo de trabalho entre setores.
+            </p>
+          </div>
+          <div className="benefit-item">
+            <h3>Relacionamento Duradouro</h3>
+            <p>
+              Fortalece a conexão entre a Brasitalia e seus clientes, garantindo um atendimento personalizado e ágil.
+            </p>
           </div>
         </div>
       </section>

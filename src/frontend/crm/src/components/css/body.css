@@ -7,7 +7,7 @@
 
 /* --- Initial Banner Section --- */
 .inicio {
-  background-image: url("https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop"); /* Replace with your desired image */
+  background-image: url("https://images.unsplash.com/photo-1447933601403-0c6688de566e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1061"); /* Replace with your desired image */
   background-size: cover;
   background-position: center;
   height: 80vh; /* Takes up 80% of the viewport height */
@@ -96,7 +96,7 @@
 .foto {
   flex: 1; /* Takes up the other half */
   height: 400px;
-  background-image: url("https://images.unsplash.com/photo-1550831107-1553da8c8464?q=80&w=1887&auto=format&fit=crop"); /* Replace with a picture of your team or office */
+  background-image: url("https://images.unsplash.com/photo-1573703748442-3ba6f4203172?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHRyYWJhbGhhbmRvJTIwY29tJTIwY2FmJUMzJUE5fGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600"); /* Replace with a picture of your team or office */
   background-size: cover;
   background-position: center;
   border-radius: 20px;
