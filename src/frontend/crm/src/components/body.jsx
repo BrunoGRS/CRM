@@ -13,7 +13,8 @@ export function Body() {
         <div className="imagem-prof">
           <h2>CRM Brasitalia</h2>
           <p>
-            Tecnologia e relacionamento unindo tradição e excelência no mercado de café.
+            Tecnologia e relacionamento unindo tradição e excelência no mercado
+            de café.
           </p>
           <Link to="/clientes">
             <button className="btn">Acessar Plataforma</button>
@@ -26,12 +27,14 @@ export function Body() {
         <div className="about-text">
           <h2>Sobre o CRM</h2>
           <p>
-            O CRM Brasitalia é uma plataforma desenvolvida para aprimorar a gestão de relacionamentos
-            com clientes, distribuidores e parceiros da marca. 
+            O CRM Brasitalia é uma plataforma desenvolvida para aprimorar a
+            gestão de relacionamentos com clientes, distribuidores e parceiros
+            da marca.
           </p>
           <p>
-            Integrando dados, comunicação e histórico de vendas, o sistema oferece uma visão completa do cliente
-            e fortalece o compromisso da Brasitalia com qualidade e proximidade no atendimento.
+            Integrando dados, comunicação e histórico de vendas, o sistema
+            oferece uma visão completa do cliente e fortalece o compromisso da
+            Brasitalia com qualidade e proximidade no atendimento.
           </p>
         </div>
         <div className="foto"></div>
@@ -41,19 +44,21 @@ export function Body() {
       <section className="how-works">
         <div className="how-works-title">
           <h2>
-            <span className="highlight">Como o CRM impulsiona a Brasitalia</span>
+            <span className="highlight">
+              Como o CRM impulsiona a Brasitalia
+            </span>
           </h2>
         </div>
         <div className="how-works-text">
           <p>
-            A plataforma foi desenvolvida para integrar os processos de relacionamento e vendas,
-            facilitando o trabalho de toda a equipe comercial. Com o CRM, é possível:
+            A plataforma foi desenvolvida para integrar os processos de
+            relacionamento e vendas, facilitando o trabalho de toda a equipe
+            comercial. Com o CRM, é possível:
           </p>
           <ul>
             <li>Registrar informações detalhadas de clientes e contatos;</li>
             <li>Gerenciar pedidos, histórico e acompanhamento de vendas;</li>
             <li>Organizar oportunidades e tarefas da equipe comercial;</li>
-            <li>Gerar relatórios estratégicos e indicadores de desempenho.</li>
           </ul>
         </div>
       </section>
@@ -65,7 +70,8 @@ export function Body() {
           <div className="benefit-item">
             <h3>Gestão Integrada</h3>
             <p>
-              Todos os dados centralizados em um único ambiente, facilitando a tomada de decisões.
+              Todos os dados centralizados em um único ambiente, facilitando a
+              tomada de decisões.
             </p>
           </div>
           <div className="benefit-item">
@@ -77,7 +83,8 @@ export function Body() {
           <div className="benefit-item">
             <h3>Relacionamento Duradouro</h3>
             <p>
-              Fortalece a conexão entre a Brasitalia e seus clientes, garantindo um atendimento personalizado e ágil.
+              Fortalece a conexão entre a Brasitalia e seus clientes, garantindo
+              um atendimento personalizado e ágil.
             </p>
           </div>
         </div>
