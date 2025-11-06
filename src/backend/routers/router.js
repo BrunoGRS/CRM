@@ -7,6 +7,7 @@ import { ClienteRouter } from "./clienteRouters.js";
 import { oportunidadeRouter } from "./oportunidadeRouter.js";
 import { ArquivoRouter } from "./arquivoRouter.js";
 import { AlocacaoRouter } from "./alocacaoRouter.js";
+import { ManutencaoRouter } from "./manutencaoRouter.js";
 
 export const expressRouter = express.Router();
 
@@ -17,6 +18,8 @@ const routerProduto = ProdutoRouter;
 const routerCliente = ClienteRouter;
 const routerOportunidade = oportunidadeRouter;
 const routerArquivo = ArquivoRouter;
+const routerAlocacao = AlocacaoRouter;
+const routerManutencao = ManutencaoRouter;
 
 expressRouter.use("/usuario", routerUsuario);
 expressRouter.use("/categoria", routerCategoria);
@@ -25,3 +28,5 @@ expressRouter.use("/produto", routerProduto);
 expressRouter.use("/cliente", routerCliente);
 expressRouter.use("/oportunidade", routerOportunidade);
 expressRouter.use("/arquivo", routerArquivo);
+expressRouter.use("/alocacao", routerAlocacao);
+expressRouter.use("/manutencao", routerManutencao);
