@@ -6,6 +6,7 @@ import { ProdutoRouter } from "./produtoRouter.js";
 import { ClienteRouter } from "./clienteRouters.js";
 import { oportunidadeRouter } from "./oportunidadeRouter.js";
 import { ArquivoRouter } from "./arquivoRouter.js";
+import { AlocacaoRouter } from "./alocacaoRouter.js";
 
 export const expressRouter = express.Router();
 

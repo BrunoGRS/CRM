@@ -9,9 +9,6 @@ export function Navbar() {
         <div className="logo"></div>
         <ul className="nav-links">
           <li>
-            <Link to="/home">Máquinas</Link>
-          </li>
-          <li>
             <Link to="/usuarios">Usuarios</Link>
           </li>
           <li>
@@ -24,10 +21,10 @@ export function Navbar() {
             <Link to="/produtos">Venda</Link>
           </li>
           <li>
-            <Link to="/produtos">Dashboard</Link>
+            <Link to="/produtos">Alocações</Link>
           </li>
           <li>
-            <Link to="/produtos">Relatórios</Link>
+            <Link to="/produtos">Manutenções</Link>
           </li>
         </ul>
       </nav>
