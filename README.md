@@ -157,4 +157,3 @@ Distribuição, cópia ou uso comercial sem autorização não é permitido.
 **Bruno Rodrigues**  
 👨‍💻 Bacharel em Ciência da Computação  
 📍 Brasil  
-📧 [rodriguesbrunor01@gmail.com](mailto:rodriguesbrunor01@gmail.com)
