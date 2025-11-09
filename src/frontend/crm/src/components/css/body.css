@@ -1,188 +1,560 @@
-/* General Body Container */
-.body-container {
-  font-family: "Verdana", sans-serif;
-  color: #333;
-  line-height: 1.6;
+/* Importando fontes do Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Montserrat:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@300;400;600;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* --- Initial Banner Section --- */
-.inicio {
-  background-image: url("https://images.unsplash.com/photo-1447933601403-0c6688de566e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1061"); /* Replace with your desired image */
+body {
+  font-family: "Montserrat", sans-serif;
+  color: #333;
+  line-height: 1.8;
+  overflow-x: hidden;
+}
+
+/* Header */
+header {
+  background: linear-gradient(135deg, #2c1810 0%, #5d3a22 100%);
+  color: white;
+  padding: 1rem 0;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+nav {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+}
+
+.logo img {
+  height: 50px;
+  width: auto;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s;
+  font-weight: 500;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-family: "Montserrat", sans-serif;
+}
+
+.nav-links a:hover {
+  color: #d4a574;
+}
+
+/* Hero Section */
+.hero {
+  margin-top: 70px;
+  height: 60vh;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800"><rect fill="%234a2c1c" width="1200" height="800"/><circle fill="%233d2316" cx="200" cy="400" r="150" opacity="0.3"/><circle fill="%233d2316" cx="800" cy="300" r="200" opacity="0.2"/><circle fill="%233d2316" cx="1000" cy="600" r="180" opacity="0.3"/></svg>');
   background-size: cover;
   background-position: center;
-  height: 80vh; /* Takes up 80% of the viewport height */
+  background-attachment: fixed;
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* Aligns content to the left */
-  padding: 0 5%;
-  position: relative;
+  justify-content: center;
+  text-align: center;
   color: white;
+  position: relative;
+  z-index: 1;
 }
 
-/* Adds a dark overlay for better text readability */
-.inicio::before {
+.hero-content {
+  max-width: 900px;
+  padding: 2rem;
+  animation: fadeInUp 1s ease-out;
+}
+
+.hero h1 {
+  font-family: "Playfair Display", serif;
+  font-size: 4.5rem;
+  font-weight: 900;
+  margin-bottom: 1.5rem;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.6);
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.hero p {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.5rem;
+  margin-bottom: 2.5rem;
+  color: #f0f0f0;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0.3px;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 1.2rem 3rem;
+  background: #d4a574;
+  color: #2c1810;
+  text-decoration: none;
+  border-radius: 50px;
+  font-weight: 700;
+  font-family: "Montserrat", sans-serif;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(212, 165, 116, 0.4);
+  font-size: 1rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.cta-button:hover {
+  background: #e6b885;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(212, 165, 116, 0.6);
+}
+
+/* About Section */
+.about {
+  padding: 5rem 2rem;
+  background: #f8f4ef;
+}
+
+/* Carrossel */
+.carousel-container {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 4rem;
+  overflow: hidden;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.carousel-slides {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.carousel-slide {
+  min-width: 100%;
+  position: relative;
+}
+
+.carousel-slide img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  display: block;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  color: #2c1810;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.carousel-btn:hover {
+  background: #d4a574;
+  color: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-btn.prev {
+  left: 20px;
+}
+
+.carousel-btn.next {
+  right: 20px;
+}
+
+.carousel-dots {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.dot.active {
+  background: #d4a574;
+  width: 30px;
+  border-radius: 6px;
+}
+
+.dot:hover {
+  background: rgba(212, 165, 116, 0.8);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-title {
+  font-family: "Playfair Display", serif;
+  text-align: center;
+  font-size: 3.2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #2c1810;
+  letter-spacing: -0.5px;
+}
+
+.section-subtitle {
+  font-family: "Cormorant Garamond", serif;
+  text-align: center;
+  font-size: 1.3rem;
+  color: #666;
+  margin-bottom: 3.5rem;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.about-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.about-card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.about-card:hover {
+  transform: translateY(-10px);
+}
+
+.about-card h3 {
+  font-family: "Playfair Display", serif;
+  color: #5d3a22;
+  margin-bottom: 1.2rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.about-card p {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #555;
+  font-weight: 400;
+}
+
+/* Services Section */
+.services {
+  padding: 5rem 2rem;
+  background: white;
+}
+
+.services .section-title {
+  color: #2c1810;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.service-card {
+  background: linear-gradient(135deg, #2c1810 0%, #5d3a22 100%);
+  color: white;
+  padding: 0.7rem;
+  border-radius: 15px;
+  text-align: center;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.service-card::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #d4a574 0%, #e6b885 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
-.imagem-prof {
-  position: relative; /* Ensures text is on top of the overlay */
-  z-index: 2;
-  max-width: 600px;
+.service-card:hover::before {
+  opacity: 1;
 }
 
-.imagem-prof h2 {
+.service-card:hover {
+  transform: scale(1.05);
+}
+
+.service-card-content {
+  position: relative;
+  z-index: 1;
+}
+
+.service-icon {
   font-size: 3rem;
-  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.service-card h3 {
+  font-family: "Playfair Display", serif;
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.service-card p {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+.service-card:hover h3,
+.service-card:hover p {
+  color: #2c1810;
+}
+
+/* Products Section */
+.products {
+  padding: 5rem 2rem;
+  background: #f8f4ef;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px);
+}
+
+.product-card img {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.product-info {
+  padding: 2rem;
+}
+
+.product-info h3 {
+  font-family: "Playfair Display", serif;
+  color: #2c1810;
+  margin-bottom: 0.8rem;
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+
+.product-info p {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #555;
   margin-bottom: 1rem;
 }
 
-.imagem-prof p {
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
-}
-
-.btn {
-  background-color: #30d5c8; /* A nice teal color */
+.product-tag {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  background: #d4a574;
   color: white;
-  padding: 15px 30px;
-  border: none;
-  border-radius: 50px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.btn:hover {
-  background-color: #28b8ad;
-  transform: translateY(-2px); /* Slight lift effect */
-}
-
-/* --- Universal Section Padding --- */
-.about-us,
-.how-works,
-.benefits {
-  padding: 60px 5%;
-}
-
-/* --- About Us Section --- */
-.about-us {
-  display: flex;
-  align-items: center;
-  gap: 40px;
-  background-color: #f9f9f9;
-}
-
-.about-text {
-  flex: 1; /* Takes up half the space */
-}
-
-.about-text h2 {
-  font-size: 2.5rem;
-  margin-bottom: 20px;
-}
-
-.about-text p {
-  font-size: 1.1rem;
-  margin-bottom: 15px;
-}
-
-.foto {
-  flex: 1; /* Takes up the other half */
-  height: 400px;
-  background-image: url("https://images.unsplash.com/photo-1573703748442-3ba6f4203172?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fHRyYWJhbGhhbmRvJTIwY29tJTIwY2FmJUMzJUE5fGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600"); /* Replace with a picture of your team or office */
-  background-size: cover;
-  background-position: center;
   border-radius: 20px;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
-/* --- How It Works Section --- */
-.how-works {
+/* Contact Section */
+.contact {
+  padding: 5rem 2rem;
+  background: linear-gradient(135deg, #2c1810 0%, #5d3a22 100%);
+  color: white;
   text-align: center;
-  background-color: #ffffff;
 }
 
-.how-works-title h2 {
-  font-size: 2.5rem;
-  margin-bottom: 30px;
+.contact h2 {
+  font-family: "Playfair Display", serif;
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
 }
 
-.highlight {
-  border-bottom: 4px solid #30d5c8;
-  padding-bottom: 5px;
+.contact > p {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.3rem;
+  margin-bottom: 2rem;
+  font-style: italic;
 }
 
-.how-works-text {
-  max-width: 800px;
-  margin: 0 auto;
-  text-align: left;
-  font-size: 1.1rem;
-}
-
-.how-works-text ul {
-  list-style-type: "✓ "; /* Custom list bullet */
-  padding-left: 20px;
-  margin-top: 20px;
-}
-
-.how-works-text li {
-  margin-bottom: 10px;
-  padding-left: 10px;
-}
-
-.highlight-cliente {
-  background-color: #e0f7fa; /* Light blue highlight */
-  padding: 2px 6px;
-  border-radius: 5px;
-  font-weight: bold;
-}
-
-.highlight-prestador {
-  background-color: #e8f5e9; /* Light green highlight */
-  padding: 2px 6px;
-  border-radius: 5px;
-  font-weight: bold;
-}
-
-/* --- Benefits Section --- */
-.benefits {
-  text-align: center;
-  background-color: #f9f9f9;
-}
-
-.benefits h2 {
-  font-size: 2.5rem;
-  margin-bottom: 40px;
-}
-
-.benefits-list {
+.contact-info {
   display: flex;
-  justify-content: space-around;
-  gap: 30px;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
 }
 
-.benefit-item {
-  flex: 1; /* Each item takes equal space */
-  background-color: white;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.contact-item {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1rem;
+  line-height: 1.8;
+  max-width: 350px;
 }
 
-.benefit-item:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+.contact-item strong {
+  color: #d4a574;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: block;
+  margin-bottom: 0.5rem;
 }
 
-.benefit-item h3 {
-  font-size: 1.5rem;
-  margin-bottom: 15px;
-  color: #30d5c8;
+/* Footer */
+footer {
+  background: #1a0f0a;
+  color: white;
+  text-align: center;
+  padding: 2.5rem 2rem;
+}
+
+footer p:first-child {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.3rem;
+  font-style: italic;
+  margin-bottom: 1rem;
+  color: #d4a574;
+}
+
+footer p:last-child {
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+  color: #999;
+  font-weight: 300;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2.8rem;
+  }
+
+  .hero p {
+    font-size: 1.2rem;
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+  }
+
+  .section-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .nav-links {
+    gap: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .products-grid,
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .carousel-slide img {
+    height: 300px;
+  }
+
+  .carousel-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+  }
+
+  .carousel-btn.prev {
+    left: 10px;
+  }
+
+  .carousel-btn.next {
+    right: 10px;
+  }
+
+  .contact-info {
+    flex-direction: column;
+    align-items: center;
+  }
 }

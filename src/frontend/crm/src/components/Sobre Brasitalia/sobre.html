@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brasitália - Cafés e Máquinas Premium</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo"><img src="imagens/mini-logo.jpg" alt="mini-logo"></div>
+            <ul class="nav-links">
+                <li><a href="#inicio">Início</a></li>
+                <li><a href="#sobre">Sobre</a></li>
+                <li><a href="#servicos">Serviços</a></li>
+                <li><a href="#produtos">Produtos</a></li>
+                <li><a href="#contato">Contato</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero" id="inicio">
+        <div class="hero-content">
+            <h1>Brasitália Cafés e Máquinas</h1>
+            <p>Experiência premium em cada xícara. Qualidade, tradição e inovação em cafés especiais e equipamentos profissionais.</p>
+            <a href="#contato" class="cta-button">Entre em Contato</a>
+        </div>
+    </section>
+
+    <section class="about" id="sobre">
+        <div class="container">
+            <!-- Carrossel de Imagens -->
+            <div class="carousel-container">
+                <div class="carousel-slides">
+                    <div class="carousel-slide active">
+                        <img src="imagens/logo brasitalia.jpg" alt="Eissenza Uno">
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="imagens/banner.webp" alt="Cafés Especiais">
+                    </div>
+                    <div class="carousel-slide">
+                        <img src="imagens/cafe protagonista.jpg" alt="Café Protagonista">
+                    </div>
+                </div>
+                <button class="carousel-btn prev" onclick="moveSlide(-1)">‹</button>
+                <button class="carousel-btn next" onclick="moveSlide(1)">›</button>
+                <div class="carousel-dots">
+                    <span class="dot active" onclick="currentSlide(0)"></span>
+                    <span class="dot" onclick="currentSlide(1)"></span>
+                    <span class="dot" onclick="currentSlide(2)"></span>
+                </div>
+            </div>
+
+            <h2 class="section-title">Sobre a Brasitália</h2> <hr>
+            <p class="section-subtitle">Tradição e excelência no mercado de cafés especiais</p>
+            
+            <div class="about-content">
+                <div class="about-card">
+                    <h3>Nossa História</h3>
+                    <p>Com anos de experiência no mercado, a Brasitália se consolidou como referência em cafés premium e equipamentos profissionais. Nossa paixão pelo café nos move a buscar sempre a excelência.</p>
+                </div>
+                <div class="about-card">
+                    <h3>Nossa Missão</h3>
+                    <p>Proporcionar experiências únicas através de cafés de alta qualidade e equipamentos tecnológicos, valorizando cada etapa da cadeia produtiva e o trabalho dos produtores.</p>
+                </div>
+                <div class="about-card">
+                    <h3>Nossos Valores</h3>
+                    <p>Qualidade, sustentabilidade, inovação e respeito. Acreditamos em relações transparentes com produtores e clientes, promovendo o desenvolvimento sustentável do setor.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="services" id="servicos">
+        <div class="container">
+            <h2 class="section-title">Nossos Serviços</h2> <hr>
+            <p class="section-subtitle">Soluções completas para seu negócio</p>
+            
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-card-content">
+                        <div class=></div>
+                        <h3>Microlotes Premium</h3>
+                        <p>Cafés especiais cuidadosamente selecionados de pequenos produtores, com rastreabilidade e perfis sensoriais únicos.</p>
+                    </div>
+                </div>
+                <div class="service-card">
+                    <div class="service-card-content">
+                        <div class="service-icon"></div>
+                        <h3>Equipamentos Profissionais</h3>
+                        <p>Máquinas de café expresso, moedores e acessórios de alta performance para cafeterias e empresas.</p>
+                    </div>
+                </div>
+                <div class="service-card">
+                    <div class="service-card-content">
+                        <div class="service-icon"></div>
+                        <h3>Consultoria e Treinamento</h3>
+                        <p>Capacitação de baristas e consultoria para implantação de cafeterias, com foco em qualidade e rentabilidade.</p>
+                    </div>
+                </div>
+                <div class="service-card">
+                    <div class="service-card-content">
+                        <div class="service-icon"></div>
+                        <h3>Distribuição</h3>
+                        <p>Logística eficiente para atender desde pequenas cafeterias até grandes redes, garantindo frescor e qualidade.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="products" id="produtos">
+        <div class="container">
+            <h2 class="section-title">Nossos Produtos</h2> <hr>
+            <p class="section-subtitle">Qualidade em cada categoria</p>
+            
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image"><img src="imagens/opa.png" alt=""></div>
+                    <div class="product-info">
+                        <h3>Microlotes</h3> <hr>
+                        <p>Cafés especiais de pequenos lotes com características únicas, pontuação acima de 80 pontos e certificações de origem.</p>
+                        <span class="product-tag">Premium</span>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image"><img src="imagens/sublime.jpg" alt=""></div>
+                    <div class="product-info">
+                        <h3>Mais Vendidos</h3> <hr>
+                        <p>Blends equilibrados e cafés que conquistaram o paladar de nossos clientes, com excelente custo-benefício.</p>
+                        <span class="product-tag">Destaque</span>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image"><img src="imagens/cafeteira.jpg" alt=""></div>
+                    <div class="product-info">
+                        <h3>Equipamentos</h3> <hr>
+                        <p>Máquinas de espresso profissionais, moedores de precisão e acessórios das melhores marcas do mercado.</p>
+                        <span class="product-tag">Profissional</span>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <div class="product-image"><img src="imagens/premium.jpg" alt=""></div>
+                    <div class="product-info">
+                        <h3>Bebidas Premium</h3> <hr>
+                        <p>Nosso Chocolate Europeu Meio Amargo - 35% Cacau combina mais cacau e mais saúde em uma bebida rica e equilibrada, com sabor intenso e levemente adoçado.</p>
+                        <span class="product-tag">Premium</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact" id="contato">
+        <div class="container">
+            <h2>Entre em Contato</h2>
+            <p>Estamos prontos para atender você e seu negócio</p>
+            
+            <div class="contact-info">
+                <div class="contact-item">
+                    <strong>📧Email:</strong>
+                  brasitalia@brasitaliacafe.com.br
+                </div>
+                <div class="contact-item">
+                    <strong>📱Telefone:</strong>
+                    (49) 3329-3680
+                </div>
+                <div class="contact-item">
+                    <strong>📍Endereço:</strong>
+                   Brasitália Café | CNPJ: 02.837.091/0001-40Av. Nereu Ramos, 747-E, Centro, Chapecó/SC - CEP: 89801-021.
+<hr>
+                Em breve: Rua Cyro Belli Muller 54 Santa Mônica, Florianópolis (Filial)© Direitos Reservados www.brasitaliacafe.com.br
+                 </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>A união perfeita entre o café Brasileiro e o legado Italiano.</p>
+        <hr>
+        <p>&copy; 2024 Brasitália Cafés e Máquinas. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
