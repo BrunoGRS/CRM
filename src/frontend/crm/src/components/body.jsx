@@ -3,6 +3,11 @@ import "./css/body.css";
 import { Navbar } from "./navbar.jsx";
 import logoBrasitalia from "../assets/logo brasitalia.jpg";
 import banner from "../assets/banner.webp";
+import cafe from "../assets/cafe protagonista.jpg";
+import opa from "../assets/opa.png";
+import sublime from "../assets/sublime.jpg";
+import cafeteira from "../assets/cafeteira.jpg";
+import premium from "../assets/premium.jpg";
 
 export function Body() {
   // Carrossel
@@ -90,7 +95,6 @@ export function Body() {
   return (
     <section className="body-container">
       <Navbar />
-      <script src="./script.js"></script>
       {/* Banner Inicial */}
       <section className="hero" id="inicio">
         <div className="hero-content">
@@ -118,10 +122,7 @@ export function Body() {
                 <img src={banner} alt="Cafés Especiais" />
               </div>
               <div className="carousel-slide">
-                <img
-                  src="imagens/cafe protagonista.jpg"
-                  alt="Café Protagonista"
-                />
+                <img src={cafe} alt="Café Protagonista" />
               </div>
             </div>
             <button className="carousel-btn prev">‹</button>
@@ -231,7 +232,7 @@ export function Body() {
           <div className="products-grid">
             <div className="product-card">
               <div className="product-image">
-                <img src="imagens/opa.png" alt="Microlotes" />
+                <img src={opa} alt="Microlotes" />
               </div>
               <div className="product-info">
                 <h3>Microlotes</h3>
@@ -246,7 +247,7 @@ export function Body() {
 
             <div className="product-card">
               <div className="product-image">
-                <img src="imagens/sublime.jpg" alt="Mais Vendidos" />
+                <img src={sublime} alt="Mais Vendidos" />
               </div>
               <div className="product-info">
                 <h3>Mais Vendidos</h3>
@@ -261,7 +262,7 @@ export function Body() {
 
             <div className="product-card">
               <div className="product-image">
-                <img src="imagens/cafeteira.jpg" alt="Equipamentos" />
+                <img src={cafeteira} alt="Equipamentos" />
               </div>
               <div className="product-info">
                 <h3>Equipamentos</h3>
@@ -276,7 +277,7 @@ export function Body() {
 
             <div className="product-card">
               <div className="product-image">
-                <img src="imagens/premium.jpg" alt="Bebidas Premium" />
+                <img src={premium} alt="Bebidas Premium" />
               </div>
               <div className="product-info">
                 <h3>Bebidas Premium</h3>

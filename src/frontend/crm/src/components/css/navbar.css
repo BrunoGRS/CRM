@@ -1,34 +1,104 @@
-nav {
-  max-width: 1200px;
-  margin: 0 auto;
+/* ==============================================
+   1. CONTÊINER PRINCIPAL (O <section>)
+   ============================================== */
+
+/* Adicione a classe "navbar-container" à sua tag <section> no JSX */
+.navbar-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 2rem;
+  justify-content: space-between; /* Joga o logo e a nav para os cantos */
+  align-items: center; /* Alinha tudo verticalmente */
+
+  width: 100%;
+  padding: 1rem 2.5rem; /* Espaçamento interno (vertical, horizontal) */
+  box-sizing: border-box; /* Garante que o padding não quebre o layout */
+
+  /* Cores baseadas na sua imagem */
+  background: linear-gradient(135deg, #2c1810 0%, #5d3a22 100%);
 }
+
+/* ==============================================
+   2. LOGO
+   ============================================== */
 
 .logo img {
-  height: 50px;
-  width: auto;
+  height: 45px; /* Ajuste a altura do seu logo */
+  display: block; /* Remove espaço extra indesejado abaixo da imagem */
 }
 
+/* ==============================================
+   3. LINKS DE NAVEGAÇÃO (Seu código, adaptado)
+   ============================================== */
+
+/* A <ul> */
 .nav-links {
   display: flex;
-  gap: 2.5rem;
+  gap: 2.5rem; /* Espaço entre os links */
   list-style: none;
+  align-items: center;
+  padding: 0;
+  margin: 0;
 }
 
+/* Os <Link> (que o React transforma em <a>) */
 .nav-links a {
-  color: white;
+  position: relative;
+  font-family: "Montserrat", sans-serif;
   text-decoration: none;
-  transition: color 0.3s;
+  text-transform: uppercase;
   font-weight: 500;
   font-size: 0.95rem;
   letter-spacing: 0.5px;
-  text-transform: uppercase;
-  font-family: "Montserrat", sans-serif;
+
+  color: #d8d4d4; /* [CORRIGIDO] Cor escura para ser legível */
+
+  transition: color 0.3s ease, transform 0.2s ease;
 }
 
+/* Efeito de linha elegante (Seu código, está ótimo!) */
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #d4a574; /* Sua cor de destaque */
+  transition: width 0.3s ease-out; /* 'ease-out' para um efeito suave */
+  border-radius: 2px;
+}
+
+/* Efeitos de Hover */
 .nav-links a:hover {
-  color: #d4a574;
+  color: #d4a574; /* Muda a cor do texto para o destaque */
+  transform: translateY(-2px); /* Efeito de "levantar" */
+}
+
+.nav-links a:hover::after {
+  width: 100%; /* Completa a linha */
+}
+
+/* Efeito de Foco para Acessibilidade */
+.nav-links a:focus-visible {
+  outline: 2px dashed #d4a574;
+  outline-offset: 4px;
+}
+
+/* ==============================================
+   4. RESPONSIVIDADE (Exemplo)
+   ============================================== */
+
+/* Em telas pequenas, empilha o logo e os links */
+@media (max-width: 768px) {
+  .navbar-container {
+    flex-direction: column; /* Empilha o logo e a nav */
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+
+  .nav-links {
+    flex-direction: column; /* Empilha os links */
+    gap: 1.2rem;
+    width: 100%;
+    align-items: center; /* Centraliza os links no mobile */
+  }
 }

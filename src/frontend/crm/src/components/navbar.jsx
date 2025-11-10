@@ -4,12 +4,15 @@ import logo from "../assets/mini-logo.jpg";
 
 export function Navbar() {
   return (
-    <section>
-      <style src="./css/Navbar.css"></style>
-      <nav className="navbar">
-        <div className="logo">
-          <img src={logo} alt="mini-logo" />
-        </div>
+    // Adicione a classe aqui!
+    <section className="navbar-container">
+      <div className="logo">
+        <Link to="/home">
+          <img src={logo} alt="Brastália logo" />
+        </Link>
+      </div>
+
+      <nav>
         <ul className="nav-links">
           <li>
             <Link to="/home">Inicio</Link>
@@ -24,13 +27,13 @@ export function Navbar() {
             <Link to="/produtos">Produtos</Link>
           </li>
           <li>
-            <Link to="/produtos">Venda</Link>
+            <Link to="/venda">Venda</Link>
           </li>
           <li>
-            <Link to="/produtos">Alocações</Link>
+            <Link to="/alocacoes">Alocações</Link>
           </li>
           <li>
-            <Link to="/produtos">Manutenções</Link>
+            <Link to="/manutencoes">Manutenções</Link>
           </li>
         </ul>
       </nav>
