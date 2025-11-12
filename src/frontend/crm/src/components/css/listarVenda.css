@@ -1,0 +1,167 @@
+/* ====== ESTILO GERAL ====== */
+:root {
+  --primary: #004aad;
+  --primary-hover: #003b8a;
+  --accent: #00a6ff;
+  --success: #00b894;
+  --danger: #e74c3c;
+  --text: #333;
+  --bg: #f4f6f8;
+  --white: #fff;
+  --border: #dcdfe3;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Montserrat", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ====== LAYOUT PRINCIPAL ====== */
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.content {
+  flex: 1;
+  padding: 2rem 3rem;
+  background: var(--bg);
+}
+
+h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+  border-left: 5px solid var(--accent);
+  padding-left: 0.8rem;
+}
+
+/* ====== BOTÃO DE NOVA VENDA ====== */
+.btn-criar-novo {
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1.6rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-bottom: 1.5rem;
+}
+
+.btn-criar-novo:hover {
+  background: var(--primary-hover);
+}
+
+/* ====== TABELA ====== */
+.venda-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--white);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.venda-table thead {
+  background: var(--primary);
+  color: var(--white);
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.venda-table th,
+.venda-table td {
+  padding: 0.9rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.venda-table th:first-child {
+  border-top-left-radius: 10px;
+}
+
+.venda-table th:last-child {
+  border-top-right-radius: 10px;
+}
+
+.venda-table tr:hover {
+  background: #f0f7ff;
+  transition: background 0.2s;
+}
+
+/* ====== TEXTO QUANDO SEM REGISTROS ====== */
+.content p {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 2rem 0;
+}
+
+/* ====== BOTÕES DE AÇÃO ====== */
+.button-editar,
+.button-excluir {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-right: 0.4rem;
+}
+
+.button-editar {
+  background: var(--accent);
+  color: var(--white);
+}
+
+.button-editar:hover {
+  background: #0094e0;
+}
+
+.button-excluir {
+  background: var(--danger);
+  color: var(--white);
+}
+
+.button-excluir:hover {
+  background: #c0392b;
+}
+
+/* ====== RESPONSIVIDADE ====== */
+@media (max-width: 900px) {
+  .content {
+    padding: 1rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .venda-table th,
+  .venda-table td {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .button-editar,
+  .button-excluir {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .venda-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}

@@ -1,4 +1,5 @@
 import modelVenda from "../models/modelVenda.js";
+import { db } from "../database/database.js";
 
 async function criarVenda(req, res) {
   try {
@@ -24,27 +25,53 @@ async function criarVenda(req, res) {
 
 async function listarVendas(req, res) {
   try {
-    const vendas = await modelVenda.findAll();
-    return res.status(200).send(vendas);
+    const [rows] = await db.query(`
+        select v.Id as Codigo, c.razaoSocialEmpresa as Cliente,  v.valor_total as Total, v.observacao as Obs, DATE_FORMAT(v.data_venda,"%d/%m/%Y") as Data
+        from vendas v
+        inner join cliente c on c.id = v.cliente_id
+      `);
+
+    if (rows.length > 0) {
+      res.status(200).send({ msg: rows });
+    } else {
+      res.status(404).send({ msg: false });
+    }
   } catch (error) {
-    console.error("Erro ao listar vendas:", error);
-    return res.status(500).send({ msg: "Erro ao listar vendas", error });
+    console.error("Erro ao mostrar Usuários", error);
+    res.status(404).send({ msg: false });
   }
 }
 
 async function visualizarVenda(req, res) {
   try {
     const { id } = req.params;
-    const venda = await modelVenda.findByPk(id);
+    const [rows] = await db.query(
+      `
+      SELECT 
+        v.Id AS Codigo,
+        c.razaoSocialEmpresa AS Cliente,
+        v.valor_total AS Total,
+        v.observacao AS Obs,
+        DATE_FORMAT(v.data_venda, "%d/%m/%Y") AS Data
+      FROM vendas v
+      INNER JOIN cliente c ON c.id = v.cliente_id
+      INNER JOIN usuario u ON u.id = v.vendedor_id
+      WHERE v.Id = ?;
+  `,
+      {
+        replacements: [id],
+        type: db.QueryTypes.SELECT,
+      }
+    );
 
-    if (!venda) {
-      return res.status(404).send({ msg: "Venda não encontrada" });
+    if (rows.length === 0) {
+      return res.status(404).json({ msg: "Venda não encontrada." });
     }
 
-    return res.status(200).send(venda);
+    res.status(200).json({ msg: rows[0] });
   } catch (error) {
-    console.error("Erro ao visualizar venda:", error);
-    return res.status(500).send({ msg: "Erro ao visualizar venda", error });
+    console.error(error);
+    res.status(500).json({ msg: "Erro ao buscar venda." });
   }
 }
 

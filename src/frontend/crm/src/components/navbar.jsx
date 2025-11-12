@@ -11,7 +11,6 @@ export function Navbar() {
           <img src={logo} alt="Brastália logo" />
         </Link>
       </div>
-
       <nav>
         <ul className="nav-links">
           <li>

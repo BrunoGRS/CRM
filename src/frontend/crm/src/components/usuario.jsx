@@ -20,7 +20,6 @@ export const Usuarios = () => {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [value, setValue] = useState("");
 
-  // --- Funções auxiliares ---
   const onlyNumbers = (value) => value.replace(/\D/g, "");
 
   // Máscara simples de telefone (aceita formatos 8 e 9 dígitos)
@@ -40,7 +39,6 @@ export const Usuarios = () => {
     }
   };
 
-  // --- Criar Usuário ---
   const criarUsuario = async (e) => {
     e.preventDefault();
     try {
@@ -75,7 +73,6 @@ export const Usuarios = () => {
     }
   };
 
-  // --- Listar Usuários ---
   const fetchUsuarios = async () => {
     try {
       const response = await fetch("http://localhost:3000/api/usuario/listar");
@@ -91,7 +88,6 @@ export const Usuarios = () => {
     fetchUsuarios();
   }, []);
 
-  // --- Excluir Usuário ---
   const excluirUsuario = async (id) => {
     try {
       const response = await fetch(
@@ -113,7 +109,6 @@ export const Usuarios = () => {
     }
   };
 
-  // --- Editar Usuário ---
   const editarUsuario = async (e, id) => {
     e.preventDefault();
     try {
@@ -157,8 +152,6 @@ export const Usuarios = () => {
       <Navbar />
       <main className="content">
         <h2>Gerenciamento de Usuários</h2>
-
-        {/* Botão principal */}
         {!mostrarFormulario && (
           <button
             className="btn-criar-novo"
@@ -179,7 +172,6 @@ export const Usuarios = () => {
           </button>
         )}
 
-        {/* Formulário aparece apenas quando clicar */}
         {mostrarFormulario && (
           <div className="modal-overlay">
             <div className="modal-content">
