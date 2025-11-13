@@ -70,8 +70,8 @@ async function visualizarVenda(req, res) {
 
     res.status(200).json({ msg: rows[0] });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: "Erro ao buscar venda." });
+    console.error("Erro ao mostrar Usuários", error);
+    res.status(404).send({ msg: false });
   }
 }
 
