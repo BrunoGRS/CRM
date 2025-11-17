@@ -17,6 +17,10 @@ VendaRouter.put("/editar/:id", (req, res) =>
   vendaController.editarVenda(req, res)
 );
 
-VendaRouter.delete("/:id", (req, res) =>
+VendaRouter.delete("/delete/:id", (req, res) =>
   vendaController.excluirVenda(req, res)
+);
+
+VendaRouter.get("/visualizar/:id", (req, res) =>
+  vendaController.visualizarVendaId(req, res)
 );

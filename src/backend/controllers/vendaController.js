@@ -1,7 +1,12 @@
 import modelVenda from "../models/modelVenda.js";
+import modelVendaItem from "../models/modelItemVenda.js";
 import { db } from "../database/database.js";
 
+// ======================================================
+// Criar Venda + Itens
+// ======================================================
 async function criarVenda(req, res) {
+  const transaction = await db.transaction();
   try {
     const venda = {
       cliente_id: req.body.cliente_id,
@@ -11,41 +16,77 @@ async function criarVenda(req, res) {
       observacao: req.body.observacao || null,
     };
 
+    const itens = req.body.itens || [];
+
     await modelVenda.sync();
-    const result = await modelVenda.create(venda);
+    await modelVendaItem.sync();
+
+    // Criar venda
+    const novaVenda = await modelVenda.create(venda, { transaction });
+
+    // Criar itens da venda
+    for (const item of itens) {
+      await modelVendaItem.create(
+        {
+          venda_id: novaVenda.id,
+          produto_id: item.produto_id,
+          quantidade: item.quantidade,
+          valor_unitario: item.valor_unitario,
+          valor_total: item.valor_total,
+        },
+        { transaction }
+      );
+    }
+
+    await transaction.commit();
 
     return res
       .status(201)
-      .send({ msg: "Venda registrada com sucesso!", venda: result });
+      .send({ msg: "Venda registrada com sucesso!", venda: novaVenda });
   } catch (error) {
     console.error("Erro ao criar venda:", error);
+    await transaction.rollback();
     return res.status(500).send({ msg: "Erro ao criar venda", error });
   }
 }
 
+// ======================================================
+// Listar vendas
+// ======================================================
 async function listarVendas(req, res) {
   try {
     const [rows] = await db.query(`
-        select v.Id as Codigo, c.razaoSocialEmpresa as Cliente,  v.valor_total as Total, v.observacao as Obs, DATE_FORMAT(v.data_venda,"%d/%m/%Y") as Data
-        from vendas v
-        inner join cliente c on c.id = v.cliente_id
-      `);
+      SELECT 
+        v.Id AS Codigo, 
+        c.razaoSocialEmpresa AS Cliente,  
+        v.valor_total AS Total, 
+        v.observacao AS Obs, 
+        DATE_FORMAT(v.data_venda, "%d/%m/%Y") AS Data
+      FROM vendas v
+      INNER JOIN cliente c ON c.id = v.cliente_id
+      ORDER BY v.id DESC;
+    `);
 
     if (rows.length > 0) {
-      res.status(200).send({ msg: rows });
+      return res.status(200).send({ msg: rows });
     } else {
-      res.status(404).send({ msg: false });
+      return res.status(404).send({ msg: false });
     }
   } catch (error) {
-    console.error("Erro ao mostrar Usuários", error);
-    res.status(404).send({ msg: false });
+    console.error("Erro ao mostrar Vendas", error);
+    return res.status(500).send({ msg: false });
   }
 }
 
+// ======================================================
+// Visualizar venda (detalhes + itens)
+// ======================================================
 async function visualizarVenda(req, res) {
   try {
     const { id } = req.params;
-    const [rows] = await db.query(
+
+    // Buscar dados da venda
+    const [venda] = await db.query(
       `
       SELECT 
         v.Id AS Codigo,
@@ -55,27 +96,67 @@ async function visualizarVenda(req, res) {
         DATE_FORMAT(v.data_venda, "%d/%m/%Y") AS Data
       FROM vendas v
       INNER JOIN cliente c ON c.id = v.cliente_id
-      INNER JOIN usuario u ON u.id = v.vendedor_id
-      WHERE v.Id = ?;
-  `,
-      {
-        replacements: [id],
-        type: db.QueryTypes.SELECT,
-      }
+      WHERE v.id = ?;
+      `,
+      { replacements: [id] }
     );
 
-    if (rows.length === 0) {
+    if (!venda.length) {
       return res.status(404).json({ msg: "Venda não encontrada." });
     }
 
-    res.status(200).json({ msg: rows[0] });
+    // Buscar itens da venda
+    const [itens] = await db.query(
+      `
+      SELECT 
+        i.id,
+        i.produto_id,
+        p.nome AS produto,
+        i.quantidade,
+        i.valor_unitario,
+        i.valor_total
+      FROM venda_itens i
+      INNER JOIN produtos p ON p.id = i.produto_id
+      WHERE i.venda_id = ?;
+      `,
+      { replacements: [id] }
+    );
+
+    return res.status(200).json({
+      venda: venda[0],
+      itens: itens,
+    });
   } catch (error) {
-    console.error("Erro ao mostrar Usuários", error);
-    res.status(404).send({ msg: false });
+    console.error("Erro ao mostrar Venda", error);
+    return res.status(500).send({ msg: false });
   }
 }
 
+// ======================================================
+// Visualizar venda somente pelo ID (simples)
+// ======================================================
+async function visualizarVendaId(req, res) {
+  try {
+    const { id } = req.params;
+    const data = await modelVenda.findByPk(id);
+
+    if (data) {
+      return res.status(200).json({ msg: data });
+    } else {
+      return res.status(404).json({ msg: "Venda não encontrada" });
+    }
+  } catch (error) {
+    console.error("Erro ao mostrar Venda", error);
+    return res.status(500).send({ msg: false });
+  }
+}
+
+// ======================================================
+// Editar Venda + Itens
+// ======================================================
 async function editarVenda(req, res) {
+  const transaction = await db.transaction();
+
   try {
     const { id } = req.params;
     const venda = await modelVenda.findByPk(id);
@@ -84,35 +165,74 @@ async function editarVenda(req, res) {
       return res.status(404).send({ msg: "Venda não encontrada" });
     }
 
-    venda.cliente_id = req.body.cliente_id || venda.cliente_id;
-    venda.vendedor_id = req.body.vendedor_id || venda.vendedor_id;
-    venda.data_venda = req.body.data_venda || venda.data_venda;
-    venda.valor_total = req.body.valor_total || venda.valor_total;
-    venda.observacao = req.body.observacao || venda.observacao;
+    // Atualizar venda
+    await venda.update(
+      {
+        cliente_id: req.body.cliente_id,
+        vendedor_id: req.body.vendedor_id,
+        data_venda: req.body.data_venda,
+        valor_total: req.body.valor_total,
+        observacao: req.body.observacao,
+      },
+      { transaction }
+    );
 
-    await venda.save();
+    // Atualizar itens
+    const itens = req.body.itens || [];
 
-    return res.status(200).send({ msg: "Venda atualizada com sucesso", venda });
+    await modelVendaItem.destroy({
+      where: { venda_id: id },
+      transaction,
+    });
+
+    for (const item of itens) {
+      await modelVendaItem.create(
+        {
+          venda_id: id,
+          produto_id: item.produto_id,
+          quantidade: item.quantidade,
+          valor_unitario: item.valor_unitario,
+          valor_total: item.valor_total,
+        },
+        { transaction }
+      );
+    }
+
+    await transaction.commit();
+    return res.status(200).send({ msg: "Venda atualizada com sucesso" });
   } catch (error) {
     console.error("Erro ao editar venda:", error);
+    await transaction.rollback();
     return res.status(500).send({ msg: "Erro ao editar venda", error });
   }
 }
 
+// ======================================================
+// Excluir Venda + Itens
+// ======================================================
 async function excluirVenda(req, res) {
+  const transaction = await db.transaction();
+
   try {
     const { id } = req.params;
-    const venda = await modelVenda.findByPk(id);
 
+    const venda = await modelVenda.findByPk(id);
     if (!venda) {
       return res.status(404).send({ msg: "Venda não encontrada" });
     }
 
-    await venda.destroy();
+    await modelVendaItem.destroy({
+      where: { venda_id: id },
+      transaction,
+    });
 
+    await venda.destroy({ transaction });
+
+    await transaction.commit();
     return res.status(200).send({ msg: "Venda excluída com sucesso" });
   } catch (error) {
     console.error("Erro ao excluir venda:", error);
+    await transaction.rollback();
     return res.status(500).send({ msg: "Erro ao excluir venda", error });
   }
 }
@@ -123,4 +243,5 @@ export default {
   visualizarVenda,
   editarVenda,
   excluirVenda,
+  visualizarVendaId,
 };

@@ -8,6 +8,7 @@ import { ArquivoRouter } from "./arquivoRouter.js";
 import { AlocacaoRouter } from "./alocacaoRouter.js";
 import { ManutencaoRouter } from "./manutencaoRouter.js";
 import { VendaRouter } from "./vendaRouter.js";
+import { ItemVendaRouter } from "./itemVendaRouter.js";
 
 export const expressRouter = express.Router();
 
@@ -20,6 +21,7 @@ const routerArquivo = ArquivoRouter;
 const routerAlocacao = AlocacaoRouter;
 const routerManutencao = ManutencaoRouter;
 const routerVenda = VendaRouter;
+const routerItemVenda = ItemVendaRouter;
 
 expressRouter.use("/usuario", routerUsuario);
 expressRouter.use("/categoria", routerCategoria);
@@ -30,3 +32,4 @@ expressRouter.use("/arquivo", routerArquivo);
 expressRouter.use("/alocacao", routerAlocacao);
 expressRouter.use("/manutencao", routerManutencao);
 expressRouter.use("/venda", routerVenda);
+expressRouter.use("/item", routerItemVenda);

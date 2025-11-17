@@ -21,8 +21,6 @@ export const ListarVendas = () => {
   };
 
   const excluirVenda = async (id) => {
-    if (!window.confirm("Tem certeza que deseja excluir esta venda?")) return;
-
     try {
       const response = await fetch(
         `http://localhost:3000/api/venda/delete/${id}`,
@@ -93,7 +91,7 @@ export const ListarVendas = () => {
                     </button>
                     <button
                       className="button-excluir"
-                      onClick={() => excluirVenda(venda.id)}
+                      onClick={() => excluirVenda(venda.Codigo)}
                     >
                       Excluir
                     </button>
