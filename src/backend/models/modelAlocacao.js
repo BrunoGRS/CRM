@@ -1,52 +1,59 @@
 import { DataTypes } from "sequelize";
 import { db } from "../database/database.js";
 
-const modelAlocacao = db.define(
-  "alocacao",
+const Alocacao = db.define(
+  "alocacoes",
   {
     id: {
       type: DataTypes.INTEGER,
-      autoIncrement: true,
       primaryKey: true,
+      autoIncrement: true,
     },
+
+    maquina_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+
     cliente_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    produto_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    quantidade: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
+
     data_inicio: {
       type: DataTypes.DATE,
       allowNull: false,
     },
+
     data_fim: {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    valor_total: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
-    },
+
     status: {
-      type: DataTypes.ENUM("ativa", "encerrada", "pendente"),
+      type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: "ativa",
     },
-    observacao: {
-      type: DataTypes.STRING(255),
+
+    local_instalacao: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    responsavel_instalacao: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    observacoes: {
+      type: DataTypes.TEXT,
       allowNull: true,
     },
   },
   {
-    tableName: "alocacao",
     timestamps: true,
+    tableName: "alocacoes",
   }
 );
 
-export default modelAlocacao;
+export default Alocacao;

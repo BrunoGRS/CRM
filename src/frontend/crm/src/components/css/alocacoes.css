@@ -1,0 +1,246 @@
+/* ====== ESTILO GERAL ====== */
+:root {
+  --primary: #004aad;
+  --primary-hover: #003b8a;
+  --accent: #00a6ff;
+  --success: #00b894;
+  --danger: #e74c3c;
+  --text: #333;
+  --bg: #f4f6f8;
+  --white: #fff;
+  --border: #dcdfe3;
+}
+
+body {
+  padding: 0;
+  font-family: "Montserrat", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ====== CONTAINER CENTRALIZADO ====== */
+
+/* ====== TÍTULO ====== */
+.aloc-container h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+  border-left: 5px solid var(--accent);
+  padding-left: 0.8rem;
+}
+
+/* ====== BOTÃO NOVA ALOCAÇÃO ====== */
+.btn-add {
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1.6rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-bottom: 1.5rem;
+}
+
+.btn-add:hover {
+  background: var(--primary-hover);
+}
+
+/* ====== TABELA ====== */
+.aloc-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--white);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.aloc-table thead {
+  background: var(--primary);
+  color: var(--white);
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.aloc-table th,
+.aloc-table td {
+  padding: 0.9rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.aloc-table tr:hover {
+  background: #f0f7ff;
+  transition: background 0.2s;
+}
+
+/* ====== BOTÕES ====== */
+.btn-edit,
+.btn-del {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 0.4rem;
+  transition: all 0.3s;
+}
+
+.btn-edit {
+  background: var(--accent);
+  color: var(--white);
+}
+
+.btn-edit:hover {
+  background: #0094e0;
+}
+
+.btn-del {
+  background: var(--danger);
+  color: var(--white);
+}
+
+.btn-del:hover {
+  background: #c0392b;
+}
+
+/* ====== MODAL ====== */
+.modal-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: var(--white);
+  padding: 1.8rem;
+  width: 500px;
+  max-width: 95%;
+  border-radius: 12px;
+}
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.btn-save {
+  background: var(--success);
+  color: var(--white);
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  margin-right: 0.6rem;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  background: var(--danger);
+  color: var(--white);
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background: #c0392b;
+}
+
+/*=============== MODAL =========== */
+.modal-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: #fff;
+  padding: 20px;
+  width: 500px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+}
+
+.modal-body-scroll {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 10px;
+  margin-top: 10px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.modal-buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding-top: 10px;
+}
+
+/* ====== ANIMAÇÃO ====== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ====== RESPONSIVIDADE ====== */
+@media (max-width: 900px) {
+  .aloc-container {
+    padding: 1rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal {
+    width: 90%;
+  }
+}
+
+@media (max-width: 700px) {
+  .aloc-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}

@@ -29,7 +29,7 @@ export function Navbar() {
             <Link to="/venda">Venda</Link>
           </li>
           <li>
-            <Link to="/alocacoes">Alocações</Link>
+            <Link to="/alocacao">Alocações</Link>
           </li>
           <li>
             <Link to="/manutencoes">Manutenções</Link>

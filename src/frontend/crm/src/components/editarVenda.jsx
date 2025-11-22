@@ -127,8 +127,7 @@ export function EditarVenda() {
         produto_id: "",
         quantidade: 1,
         valor_unitario: 0,
-        subtotal: 0,
-        novo: true,
+        valor_total: 0,
       },
     ]);
   };
@@ -148,43 +147,44 @@ export function EditarVenda() {
 
     setItens(lista);
   };
-
+  // Criar item(s) da venda - versão robusta
   // ============================
-  // SALVAR ITENS NO BACK-END
+  // SALVAR ITENS (NOVOS OU EDITADOS)
   // ============================
   const salvarItens = async () => {
-    for (const item of itens) {
-      // Criar novo item
-      if (item.novo) {
-        await fetch("http://localhost:3000/api/item/item-venda/criar", {
+    try {
+      const novosItens = itens.filter((i) => i.novo === true);
+
+      if (novosItens.length === 0) return;
+
+      const payload = {
+        venda_id: id,
+        itens: novosItens.map((i) => ({
+          produto_id: i.produto_id,
+          quantidade: Number(i.quantidade),
+          valor_unitario: Number(i.valor_unitario),
+        })),
+      };
+
+      const resp = await fetch(
+        "http://localhost:3000/api/item/item-venda/criar",
+        {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            venda_id: id,
-            itens: [
-              {
-                produto_id: item.produto_id,
-                quantidade: item.quantidade,
-                valor_unitario: item.valor_unitario,
-              },
-            ],
-          }),
-        });
-      } else {
-        // Editar item existente
-        await fetch(
-          `http://localhost:3000/api/item/item-venda/editar/${item.id}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              produto_id: item.produto_id,
-              quantidade: item.quantidade,
-              valor_unitario: item.valor_unitario,
-            }),
-          }
-        );
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await resp.json();
+
+      if (!resp.ok) {
+        console.error("Erro backend:", data);
+        toast.error("Erro ao salvar itens");
+        return;
       }
+    } catch (err) {
+      console.error("Erro salvar itens:", err);
+      toast.error("Erro ao salvar itens");
     }
   };
 

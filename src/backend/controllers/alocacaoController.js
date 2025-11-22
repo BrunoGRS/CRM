@@ -1,75 +1,82 @@
-import { db } from "../database/database.js";
-import modelAlocacao from "../models/modelAlocacao.js";
+import Alocacao from "../models/modelAlocacao.js";
 
-async function criarAlocacao(req, res) {
-  try {
-    const alocacao = {
-      maquina_id: req.body.maquina_id,
-      cliente_id: req.body.cliente_id,
-      data_inicio: req.body.data_inicio,
-      data_fim: req.body.data_fim || null,
-      status: req.body.status,
-      local_instalacao: req.body.local_instalacao,
-      responsavel_instalacao: req.body.responsavel_instalacao,
-      observacoes: req.body.observacoes || null,
-    };
-
-    await modelAlocacao.sync();
-    const result = await modelAlocacao.create(alocacao);
-
-    result
-      ? res.status(201).send({ msg: "Alocação criada com sucesso!" })
-      : res.status(500).send({ msg: "Falha ao criar alocação." });
-  } catch (error) {
-    console.error("Erro ao criar alocação:", error);
-    res.status(500).send({ msg: "Erro ao criar alocação." });
-  }
-}
-
-async function listarAlocacoes(req, res) {
-  try {
-    const alocacoes = await modelAlocacao.findAll();
-    res.status(200).send({ msg: alocacoes });
-  } catch (error) {
-    console.error("Erro ao listar alocações:", error);
-    res.status(500).send({ msg: "Erro ao listar alocações." });
-  }
-}
-
-async function editarAlocacao(req, res) {
-  try {
-    const alocacao = await modelAlocacao.findByPk(req.params.id);
-    if (alocacao) {
-      Object.assign(alocacao, req.body);
-      await alocacao.save();
-      res.status(200).send({ msg: "Alocação atualizada com sucesso!" });
-    } else {
-      res.status(404).send({ msg: "Alocação não encontrada." });
+const alocacaoController = {
+  // LISTAR TODAS
+  listar: async (req, res) => {
+    try {
+      const alocacoes = await Alocacao.findAll();
+      return res.status(200).json(alocacoes);
+    } catch (error) {
+      console.error("Erro ao listar alocações:", error);
+      return res.status(500).json({ error: "Erro ao listar alocações" });
     }
-  } catch (error) {
-    console.error("Erro ao editar alocação:", error);
-    res.status(500).send({ msg: "Erro ao editar alocação." });
-  }
-}
+  },
 
-async function excluirAlocacao(req, res) {
-  try {
-    const alocacao = await modelAlocacao.findByPk(req.params.id);
-    if (alocacao) {
+  // BUSCAR POR ID
+  buscarPorId: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const alocacao = await Alocacao.findByPk(id);
+
+      if (!alocacao) {
+        return res.status(404).json({ error: "Alocação não encontrada" });
+      }
+
+      return res.status(200).json(alocacao);
+    } catch (error) {
+      console.error("Erro ao buscar alocação:", error);
+      return res.status(500).json({ error: "Erro ao buscar alocação" });
+    }
+  },
+
+  // CRIAR
+  criar: async (req, res) => {
+    try {
+      const novaAlocacao = await Alocacao.create(req.body);
+      return res.status(201).json(novaAlocacao);
+    } catch (error) {
+      console.error("Erro ao criar alocação:", error);
+      return res.status(500).json({ error: "Erro ao criar alocação" });
+    }
+  },
+
+  // EDITAR
+  editar: async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const alocacao = await Alocacao.findByPk(id);
+      if (!alocacao) {
+        return res.status(404).json({ error: "Alocação não encontrada" });
+      }
+
+      await alocacao.update(req.body);
+
+      return res.status(200).json(alocacao);
+    } catch (error) {
+      console.error("Erro ao editar alocação:", error);
+      return res.status(500).json({ error: "Erro ao editar alocação" });
+    }
+  },
+
+  // DELETAR
+  deletar: async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const alocacao = await Alocacao.findByPk(id);
+      if (!alocacao) {
+        return res.status(404).json({ error: "Alocação não encontrada" });
+      }
+
       await alocacao.destroy();
-      res.status(200).send({ msg: "Alocação excluída com sucesso!" });
-    } else {
-      res.status(404).send({ msg: "Alocação não encontrada." });
-    }
-  } catch (error) {
-    console.error("Erro ao excluir alocação:", error);
-    res.status(500).send({ msg: "Erro ao excluir alocação." });
-  }
-}
 
-export default {
-  criarAlocacao,
-  listarAlocacoes,
-  editarAlocacao,
-  excluirAlocacao,
+      return res.status(200).json({ message: "Alocação excluída com sucesso" });
+    } catch (error) {
+      console.error("Erro ao deletar alocação:", error);
+      return res.status(500).json({ error: "Erro ao deletar alocação" });
+    }
+  },
 };
+
+export default alocacaoController;

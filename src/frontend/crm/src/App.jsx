@@ -9,6 +9,8 @@ import { Prospect } from "./components/prospect.jsx";
 import { RegistroVenda } from "./components/venda.jsx";
 import { ListarVendas } from "./components/listarVendas.jsx";
 import { EditarVenda } from "./components/editarVenda.jsx";
+import Alocacao from "./components/alocacao.jsx";
+import NovaALocacao from "./components/novaAlocacao.jsx";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -24,6 +26,8 @@ function App() {
         <Route path="/venda" element={<ListarVendas />} />
         <Route path="/venda/nova" element={<RegistroVenda />} />
         <Route path="/venda/editar/:id" element={<EditarVenda />} />
+        <Route path="/alocacao" element={<Alocacao />} />
+        <Route path="/alocacao/nova" element={<NovaALocacao />} />
       </Routes>
     </Router>
   );
