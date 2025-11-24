@@ -11,6 +11,7 @@ import { ListarVendas } from "./components/listarVendas.jsx";
 import { EditarVenda } from "./components/editarVenda.jsx";
 import Alocacao from "./components/alocacao.jsx";
 import NovaALocacao from "./components/novaAlocacao.jsx";
+import { PrivateRoute } from "./components/PrivateRoute.jsx";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -18,16 +19,90 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* ROTA PÚBLICA */}
         <Route path="/" element={<Login />} />
-        <Route path="/home" element={<Body />} />
-        <Route path="/usuarios" element={<Usuarios />} />
-        <Route path="/produtos" element={<Produtos />} />
-        <Route path="/prospect" element={<Prospect />} />
-        <Route path="/venda" element={<ListarVendas />} />
-        <Route path="/venda/nova" element={<RegistroVenda />} />
-        <Route path="/venda/editar/:id" element={<EditarVenda />} />
-        <Route path="/alocacao" element={<Alocacao />} />
-        <Route path="/alocacao/nova" element={<NovaALocacao />} />
+
+        {/* ROTAS PROTEGIDAS */}
+        <Route
+          path="/home"
+          element={
+            <PrivateRoute>
+              <Body />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/usuarios"
+          element={
+            <PrivateRoute>
+              <Usuarios />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/produtos"
+          element={
+            <PrivateRoute>
+              <Produtos />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/prospect"
+          element={
+            <PrivateRoute>
+              <Prospect />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/venda"
+          element={
+            <PrivateRoute>
+              <ListarVendas />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/venda/nova"
+          element={
+            <PrivateRoute>
+              <RegistroVenda />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/venda/editar/:id"
+          element={
+            <PrivateRoute>
+              <EditarVenda />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/alocacao"
+          element={
+            <PrivateRoute>
+              <Alocacao />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/alocacao/nova"
+          element={
+            <PrivateRoute>
+              <NovaALocacao />
+            </PrivateRoute>
+          }
+        />
       </Routes>
     </Router>
   );

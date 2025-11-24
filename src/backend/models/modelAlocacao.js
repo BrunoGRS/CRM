@@ -21,12 +21,11 @@ const Alocacao = db.define(
     },
 
     data_inicio: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
-
     data_fim: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: true,
     },
 

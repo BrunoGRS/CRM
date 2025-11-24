@@ -6,14 +6,15 @@ import { Navbar } from "./navbar";
 
 export const ListarVendas = () => {
   const [vendas, setVendas] = useState([]);
+  const [busca, setBusca] = useState(""); // ← FILTRO
   const navigate = useNavigate();
 
   const fetchVendas = async () => {
     try {
       const response = await fetch("http://localhost:3000/api/venda/listar");
       const data = await response.json();
+
       const lista = Array.isArray(data.msg) ? data.msg : [];
-      console.log(lista);
       setVendas(lista);
     } catch {
       toast.error("Erro ao listar vendas");
@@ -45,6 +46,30 @@ export const ListarVendas = () => {
     fetchVendas();
   }, []);
 
+  // 🔥 FILTRO FUNCIONAL
+  const vendasFiltradas = vendas.filter((v) => {
+    const txt = busca.toLowerCase();
+
+    return (
+      String(v.Codigo).toLowerCase().includes(txt) ||
+      String(v.Cliente || "")
+        .toLowerCase()
+        .includes(txt) ||
+      String(v.vendedor_id || "")
+        .toLowerCase()
+        .includes(txt) ||
+      String(v.Data || "")
+        .toLowerCase()
+        .includes(txt) ||
+      String(v.Total || "")
+        .toLowerCase()
+        .includes(txt) ||
+      String(v.Obs || "")
+        .toLowerCase()
+        .includes(txt)
+    );
+  });
+
   return (
     <div className="layout">
       <Navbar />
@@ -58,7 +83,16 @@ export const ListarVendas = () => {
           + Nova Venda
         </button>
 
-        {vendas.length === 0 ? (
+        {/* 🔍 INPUT DE BUSCA */}
+        <input
+          type="text"
+          className="input-busca"
+          placeholder="Buscar por código, cliente, vendedor..."
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+        />
+
+        {vendasFiltradas.length === 0 ? (
           <p>Nenhuma venda encontrada.</p>
         ) : (
           <table className="venda-table">
@@ -74,7 +108,7 @@ export const ListarVendas = () => {
               </tr>
             </thead>
             <tbody>
-              {vendas.map((venda) => (
+              {vendasFiltradas.map((venda) => (
                 <tr key={venda.Codigo}>
                   <td>{venda.Codigo}</td>
                   <td>{venda.Cliente}</td>

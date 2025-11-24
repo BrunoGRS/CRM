@@ -1,246 +1,235 @@
-/* ====== ESTILO GERAL ====== */
-:root {
-  --primary: #004aad;
-  --primary-hover: #003b8a;
-  --accent: #00a6ff;
-  --success: #00b894;
-  --danger: #e74c3c;
-  --text: #333;
-  --bg: #f4f6f8;
-  --white: #fff;
-  --border: #dcdfe3;
-}
+/* ====================================== */
+/*   ESTILOS RESTRITOS A .aloc-container   */
+/* ====================================== */
 
-body {
-  padding: 0;
-  font-family: "Montserrat", sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
-
-/* ====== CONTAINER CENTRALIZADO ====== */
-
-/* ====== TÍTULO ====== */
 .aloc-container h1 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: var(--primary);
-  margin-bottom: 1.5rem;
-  border-left: 5px solid var(--accent);
-  padding-left: 0.8rem;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #222;
 }
 
-/* ====== BOTÃO NOVA ALOCAÇÃO ====== */
-.btn-add {
-  background: var(--primary);
-  color: var(--white);
+/* Botão Nova Alocação */
+.aloc-container .btn-add {
+  padding: 12px 18px;
+  background: #4a90e2;
+  color: white;
   border: none;
-  border-radius: 8px;
-  padding: 0.8rem 1.6rem;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.3s ease;
-  margin-bottom: 1.5rem;
+  font-size: 15px;
+  margin-bottom: 20px;
+  transition: 0.2s;
 }
 
-.btn-add:hover {
-  background: var(--primary-hover);
+.aloc-container .btn-add:hover {
+  background: #357abd;
 }
 
-/* ====== TABELA ====== */
-.aloc-table {
+/* Campo de busca */
+.aloc-container .input-busca {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #d0d7de;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 15px;
+  transition: 0.2s;
+  background: white;
+}
+
+.aloc-container .input-busca:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+/* Tabela */
+.aloc-container .aloc-table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--white);
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.aloc-table thead {
-  background: var(--primary);
-  color: var(--white);
-  text-transform: uppercase;
-  font-size: 0.9rem;
-}
-
-.aloc-table th,
-.aloc-table td {
-  padding: 0.9rem 1rem;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-}
-
-.aloc-table tr:hover {
-  background: #f0f7ff;
-  transition: background 0.2s;
-}
-
-/* ====== BOTÕES ====== */
-.btn-edit,
-.btn-del {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-right: 0.4rem;
-  transition: all 0.3s;
-}
-
-.btn-edit {
-  background: var(--accent);
-  color: var(--white);
-}
-
-.btn-edit:hover {
-  background: #0094e0;
-}
-
-.btn-del {
-  background: var(--danger);
-  color: var(--white);
-}
-
-.btn-del:hover {
-  background: #c0392b;
-}
-
-/* ====== MODAL ====== */
-.modal-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal {
-  background: var(--white);
-  padding: 1.8rem;
-  width: 500px;
-  max-width: 95%;
+  background: white;
   border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
-.form-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
+.aloc-container .aloc-table thead {
+  background: #eef2f7;
 }
 
-.modal-buttons {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
+.aloc-container .aloc-table th {
+  padding: 14px;
+  text-align: left;
+  font-size: 14px;
+  color: #444;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
 }
 
-.btn-save {
-  background: var(--success);
-  color: var(--white);
-  padding: 0.6rem 1.2rem;
-  border: none;
+.aloc-container .aloc-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.aloc-container .aloc-table tbody tr:hover {
+  background: #f7f9fc;
+}
+
+/* Botões editar/excluir */
+.aloc-container .btn-edit {
+  background: #ffd966;
+  padding: 8px 12px;
   border-radius: 8px;
-  margin-right: 0.6rem;
-  cursor: pointer;
-}
-
-.btn-cancel {
-  background: var(--danger);
-  color: var(--white);
-  padding: 0.6rem 1.2rem;
   border: none;
-  border-radius: 8px;
   cursor: pointer;
+  margin-right: 8px;
+  transition: 0.2s;
 }
 
-.btn-cancel:hover {
-  background: #c0392b;
+.aloc-container .btn-edit:hover {
+  background: #f7c843;
 }
 
-/*=============== MODAL =========== */
-.modal-bg {
+.aloc-container .btn-del {
+  background: #ff6b6b;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  transition: 0.2s;
+}
+
+.aloc-container .btn-del:hover {
+  background: #e25656;
+}
+
+/* Modal */
+.aloc-container .modal-bg {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(20, 20, 20, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
+  animation: fadeIn 0.2s;
 }
 
-.modal {
-  background: #fff;
-  padding: 20px;
-  width: 500px;
-  max-height: 90vh;
+.aloc-container .modal {
+  background: white;
+  width: 520px;
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.25s;
+}
+
+.aloc-container .modal h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 22px;
+}
+
+.aloc-container .modal-body-scroll {
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* Formulário dentro do modal */
+.aloc-container .form-grid {
   display: flex;
   flex-direction: column;
-  border-radius: 10px;
 }
 
-.modal-body-scroll {
-  max-height: 60vh;
-  overflow-y: auto;
-  padding-right: 10px;
+.aloc-container .form-grid label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.aloc-container .form-grid input,
+.aloc-container .form-grid select,
+.aloc-container .form-grid textarea {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #d0d7de;
+  margin-bottom: 16px;
+  background: #fafafa;
+  transition: 0.2s;
+}
+
+.aloc-container .form-grid input:focus,
+.aloc-container .form-grid select:focus,
+.aloc-container .form-grid textarea:focus {
+  border-color: #4a90e2;
+  background: white;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.25);
+}
+
+.aloc-container textarea {
+  resize: none;
+  height: 70px;
+}
+
+/* Botões modal */
+.aloc-container .modal-buttons {
+  display: flex;
+  justify-content: space-between;
   margin-top: 10px;
 }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
+.aloc-container .btn-save {
+  flex: 1;
+  margin-right: 10px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #4caf50;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
 }
 
-.modal-buttons {
-  margin-top: 15px;
-  display: flex;
-  justify-content: space-between;
-  position: sticky;
-  bottom: 0;
-  background: #fff;
-  padding-top: 10px;
+.aloc-container .btn-save:hover {
+  background: #3e8e41;
 }
 
-/* ====== ANIMAÇÃO ====== */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.aloc-container .btn-cancel {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #b6b6b6;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
 }
 
-/* ====== RESPONSIVIDADE ====== */
-@media (max-width: 900px) {
-  .aloc-container {
-    padding: 1rem;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .modal {
-    width: 90%;
-  }
+.aloc-container .btn-cancel:hover {
+  background: #999;
 }
 
-@media (max-width: 700px) {
-  .aloc-table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
+/* Responsivo */
+@media (max-width: 600px) {
+  .aloc-container .modal {
+    width: 92%;
+  }
+
+  .aloc-container .btn-add {
+    width: 100%;
+  }
+
+  .aloc-container .input-busca {
+    width: 100%;
   }
 }

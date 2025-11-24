@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./css/alocacoes.css";
 import { Navbar } from "./navbar.jsx";
 
@@ -8,6 +8,8 @@ function Alocacao() {
   const [modalAberto, setModalAberto] = useState(false);
   const [editando, setEditando] = useState(false);
   const navigate = useNavigate();
+
+  const [busca, setBusca] = useState("");
 
   const [form, setForm] = useState({
     id: 0,
@@ -86,14 +88,38 @@ function Alocacao() {
     else alert("Erro ao excluir");
   };
 
+  // ✅ FILTRO CORRIGIDO + NOME DO CLIENTE + NOME DA MÁQUINA
+  const alocacoesFiltradas = alocacoes.filter((a) => {
+    const txt = busca.toLowerCase();
+
+    return (
+      String(a.id).includes(txt) ||
+      String(a.maquina_id).toLowerCase().includes(txt) ||
+      String(a.cliente_id).toLowerCase().includes(txt) ||
+      a.status?.toLowerCase().includes(txt) ||
+      a.local_instalacao?.toLowerCase().includes(txt) ||
+      a.cliente_nome?.toLowerCase().includes(txt) || // ← se vier do backend
+      a.maquina_nome?.toLowerCase().includes(txt) // ← se vier do backend
+    );
+  });
+
   return (
     <div className="aloc-container">
       <Navbar />
       <h1>Alocações de Máquina</h1>
 
-      <button className="btn-add" onClick={() => navigate("/alocacao/nova")}>
+      <button className="btn-add" onClick={novaAlocacao}>
         + Nova Alocação
       </button>
+
+      {/* CAMPO DE BUSCA */}
+      <input
+        type="text"
+        className="input-busca"
+        placeholder="Buscar por ID, Máquina, Cliente, Status..."
+        value={busca}
+        onChange={(e) => setBusca(e.target.value)}
+      />
 
       <table className="aloc-table">
         <thead>
@@ -108,14 +134,18 @@ function Alocacao() {
           </tr>
         </thead>
         <tbody>
-          {alocacoes.map((a) => (
+          {alocacoesFiltradas.map((a) => (
             <tr key={a.id}>
               <td>{a.id}</td>
-              <td>{a.maquina_id}</td>
-              <td>{a.cliente_id}</td>
+
+              {/* Exibir nome se houver */}
+              <td>{a.maquina_nome || a.maquina_id}</td>
+              <td>{a.cliente_nome || a.cliente_id}</td>
+
               <td>{a.data_inicio?.slice(0, 10)}</td>
               <td>{a.data_fim?.slice(0, 10)}</td>
               <td>{a.status}</td>
+
               <td>
                 <button className="btn-edit" onClick={() => editarAlocacao(a)}>
                   Editar
@@ -128,7 +158,7 @@ function Alocacao() {
             </tr>
           ))}
 
-          {alocacoes.length === 0 && (
+          {alocacoesFiltradas.length === 0 && (
             <tr>
               <td colSpan="7">Nenhuma alocação encontrada</td>
             </tr>
@@ -142,9 +172,6 @@ function Alocacao() {
           <div className="modal">
             <h2>{editando ? "Editar Alocação" : "Nova Alocação"}</h2>
 
-            {/* ------------------------- */}
-            {/* ÁREA COM SCROLL */}
-            {/* ------------------------- */}
             <div className="modal-body-scroll">
               <div className="form-grid">
                 <label>Máquina ID</label>
@@ -184,11 +211,16 @@ function Alocacao() {
                 />
 
                 <label>Status</label>
-                <input
-                  type="text"
+                <select
                   value={form.status}
                   onChange={(e) => setForm({ ...form, status: e.target.value })}
-                />
+                >
+                  <option value="">Selecione...</option>
+                  <option value="ativa">Ativa</option>
+                  <option value="encerrada">Encerrada</option>
+                  <option value="em_manutencao">Em manutenção</option>
+                  <option value="reservada">Reservada</option>
+                </select>
 
                 <label>Local Instalação</label>
                 <input
@@ -221,7 +253,6 @@ function Alocacao() {
               </div>
             </div>
 
-            {/* BOTÕES FIXOS */}
             <div className="modal-buttons">
               <button className="btn-save" onClick={salvar}>
                 Salvar

@@ -31,7 +31,9 @@ export const Login = () => {
   const login = async (e) => {
     e.preventDefault();
     const status = await validarUsuario();
+
     if (status === 200) {
+      localStorage.setItem("auth", "true"); // ← salva login
       navigate("/home");
     } else {
       toast.error("Usuário ou Senha Inválidos.");

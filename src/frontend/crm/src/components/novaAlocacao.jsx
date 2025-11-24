@@ -1,17 +1,16 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import "./css/alocacoes.css";
+import { useEffect, useState } from "react";
 import { Navbar } from "./navbar";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "./css/alocacoes.css";
 
-function AlocacaoForm() {
+export default function AlocacaoCriar() {
   const navigate = useNavigate();
-  const { id } = useParams();
-  const location = useLocation();
 
-  const editando = Boolean(id);
+  const [clientes, setClientes] = useState([]);
+  const [produtos, setProdutos] = useState([]);
 
   const [form, setForm] = useState({
-    id: 0,
     maquina_id: "",
     cliente_id: "",
     data_inicio: "",
@@ -22,103 +21,145 @@ function AlocacaoForm() {
     observacoes: "",
   });
 
-  useEffect(() => {
-    if (editando && location.state) {
-      setForm(location.state);
+  // =============================
+  // BUSCAR CLIENTES
+  // =============================
+  const fetchClientes = async () => {
+    try {
+      const resp = await fetch("http://localhost:3000/api/cliente/listar");
+      const data = await resp.json();
+      setClientes(Array.isArray(data.msg) ? data.msg : []);
+    } catch (error) {
+      toast.error("Erro ao carregar clientes");
     }
+  };
+
+  // =============================
+  // BUSCAR PRODUTOS (MÁQUINAS)
+  // =============================
+  const fetchProdutos = async () => {
+    try {
+      const resp = await fetch("http://localhost:3000/api/produto/listar");
+      const data = await resp.json();
+      setProdutos(Array.isArray(data.msg) ? data.msg : []);
+    } catch (error) {
+      toast.error("Erro ao carregar máquinas/produtos");
+    }
+  };
+
+  useEffect(() => {
+    fetchClientes();
+    fetchProdutos();
   }, []);
 
+  // =============================
+  // SALVAR ALOCAÇÃO
+  // =============================
   const salvar = async () => {
-    const url = editando
-      ? `http://localhost:3000/api/alocacao/editar/${id}`
-      : "http://localhost:3000/api/alocacao/criar";
+    try {
+      const resp = await fetch("http://localhost:3000/api/alocacao/criar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    const metodo = editando ? "PUT" : "POST";
+      if (!resp.ok) {
+        toast.error("Erro ao salvar alocação");
+        return;
+      }
 
-    const resp = await fetch(url, {
-      method: metodo,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-
-    if (resp.ok) {
+      toast.success("Alocação criada!");
       navigate("/alocacao");
-    } else {
-      alert("Erro ao salvar alocação");
+    } catch (error) {
+      toast.error("Erro ao salvar");
     }
   };
 
   return (
-    <div className="aloc-container">
+    <section className="aloc-container">
       <Navbar />
-      <h1>{editando ? "Editar Alocação" : "Nova Alocação"}</h1>
+      <h1>Nova Alocação</h1>
 
-      <div className="page-form">
-        <div className="form-grid">
-          <label>Máquina ID</label>
-          <input
-            type="number"
-            value={form.maquina_id}
-            onChange={(e) => setForm({ ...form, maquina_id: e.target.value })}
-          />
+      <div className="aloc-form">
+        {/* SELECIONAR MÁQUINA */}
+        <label>Máquina / Produto</label>
+        <select
+          value={form.maquina_id}
+          onChange={(e) => setForm({ ...form, maquina_id: e.target.value })}
+        >
+          <option value="">Selecione</option>
+          {produtos.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.nome}
+            </option>
+          ))}
+        </select>
 
-          <label>Cliente ID</label>
-          <input
-            type="number"
-            value={form.cliente_id}
-            onChange={(e) => setForm({ ...form, cliente_id: e.target.value })}
-          />
+        {/* SELECIONAR CLIENTE */}
+        <label>Cliente</label>
+        <select
+          value={form.cliente_id}
+          onChange={(e) => setForm({ ...form, cliente_id: e.target.value })}
+        >
+          <option value="">Selecione</option>
+          {clientes.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.fantasiaEmpresa || c.razaoSocialEmpresa}
+            </option>
+          ))}
+        </select>
 
-          <label>Data Início</label>
-          <input
-            type="date"
-            value={form.data_inicio?.slice(0, 10)}
-            onChange={(e) => setForm({ ...form, data_inicio: e.target.value })}
-          />
+        <label>Data Início</label>
+        <input
+          type="date"
+          value={form.data_inicio}
+          onChange={(e) => setForm({ ...form, data_inicio: e.target.value })}
+        />
 
-          <label>Data Fim</label>
-          <input
-            type="date"
-            value={form.data_fim?.slice(0, 10)}
-            onChange={(e) => setForm({ ...form, data_fim: e.target.value })}
-          />
+        <label>Data Fim</label>
+        <input
+          type="date"
+          value={form.data_fim}
+          onChange={(e) => setForm({ ...form, data_fim: e.target.value })}
+        />
 
-          <label>Status</label>
-          <input
-            type="text"
-            value={form.status}
-            onChange={(e) => setForm({ ...form, status: e.target.value })}
-          />
+        <label>Status</label>
+        <select
+          value={form.status}
+          onChange={(e) => setForm({ ...form, status: e.target.value })}
+        >
+          <option value="">Selecione</option>
+          <option value="ativa">Ativa</option>
+          <option value="encerrada">Encerrada</option>
+          <option value="em_manutencao">Em manutenção</option>
+          <option value="reservada">Reservada</option>
+        </select>
 
-          <label>Local Instalação</label>
-          <input
-            type="text"
-            value={form.local_instalacao}
-            onChange={(e) =>
-              setForm({ ...form, local_instalacao: e.target.value })
-            }
-          />
+        <label>Local Instalação</label>
+        <input
+          type="text"
+          value={form.local_instalacao}
+          onChange={(e) =>
+            setForm({ ...form, local_instalacao: e.target.value })
+          }
+        />
 
-          <label>Responsável</label>
-          <input
-            type="text"
-            value={form.responsavel_instalacao}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                responsavel_instalacao: e.target.value,
-              })
-            }
-          />
+        <label>Responsável Instalação</label>
+        <input
+          type="text"
+          value={form.responsavel_instalacao}
+          onChange={(e) =>
+            setForm({ ...form, responsavel_instalacao: e.target.value })
+          }
+        />
 
-          <label>Observações</label>
-          <textarea
-            value={form.observacoes}
-            onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
-          ></textarea>
-        </div>
+        <label>Observações</label>
+        <textarea
+          value={form.observacoes}
+          onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
+        ></textarea>
 
-        <div className="form-buttons">
+        <div className="aloc-btns">
           <button className="btn-save" onClick={salvar}>
             Salvar
           </button>
@@ -127,8 +168,6 @@ function AlocacaoForm() {
           </button>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
-
-export default AlocacaoForm;

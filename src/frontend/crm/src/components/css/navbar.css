@@ -83,6 +83,27 @@
   outline-offset: 4px;
 }
 
+.btn-logout {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 20px;
+}
+
+.btn-logout:hover {
+  background-color: #b71c1c;
+}
+
+.navbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 /* ==============================================
    4. RESPONSIVIDADE (Exemplo)
    ============================================== */
