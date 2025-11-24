@@ -1,14 +1,19 @@
 /* ====== ESTILO GERAL ====== */
 :root {
-  --primary: #004aad;
-  --primary-hover: #003b8a;
-  --accent: #00a6ff;
-  --success: #00b894;
-  --danger: #e74c3c;
-  --text: #333;
-  --bg: #f4f6f8;
-  --white: #fff;
-  --border: #dcdfe3;
+  --primary: #5d3a22;
+  --primary-light: #7a563f;
+  --primary-hover: #4c2f19;
+
+  --bg: #f7f7f7;
+  --white: #ffffff;
+
+  --text: #444;
+  --text-light: #666;
+
+  --border: #e1e1e1;
+  --border-dark: #d3d3d3;
+
+  --status-exportado: #2a9df4;
 }
 
 body {
@@ -19,7 +24,7 @@ body {
   color: var(--text);
 }
 
-/* ====== LAYOUT PRINCIPAL ====== */
+/* ====== ÁREA PRINCIPAL ====== */
 .layout {
   display: flex;
   flex-direction: column;
@@ -28,137 +33,140 @@ body {
 
 .content {
   flex: 1;
-  padding: 2rem 3rem;
-  background: var(--bg);
+  padding: 1.8rem 2.5rem;
 }
 
 h2 {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  color: var(--primary);
-  margin-bottom: 1.5rem;
-  border-left: 5px solid var(--accent);
-  padding-left: 0.8rem;
+  color: #333;
+  margin-bottom: 1.4rem;
 }
 
-/* ====== BOTÃO DE NOVA VENDA ====== */
+/* ====== BOTÃO NOVO ====== */
 .btn-criar-novo {
   background: var(--primary);
   color: var(--white);
   border: none;
-  border-radius: 8px;
-  padding: 0.8rem 1.6rem;
-  font-size: 1rem;
+  border-radius: 6px;
+  padding: 0.7rem 1.3rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
-  margin-bottom: 1.5rem;
+  transition: 0.3s ease;
+  margin-bottom: 1.2rem;
 }
 
 .btn-criar-novo:hover {
   background: var(--primary-hover);
 }
 
-/* ====== TABELA ====== */
+/* =======================================================
+   TABELA ESTILO DASHBOARD CORPORATIVO
+   ======================================================= */
 .venda-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0 6px; /* ❗ Linhas separadas */
+}
+
+/* ====== LINHAS ====== */
+.venda-table tbody tr {
   background: var(--white);
   border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.venda-table thead {
-  background: var(--primary);
-  color: var(--white);
-  text-transform: uppercase;
-  font-size: 0.9rem;
+.venda-table tbody tr:hover {
+  background: #f5f5f5;
 }
 
-.venda-table th,
-.venda-table td {
+/* ====== CÉLULAS ====== */
+.venda-table td,
+.venda-table th {
   padding: 0.9rem 1rem;
-  text-align: left;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+.venda-table th {
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #999;
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  background: transparent;
   border-bottom: 1px solid var(--border);
 }
 
-.venda-table th:first-child {
-  border-top-left-radius: 10px;
+/* Remove borda final */
+.venda-table tbody tr td {
+  border-bottom: none !important;
 }
 
-.venda-table th:last-child {
-  border-top-right-radius: 10px;
-}
-
-.venda-table tr:hover {
-  background: #f0f7ff;
-  transition: background 0.2s;
-}
-
-/* ====== TEXTO QUANDO SEM REGISTROS ====== */
-.content p {
-  text-align: center;
-  color: #666;
-  font-style: italic;
-  padding: 2rem 0;
+/* ====== BADGE STATUS ====== */
+.status-badge {
+  background: var(--status-exportado);
+  color: white;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  border-radius: 20px;
+  font-weight: 600;
 }
 
 /* ====== BOTÕES DE AÇÃO ====== */
+.action-buttons {
+  display: flex;
+  gap: 6px;
+}
+
 .button-editar,
-.button-excluir {
-  padding: 0.5rem 1rem;
+.button-excluir,
+.btn-pdf {
+  padding: 0.45rem 0.9rem;
   border: none;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  margin-right: 0.4rem;
+  transition: 0.3s ease;
 }
 
 .button-editar {
-  background: var(--accent);
-  color: var(--white);
+  background: var(--primary-light);
+  color: white;
 }
-
 .button-editar:hover {
-  background: #0094e0;
+  background: var(--primary);
 }
 
 .button-excluir {
-  background: var(--danger);
-  color: var(--white);
+  background: #d9534f;
+  color: white;
+}
+.button-excluir:hover {
+  background: #c9302c;
 }
 
-.button-excluir:hover {
-  background: #c0392b;
+/* ====== BOTÃO PDF ====== */
+.btn-pdf {
+  padding: 6px 12px;
+  background-color: var(--primary);
+  color: white;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: 0.2s;
+  margin-left: 5px;
+}
+
+.btn-pdf:hover {
+  background-color: var(--primary-hover);
 }
 
 /* ====== RESPONSIVIDADE ====== */
-@media (max-width: 900px) {
-  .content {
-    padding: 1rem;
-  }
-
-  h2 {
-    font-size: 1.5rem;
-  }
-
-  .venda-table th,
-  .venda-table td {
-    padding: 0.6rem;
-    font-size: 0.9rem;
-  }
-
-  .button-editar,
-  .button-excluir {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
-  }
-}
-
-@media (max-width: 700px) {
+@media (max-width: 780px) {
   .venda-table {
     display: block;
     overflow-x: auto;

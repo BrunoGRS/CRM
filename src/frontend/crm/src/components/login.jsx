@@ -82,8 +82,8 @@ export const Login = () => {
             <a href="#">Esqueceu a Senha?</a>
           </div>
         </form>
-        <ToastContainer />
       </div>
+      <ToastContainer />
     </div>
   );
 };

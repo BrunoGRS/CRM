@@ -5,6 +5,8 @@ import { Navbar } from "./navbar.jsx";
 
 function Alocacao() {
   const [alocacoes, setAlocacoes] = useState([]);
+  const [clientes, setClientes] = useState([]);
+  const [maquinas, setMaquinas] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);
   const [editando, setEditando] = useState(false);
   const navigate = useNavigate();
@@ -23,16 +25,36 @@ function Alocacao() {
     observacoes: "",
   });
 
+  // ============================
+  // 🔄 CARREGAR DADOS DO BACKEND
+  // ============================
   const carregarAlocacoes = async () => {
     const resp = await fetch("http://localhost:3000/api/alocacao/listar");
     const dados = await resp.json();
     setAlocacoes(dados);
   };
 
+  const carregarClientesEMaquinas = async () => {
+    const [rc, rm] = await Promise.all([
+      fetch("http://localhost:3000/api/cliente/listar"),
+      fetch("http://localhost:3000/api/produto/listar"),
+    ]);
+
+    const c = await rc.json();
+    const m = await rm.json();
+
+    setClientes(c.msg || []);
+    setMaquinas(m.msg || []);
+  };
+
   useEffect(() => {
     carregarAlocacoes();
+    carregarClientesEMaquinas();
   }, []);
 
+  // ============================
+  // 🆕 NOVA ALOCAÇÃO
+  // ============================
   const novaAlocacao = () => {
     setEditando(false);
     setForm({
@@ -49,12 +71,18 @@ function Alocacao() {
     setModalAberto(true);
   };
 
+  // ============================
+  // ✏ EDITAR ALOCAÇÃO
+  // ============================
   const editarAlocacao = (item) => {
     setEditando(true);
     setForm(item);
     setModalAberto(true);
   };
 
+  // ============================
+  // 💾 SALVAR
+  // ============================
   const salvar = async () => {
     const url = editando
       ? `http://localhost:3000/api/alocacao/editar/${form.id}`
@@ -62,10 +90,16 @@ function Alocacao() {
 
     const metodo = editando ? "PUT" : "POST";
 
+    const body = {
+      ...form,
+      data_inicio: form.data_inicio,
+      data_fim: form.data_fim || null,
+    };
+
     const resp = await fetch(url, {
       method: metodo,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify(body),
     });
 
     if (resp.ok) {
@@ -76,6 +110,9 @@ function Alocacao() {
     }
   };
 
+  // ============================
+  // 🗑 EXCLUIR
+  // ============================
   const excluir = async (id) => {
     if (!window.confirm("Deseja realmente excluir?")) return;
 
@@ -88,18 +125,18 @@ function Alocacao() {
     else alert("Erro ao excluir");
   };
 
-  // ✅ FILTRO CORRIGIDO + NOME DO CLIENTE + NOME DA MÁQUINA
+  // ============================
+  // 🔎 FILTRO + NOMES DO CLIENTE / MÁQUINA
+  // ============================
   const alocacoesFiltradas = alocacoes.filter((a) => {
     const txt = busca.toLowerCase();
 
     return (
       String(a.id).includes(txt) ||
-      String(a.maquina_id).toLowerCase().includes(txt) ||
-      String(a.cliente_id).toLowerCase().includes(txt) ||
+      a.cliente_nome?.toLowerCase().includes(txt) ||
+      a.maquina_nome?.toLowerCase().includes(txt) ||
       a.status?.toLowerCase().includes(txt) ||
-      a.local_instalacao?.toLowerCase().includes(txt) ||
-      a.cliente_nome?.toLowerCase().includes(txt) || // ← se vier do backend
-      a.maquina_nome?.toLowerCase().includes(txt) // ← se vier do backend
+      a.local_instalacao?.toLowerCase().includes(txt)
     );
   });
 
@@ -112,11 +149,10 @@ function Alocacao() {
         + Nova Alocação
       </button>
 
-      {/* CAMPO DE BUSCA */}
       <input
         type="text"
         className="input-busca"
-        placeholder="Buscar por ID, Máquina, Cliente, Status..."
+        placeholder="Buscar por Nome do Cliente, Máquina, Status..."
         value={busca}
         onChange={(e) => setBusca(e.target.value)}
       />
@@ -133,15 +169,13 @@ function Alocacao() {
             <th>Ações</th>
           </tr>
         </thead>
+
         <tbody>
           {alocacoesFiltradas.map((a) => (
             <tr key={a.id}>
               <td>{a.id}</td>
-
-              {/* Exibir nome se houver */}
               <td>{a.maquina_nome || a.maquina_id}</td>
               <td>{a.cliente_nome || a.cliente_id}</td>
-
               <td>{a.data_inicio?.slice(0, 10)}</td>
               <td>{a.data_fim?.slice(0, 10)}</td>
               <td>{a.status}</td>
@@ -166,7 +200,9 @@ function Alocacao() {
         </tbody>
       </table>
 
-      {/* MODAL */}
+      {/* ============================
+          MODAL
+        ============================ */}
       {modalAberto && (
         <div className="modal-bg">
           <div className="modal">
@@ -174,24 +210,39 @@ function Alocacao() {
 
             <div className="modal-body-scroll">
               <div className="form-grid">
-                <label>Máquina ID</label>
-                <input
-                  type="number"
+                {/* SELECT MÁQUINA */}
+                <label>Máquina</label>
+                <select
                   value={form.maquina_id}
                   onChange={(e) =>
                     setForm({ ...form, maquina_id: e.target.value })
                   }
-                />
+                >
+                  <option value="">Selecione...</option>
+                  {maquinas.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.nome}
+                    </option>
+                  ))}
+                </select>
 
-                <label>Cliente ID</label>
-                <input
-                  type="number"
+                {/* SELECT CLIENTE */}
+                <label>Cliente</label>
+                <select
                   value={form.cliente_id}
                   onChange={(e) =>
                     setForm({ ...form, cliente_id: e.target.value })
                   }
-                />
+                >
+                  <option value="">Selecione...</option>
+                  {clientes.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.razaoSocialEmpresa}
+                    </option>
+                  ))}
+                </select>
 
+                {/* DEMAIS CAMPOS */}
                 <label>Data Início</label>
                 <input
                   type="date"
