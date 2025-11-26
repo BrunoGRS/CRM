@@ -1,0 +1,291 @@
+/* ======================================================
+   VARIAVEIS DE COR (Identidade Brastália)
+   ====================================================== */
+:root {
+  --primary-brown: #4b2e2a; /* Marrom Café */
+  --secondary-brown: #6d4c41; /* Marrom mais claro */
+  --light-cream: #f5ede3; /* Fundo suave */
+  --bg-page: #f4f5f7; /* Fundo da página */
+  --white: #ffffff;
+  --text-dark: #333333;
+  --text-muted: #666666;
+  --danger: #d32f2f;
+  --success: #2e7d32;
+  --border-color: #ddd;
+}
+
+/* ======================================================
+   LAYOUT GERAL
+   ====================================================== */
+.venda-page {
+  min-height: 100vh;
+  background-color: var(--bg-page);
+  display: flex;
+  flex-direction: column;
+  font-family: "Poppins", sans-serif;
+}
+
+.venda-wrapper {
+  margin: 40px auto;
+  width: 95%;
+  max-width: 900px;
+  background: var(--white);
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 8px 24px rgba(75, 46, 42, 0.08);
+}
+
+/* ======================================================
+   TÍTULOS
+   ====================================================== */
+.venda-wrapper h2 {
+  color: var(--primary-brown);
+  font-weight: 700;
+  font-size: 1.8rem;
+  margin-bottom: 30px;
+  border-bottom: 4px solid var(--primary-brown);
+  display: inline-block;
+  padding-bottom: 5px;
+}
+
+.venda-wrapper h3 {
+  color: var(--secondary-brown);
+  font-size: 1.2rem;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+/* ======================================================
+   FORMULÁRIO GERAL
+   ====================================================== */
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 0.95rem;
+}
+
+/* Estilo padrão para Selects, Inputs e Textareas */
+.form-group select,
+.form-group textarea,
+.produto-row select,
+.produto-row input {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  transition: all 0.2s;
+  background-color: #fafafa;
+}
+
+/* Foco nos inputs */
+.form-group select:focus,
+.form-group textarea:focus,
+.produto-row select:focus,
+.produto-row input:focus {
+  border-color: var(--primary-brown);
+  background-color: var(--white);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(75, 46, 42, 0.1);
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* ======================================================
+   LINHA DE PRODUTOS (GRID)
+   ====================================================== */
+.produto-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 15px;
+  background-color: var(--light-cream);
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.produto-row:hover {
+  border-color: #dacdc0;
+}
+
+/* Largura dos campos na linha */
+.produto-row select[name="produto_id"] {
+  flex: 3; /* Nome do produto ocupa mais espaço */
+}
+
+.produto-row input[name="quantidade"] {
+  flex: 0.5;
+  text-align: center;
+}
+
+.produto-row input[name="valor_unitario"],
+.produto-row input[readOnly] {
+  flex: 1;
+  background-color: #e9ecef; /* Fundo cinza para campos automáticos */
+  color: #555;
+  cursor: default;
+  text-align: right;
+  font-weight: 500;
+}
+
+/* Botão Remover (X) */
+.btn-remover {
+  background-color: #ffebee;
+  color: var(--danger);
+  border: 1px solid #ffcdd2;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 0.2s;
+  flex-shrink: 0; /* Impede que o botão encolha */
+}
+
+.btn-remover:hover {
+  background-color: var(--danger);
+  color: white;
+  border-color: var(--danger);
+}
+
+/* Botão Adicionar Produto (+) */
+.btn-add {
+  margin-top: 10px;
+  background-color: transparent;
+  border: 2px dashed var(--primary-brown);
+  color: var(--primary-brown);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-add:hover {
+  background-color: var(--light-cream);
+  border-style: solid;
+}
+
+/* ======================================================
+   TOTAL E BOTÕES FINAIS
+   ====================================================== */
+.total-display {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  text-align: right;
+  font-size: 1.5rem;
+  color: var(--text-dark);
+  padding: 20px;
+  background-color: var(--light-cream);
+  border-radius: 8px;
+  border-left: 5px solid var(--primary-brown);
+}
+
+.total-display strong {
+  color: var(--primary-brown);
+  margin-right: 10px;
+}
+
+.botoes-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.btn-salvar {
+  background-color: var(--primary-brown);
+  color: var(--white);
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-salvar:hover {
+  background-color: #3a221f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn-voltar {
+  background-color: #e0e0e0;
+  color: var(--text-dark);
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-voltar:hover {
+  background-color: #d6d6d6;
+}
+
+/* ======================================================
+   RESPONSIVIDADE (MOBILE)
+   ====================================================== */
+@media (max-width: 768px) {
+  .venda-wrapper {
+    padding: 20px;
+    margin: 20px auto;
+  }
+
+  .produto-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 20px;
+  }
+
+  .produto-row select,
+  .produto-row input {
+    width: 100%;
+  }
+
+  .btn-remover {
+    width: 100%;
+    margin-top: 5px;
+  }
+
+  .botoes-acoes {
+    flex-direction: column-reverse;
+  }
+
+  .btn-salvar,
+  .btn-voltar {
+    width: 100%;
+    justify-content: center;
+  }
+}

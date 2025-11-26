@@ -1,5 +1,7 @@
 import { Sequelize } from "sequelize";
 import { db } from "../database/database.js";
+// 1. IMPORTANTE: Você precisa importar o model com quem quer se relacionar
+import modelItemVenda from "./modelItemVenda.js";
 
 const modelVenda = db.define(
   "vendas",
@@ -15,7 +17,7 @@ const modelVenda = db.define(
     },
     vendedor_id: {
       type: Sequelize.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     data_venda: {
       type: Sequelize.DATE,
@@ -23,7 +25,7 @@ const modelVenda = db.define(
     },
     valor_total: {
       type: Sequelize.DECIMAL(10, 2),
-      allowNull: false,
+      allowNull: true,
     },
     observacao: {
       type: Sequelize.TEXT,
@@ -32,7 +34,19 @@ const modelVenda = db.define(
   },
   {
     timestamps: false,
+    tableName: "vendas", // É boa prática garantir o nome da tabela
   }
 );
+
+// --- 2. ADICIONE O RELACIONAMENTO AQUI ---
+
+// Uma Venda TEM MUITOS Itens
+modelVenda.hasMany(modelItemVenda, {
+  foreignKey: "venda_id",
+  as: "itens",
+});
+
+// Opcional: Se quiser que o item "volte" para venda
+// modelItemVenda.belongsTo(modelVenda, { foreignKey: 'venda_id' });
 
 export default modelVenda;

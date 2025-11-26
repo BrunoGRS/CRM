@@ -61,6 +61,50 @@ h2 {
   background: var(--primary-hover);
 }
 
+/* ====== CAMPO DE BUSCA ESTILIZADO ====== */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1.2rem;
+}
+
+.input-busca {
+  width: 280px;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-dark);
+  background: var(--white);
+  font-size: 0.9rem;
+  color: var(--text);
+  transition: 0.25s;
+  outline: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  margin-left: 50px;
+}
+
+.input-busca::placeholder {
+  color: var(--text-light);
+}
+
+.input-busca:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(93, 58, 34, 0.25);
+}
+
+.clear-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: var(--text-light);
+  padding: 0 4px;
+}
+
+.clear-btn:hover {
+  color: var(--primary);
+}
+
 /* =======================================================
    TABELA ESTILO DASHBOARD CORPORATIVO
    ======================================================= */
@@ -82,12 +126,43 @@ h2 {
 }
 
 /* ====== CÉLULAS ====== */
-.venda-table td,
-.venda-table th {
+.venda-table th,
+.venda-table td {
+  text-align: left;
   padding: 0.9rem 1rem;
   font-size: 0.88rem;
   color: var(--text);
+  width: 16%; /* 🔥 garante alinhamento */
 }
+
+.venda-table th:nth-child(1),
+.venda-table td:nth-child(1) {
+  width: 8%;
+} /* código */
+.venda-table th:nth-child(2),
+.venda-table td:nth-child(2) {
+  width: 20%;
+} /* cliente */
+.venda-table th:nth-child(3),
+.venda-table td:nth-child(3) {
+  width: 16%;
+} /* vendedor */
+.venda-table th:nth-child(4),
+.venda-table td:nth-child(4) {
+  width: 16%;
+} /* data */
+.venda-table th:nth-child(5),
+.venda-table td:nth-child(5) {
+  width: 16%;
+} /* total */
+.venda-table th:nth-child(6),
+.venda-table td:nth-child(6) {
+  width: 16%;
+} /* obs */
+.venda-table th:nth-child(7),
+.venda-table td:nth-child(7) {
+  width: 8%;
+} /* ações */
 
 .venda-table th {
   text-transform: uppercase;
@@ -163,6 +238,29 @@ h2 {
 
 .btn-pdf:hover {
   background-color: var(--primary-hover);
+}
+
+.btn-paginacao {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #ddd;
+  transition: 0.2s;
+}
+
+.btn-paginacao:hover:not(:disabled) {
+  background-color: #ccc;
+}
+
+.btn-paginacao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-paginacao.ativo {
+  background-color: #4b2e2a; /* Cor Brastália */
+  color: white;
 }
 
 /* ====== RESPONSIVIDADE ====== */

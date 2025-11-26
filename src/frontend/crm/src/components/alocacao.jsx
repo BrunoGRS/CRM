@@ -1,7 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
 import "./css/alocacoes.css";
 import { Navbar } from "./navbar.jsx";
+
+/*
+  Nota sobre o logo:
+  - Substitua o caminho abaixo pelo caminho/URL real se necessário.
+  - Ambiente de desenvolvimento pode exigir ajuste (ex: import logo from "../assets/logo.png")
+*/
+const LOGO_PATH = "/mnt/data/221cb158-b210-4401-8874-a4ccff8956e4.png";
 
 function Alocacao() {
   const [alocacoes, setAlocacoes] = useState([]);
@@ -9,10 +17,8 @@ function Alocacao() {
   const [maquinas, setMaquinas] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);
   const [editando, setEditando] = useState(false);
-  const navigate = useNavigate();
-
   const [busca, setBusca] = useState("");
-
+  const [menuAberto, setMenuAberto] = useState(null);
   const [form, setForm] = useState({
     id: 0,
     maquina_id: "",
@@ -25,26 +31,46 @@ function Alocacao() {
     observacoes: "",
   });
 
-  // ============================
-  // 🔄 CARREGAR DADOS DO BACKEND
-  // ============================
+  const menuRef = useRef(null);
+  const navigate = useNavigate();
+
+  // fechar menu ao clicar fora
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuAberto(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  // carregar dados
   const carregarAlocacoes = async () => {
-    const resp = await fetch("http://localhost:3000/api/alocacao/listar");
-    const dados = await resp.json();
-    setAlocacoes(dados);
+    try {
+      const resp = await fetch("http://localhost:3000/api/alocacao/listar");
+      const dados = await resp.json();
+      setAlocacoes(Array.isArray(dados) ? dados : []);
+    } catch (err) {
+      console.error("Erro carregar alocações", err);
+    }
   };
 
   const carregarClientesEMaquinas = async () => {
-    const [rc, rm] = await Promise.all([
-      fetch("http://localhost:3000/api/cliente/listar"),
-      fetch("http://localhost:3000/api/produto/listar"),
-    ]);
+    try {
+      const [rc, rm] = await Promise.all([
+        fetch("http://localhost:3000/api/cliente/listar"),
+        fetch("http://localhost:3000/api/produto/listar"),
+      ]);
 
-    const c = await rc.json();
-    const m = await rm.json();
+      const cc = await rc.json();
+      const mm = await rm.json();
 
-    setClientes(c.msg || []);
-    setMaquinas(m.msg || []);
+      setClientes(Array.isArray(cc.msg) ? cc.msg : []);
+      setMaquinas(Array.isArray(mm.msg) ? mm.msg : []);
+    } catch (err) {
+      console.error("Erro carregar clientes/maquinas", err);
+    }
   };
 
   useEffect(() => {
@@ -52,9 +78,6 @@ function Alocacao() {
     carregarClientesEMaquinas();
   }, []);
 
-  // ============================
-  // 🆕 NOVA ALOCAÇÃO
-  // ============================
   const novaAlocacao = () => {
     setEditando(false);
     setForm({
@@ -71,91 +94,207 @@ function Alocacao() {
     setModalAberto(true);
   };
 
-  // ============================
-  // ✏ EDITAR ALOCAÇÃO
-  // ============================
-  const editarAlocacao = (item) => {
+  const editarAlocacao = (a) => {
     setEditando(true);
-    setForm(item);
+    // garantir formato data yyyy-mm-dd se for string
+    const dataIni = a.data_inicio ? a.data_inicio.slice(0, 10) : "";
+    const dataFim = a.data_fim ? a.data_fim.slice(0, 10) : "";
+    setForm({ ...a, data_inicio: dataIni, data_fim: dataFim });
     setModalAberto(true);
+    setMenuAberto(null);
   };
 
-  // ============================
-  // 💾 SALVAR
-  // ============================
   const salvar = async () => {
-    const url = editando
-      ? `http://localhost:3000/api/alocacao/editar/${form.id}`
-      : "http://localhost:3000/api/alocacao/criar";
+    try {
+      const url = editando
+        ? `http://localhost:3000/api/alocacao/editar/${form.id}`
+        : "http://localhost:3000/api/alocacao/criar";
+      const metodo = editando ? "PUT" : "POST";
 
-    const metodo = editando ? "PUT" : "POST";
+      const body = {
+        ...form,
+        data_inicio: form.data_inicio || null,
+        data_fim: form.data_fim || null,
+      };
 
-    const body = {
-      ...form,
-      data_inicio: form.data_inicio,
-      data_fim: form.data_fim || null,
-    };
+      const resp = await fetch(url, {
+        method: metodo,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
 
-    const resp = await fetch(url, {
-      method: metodo,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-
-    if (resp.ok) {
+      if (!resp.ok) throw new Error("Erro ao salvar");
       setModalAberto(false);
       carregarAlocacoes();
-    } else {
+    } catch (err) {
+      console.error(err);
       alert("Erro ao salvar alocação");
     }
   };
 
-  // ============================
-  // 🗑 EXCLUIR
-  // ============================
   const excluir = async (id) => {
     if (!window.confirm("Deseja realmente excluir?")) return;
-
-    const resp = await fetch(
-      `http://localhost:3000/api/alocacao/deletar/${id}`,
-      { method: "DELETE" }
-    );
-
-    if (resp.ok) carregarAlocacoes();
-    else alert("Erro ao excluir");
+    try {
+      const resp = await fetch(
+        `http://localhost:3000/api/alocacao/deletar/${id}`,
+        { method: "DELETE" }
+      );
+      if (resp.ok) carregarAlocacoes();
+    } catch (err) {
+      console.error("Erro ao excluir", err);
+    }
   };
 
-  // ============================
-  // 🔎 FILTRO + NOMES DO CLIENTE / MÁQUINA
-  // ============================
-  const alocacoesFiltradas = alocacoes.filter((a) => {
-    const txt = busca.toLowerCase();
+  // geração de PDF (layout premium)
+  const gerarPdfAlocacao = async (aloc) => {
+    try {
+      const doc = new jsPDF("p", "mm", "a4");
+      const pageWidth = 210;
+      // tentar carregar logo (se falhar continua sem)
+      let imgData = null;
+      try {
+        await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = "Anonymous";
+          img.onload = () => {
+            // desenhar em canvas para obter base64
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+            imgData = canvas.toDataURL("image/png");
+            resolve(true);
+          };
+          img.onerror = () => {
+            resolve(false);
+          };
+          img.src = LOGO_PATH; // aqui usamos o caminho local; adapte se necessário
+        });
+      } catch (e) {
+        console.warn("Logo não carregada", e);
+      }
 
+      // cabeçalho
+      doc.setFillColor(37, 64, 97);
+      doc.rect(0, 0, pageWidth, 26, "F");
+      if (imgData) {
+        // mantemos margem e tamanho proporcional
+        doc.addImage(imgData, "PNG", 14, 4, 36, 18);
+      }
+      doc.setFontSize(18);
+      doc.setTextColor(255, 255, 255);
+      doc.text("Brastália Café", imgData ? 56 : 14, 16);
+
+      // bloco info empresa (à direita)
+      doc.setFontSize(9);
+      doc.setTextColor(255, 255, 255);
+      doc.text("Rua Exemplo, 123 - Chapecó", pageWidth - 14, 9, {
+        align: "right",
+      });
+      doc.text("Contato: (49) 99999-9999", pageWidth - 14, 15, {
+        align: "right",
+      });
+
+      // área do conteúdo
+      let cursor = 36;
+      doc.setFillColor(245, 245, 245);
+      doc.rect(10, cursor - 6, pageWidth - 20, 8, "F");
+      doc.setTextColor(37, 64, 97);
+      doc.setFontSize(12);
+      doc.text("Resumo da Alocação", 14, cursor);
+
+      cursor += 8;
+      doc.setFontSize(10);
+      doc.setTextColor(30, 30, 30);
+
+      const add = (label, value, yOffset = 7) => {
+        doc.setFont(undefined, "bold");
+        doc.text(`${label}:`, 14, cursor);
+        doc.setFont(undefined, "normal");
+        doc.text(String(value || "-"), 60, cursor);
+        cursor += yOffset;
+      };
+
+      add("Código", aloc.id);
+      add("Máquina", aloc.maquina_nome || aloc.maquina_id);
+      add("Cliente", aloc.cliente_nome || aloc.cliente_id);
+      add(
+        "Período",
+        `${aloc.data_inicio?.slice(0, 10) || "-"} → ${
+          aloc.data_fim?.slice(0, 10) || "-"
+        }`
+      );
+      add("Status", aloc.status);
+      add("Local Instalação", aloc.local_instalacao || "-");
+      add("Responsável", aloc.responsavel_instalacao || "-");
+      // observações em bloco
+      cursor += 4;
+      doc.setFont(undefined, "bold");
+      doc.text("Observações:", 14, cursor);
+      doc.setFont(undefined, "normal");
+      cursor += 6;
+
+      const wrapText = doc.splitTextToSize(
+        aloc.observacoes || "-",
+        pageWidth - 28
+      );
+      doc.text(wrapText, 14, cursor);
+      cursor += wrapText.length * 6 + 6;
+
+      // rodapé com data e assinatura
+      doc.setDrawColor(220);
+      doc.line(14, 280, pageWidth - 14, 280);
+      doc.setFontSize(9);
+      doc.setTextColor(120);
+      doc.text(`Emitido em: ${new Date().toLocaleString()}`, 14, 286);
+      doc.text(
+        "Assinatura: ____________________________",
+        pageWidth - 14,
+        286,
+        { align: "right" }
+      );
+
+      // salvar
+      doc.save(`alocacao_${aloc.id}.pdf`);
+    } catch (err) {
+      console.error("Erro gerar PDF", err);
+      alert("Erro ao gerar PDF");
+    }
+  };
+
+  const alocacoesFiltradas = alocacoes.filter((a) => {
+    const t = busca.toLowerCase();
     return (
-      String(a.id).includes(txt) ||
-      a.cliente_nome?.toLowerCase().includes(txt) ||
-      a.maquina_nome?.toLowerCase().includes(txt) ||
-      a.status?.toLowerCase().includes(txt) ||
-      a.local_instalacao?.toLowerCase().includes(txt)
+      String(a.id).includes(t) ||
+      (a.cliente_nome || "").toLowerCase().includes(t) ||
+      (a.maquina_nome || "").toLowerCase().includes(t) ||
+      (a.status || "").toLowerCase().includes(t) ||
+      (a.local_instalacao || "").toLowerCase().includes(t)
     );
   });
 
   return (
     <div className="aloc-container">
       <Navbar />
-      <h1>Alocações de Máquina</h1>
 
-      <button className="btn-add" onClick={novaAlocacao}>
-        + Nova Alocação
-      </button>
+      <div className="aloc-header">
+        <h1>📦 Alocações de Máquina</h1>
+        <div className="aloc-actions-right">
+          <button className="btn-add" onClick={novaAlocacao}>
+            + Nova Alocação
+          </button>
+        </div>
+      </div>
 
-      <input
-        type="text"
-        className="input-busca"
-        placeholder="Buscar por Nome do Cliente, Máquina, Status..."
-        value={busca}
-        onChange={(e) => setBusca(e.target.value)}
-      />
+      <div className="search-row">
+        <input
+          className="input-busca"
+          placeholder="Buscar por Cliente, Máquina ou Status..."
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+        />
+      </div>
 
       <table className="aloc-table">
         <thead>
@@ -176,33 +315,53 @@ function Alocacao() {
               <td>{a.id}</td>
               <td>{a.maquina_nome || a.maquina_id}</td>
               <td>{a.cliente_nome || a.cliente_id}</td>
-              <td>{a.data_inicio?.slice(0, 10)}</td>
-              <td>{a.data_fim?.slice(0, 10)}</td>
-              <td>{a.status}</td>
-
+              <td>{a.data_inicio?.slice(0, 10) || "-"}</td>
+              <td>{a.data_fim?.slice(0, 10) || "-"}</td>
               <td>
-                <button className="btn-edit" onClick={() => editarAlocacao(a)}>
-                  Editar
-                </button>
+                <span className={`status-badge status-${a.status}`}>
+                  {a.status}
+                </span>
+              </td>
 
-                <button className="btn-del" onClick={() => excluir(a.id)}>
-                  Excluir
-                </button>
+              <td className="acoes-col">
+                <div className="menu-wrapper" ref={menuRef}>
+                  <button
+                    className="menu-trigger"
+                    onClick={() =>
+                      setMenuAberto(menuAberto === a.id ? null : a.id)
+                    }
+                    aria-label="Ações"
+                  >
+                    ⋮
+                  </button>
+
+                  {menuAberto === a.id && (
+                    <div className="menu-dropdown">
+                      <button onClick={() => editarAlocacao(a)}>
+                        ✏ Editar
+                      </button>
+                      <button onClick={() => excluir(a.id)}>🗑 Excluir</button>
+                      <button onClick={() => gerarPdfAlocacao(a)}>
+                        📄 Gerar PDF
+                      </button>
+                    </div>
+                  )}
+                </div>
               </td>
             </tr>
           ))}
 
           {alocacoesFiltradas.length === 0 && (
             <tr>
-              <td colSpan="7">Nenhuma alocação encontrada</td>
+              <td colSpan="7" className="no-results">
+                Nenhuma alocação encontrada
+              </td>
             </tr>
           )}
         </tbody>
       </table>
 
-      {/* ============================
-          MODAL
-        ============================ */}
+      {/* MODAL */}
       {modalAberto && (
         <div className="modal-bg">
           <div className="modal">
@@ -210,7 +369,6 @@ function Alocacao() {
 
             <div className="modal-body-scroll">
               <div className="form-grid">
-                {/* SELECT MÁQUINA */}
                 <label>Máquina</label>
                 <select
                   value={form.maquina_id}
@@ -226,7 +384,6 @@ function Alocacao() {
                   ))}
                 </select>
 
-                {/* SELECT CLIENTE */}
                 <label>Cliente</label>
                 <select
                   value={form.cliente_id}
@@ -242,7 +399,6 @@ function Alocacao() {
                   ))}
                 </select>
 
-                {/* DEMAIS CAMPOS */}
                 <label>Data Início</label>
                 <input
                   type="date"
@@ -287,10 +443,7 @@ function Alocacao() {
                   type="text"
                   value={form.responsavel_instalacao}
                   onChange={(e) =>
-                    setForm({
-                      ...form,
-                      responsavel_instalacao: e.target.value,
-                    })
+                    setForm({ ...form, responsavel_instalacao: e.target.value })
                   }
                 />
 

@@ -1,11 +1,12 @@
+// EditarVenda.jsx
 import React, { useState, useEffect } from "react";
-import "./css/venda.css";
+import "./css/editarVenda.css";
 import { Navbar } from "./navbar.jsx";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
 
 export function EditarVenda() {
-  const { id } = useParams();
+  const { id } = useParams(); // id da venda
   const navigate = useNavigate();
 
   const [clientes, setClientes] = useState([]);
@@ -18,200 +19,215 @@ export function EditarVenda() {
   });
 
   const [itens, setItens] = useState([]);
+  const [itensExcluidos, setItensExcluidos] = useState([]); // ids a excluir
+  const [loading, setLoading] = useState(false);
 
-  // ============================
-  // BUSCA CLIENTES / PRODUTOS
-  // ============================
+  const fetchJson = async (url, options = {}) => {
+    const resp = await fetch(url, options);
+    const data = await resp.json().catch(() => null);
+    return { resp, data };
+  };
+
+  // fetch clientes/produtos
   const fetchClientes = async () => {
     try {
-      const resp = await fetch("http://localhost:3000/api/cliente/listar");
-      const data = await resp.json();
-      setClientes(Array.isArray(data.msg) ? data.msg : []);
-    } catch {
+      const { resp, data } = await fetchJson(
+        "http://localhost:3000/api/cliente/listar"
+      );
+      if (resp.ok && Array.isArray(data.msg)) setClientes(data.msg);
+    } catch (err) {
+      console.error(err);
       toast.error("Erro ao buscar clientes");
     }
   };
 
   const fetchProdutos = async () => {
     try {
-      const resp = await fetch("http://localhost:3000/api/produto/listar");
-      const data = await resp.json();
-      setProdutos(Array.isArray(data.msg) ? data.msg : []);
-    } catch {
+      const { resp, data } = await fetchJson(
+        "http://localhost:3000/api/produto/listar"
+      );
+      if (resp.ok && Array.isArray(data.msg)) setProdutos(data.msg);
+    } catch (err) {
+      console.error(err);
       toast.error("Erro ao buscar produtos");
     }
   };
 
-  // ============================
-  // BUSCA VENDA
-  // ============================
+  // buscar venda + itens (unificado)
   const fetchVenda = async () => {
+    if (!id) return;
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/venda/visualizar/${id}`
+      const { resp, data } = await fetchJson(
+        `http://localhost:3000/api/venda/${id}`
       );
-      const data = await response.json();
-
-      if (!data || !data.msg) {
+      if (!resp.ok) {
         toast.error("Venda não encontrada");
         navigate("/venda");
         return;
       }
-
+      // data.venda (model) e data.itens (array)
+      const v = data.msg;
       setVenda({
-        cliente_id: data.msg.cliente_id,
-        observacao: data.msg.observacao || "",
-        valor_total: data.msg.valor_total || 0,
+        cliente_id: v.cliente_id,
+        observacao: v.observacao || "",
+        valor_total: v.valor_total || 0,
       });
-    } catch {
-      toast.error("Erro ao buscar venda");
-    }
-  };
 
-  // ============================
-  // BUSCA ITENS DA VENDA
-  // ============================
-  const fetchItens = async () => {
-    try {
-      const resp = await fetch(
-        `http://localhost:3000/api/item/item-venda/listar/${id}`
-      );
-      const data = await resp.json();
-      setItens(data.itens || []);
-    } catch (e) {
-      toast.error("Erro ao buscar itens da venda");
+      const itensTratados = (data.msg.itens || []).map((it) => ({
+        id: it.id,
+        produto_id: it.produto_id,
+        quantidade: Number(it.quantidade),
+        valor_unitario: Number(it.valor_unitario),
+      }));
+      setItens(itensTratados);
+      setItensExcluidos([]);
+      console.log(data.msg.itens);
+    } catch (err) {
+      toast.error("Erro ao carregar venda");
     }
   };
 
   useEffect(() => {
-    fetchClientes();
-    fetchProdutos();
-    fetchVenda();
-    fetchItens();
-  }, []);
+    if (!id) return;
+    const carregar = async () => {
+      setLoading(true);
+      await Promise.all([fetchClientes(), fetchProdutos()]);
+      await fetchVenda();
+      setLoading(false);
+    };
+    carregar();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
-  // ============================
-  // CALCULA TOTAL AUTOMATICAMENTE
-  // ============================
+  // recalcular total no front (apenas visual)
   useEffect(() => {
-    const total = itens.reduce(
-      (acc, item) => acc + parseFloat(item.subtotal),
-      0
-    );
-    setVenda((prev) => ({ ...prev, valor_total: total.toFixed(2) }));
+    const total = itens.reduce((acc, it) => acc + Number(it.subtotal || 0), 0);
+    setVenda((prev) => ({ ...prev, valor_total: Number(total).toFixed(2) }));
   }, [itens]);
 
-  // ============================
-  // EDITAR VENDA (CLIENTE + OBS)
-  // ============================
-  const salvarVenda = async () => {
-    try {
-      await fetch(`http://localhost:3000/api/venda/editar/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(venda),
-      });
-    } catch {
-      toast.error("Erro ao salvar dados da venda");
-    }
+  // helpers de UI
+  const atualizarItem = (index, campo, valor) => {
+    setItens((prev) => {
+      const lista = [...prev];
+      lista[index][campo] = valor;
+      const qtd = Number(lista[index].quantidade || 0);
+      const vu = Number(lista[index].valor_unitario || 0);
+      lista[index].subtotal = Number((qtd * vu).toFixed(2));
+      return lista;
+    });
   };
 
-  // ============================
-  // ADICIONAR UM NOVO ITEM
-  // ============================
+  const handleSelectProduto = (index, produtoId) => {
+    const produto = produtos.find((p) => String(p.id) === String(produtoId));
+    atualizarItem(index, "produto_id", produtoId);
+    if (produto)
+      atualizarItem(
+        index,
+        "valor_unitario",
+        Number(produto.preco ?? produto.valor ?? 0)
+      );
+  };
+
   const adicionarItem = () => {
-    setItens([
-      ...itens,
+    setItens((prev) => [
+      ...prev,
       {
         id: null,
         produto_id: "",
         quantidade: 1,
         valor_unitario: 0,
-        valor_total: 0,
+        subtotal: 0,
       },
     ]);
   };
 
-  // ============================
-  // ATUALIZA OS CAMPOS DO ITEM
-  // ============================
-  const atualizarItem = (index, campo, valor) => {
-    const lista = [...itens];
-
-    lista[index][campo] = valor;
-
-    const qtd = parseFloat(lista[index].quantidade || 0);
-    const vu = parseFloat(lista[index].valor_unitario || 0);
-
-    lista[index].subtotal = qtd * vu;
-
-    setItens(lista);
+  // marcar item para exclusão (se já existente)
+  const removerItem = (index) => {
+    setItens((prev) => {
+      const lista = [...prev];
+      const item = lista[index];
+      if (item && item.id) {
+        setItensExcluidos((prevIds) => [...prevIds, item.id]);
+      }
+      lista.splice(index, 1);
+      return lista;
+    });
   };
-  // Criar item(s) da venda - versão robusta
-  // ============================
-  // SALVAR ITENS (NOVOS OU EDITADOS)
-  // ============================
-  const salvarItens = async () => {
+
+  // salvar venda (unificado): PUT /api/venda/salvar/:id
+  const salvarTudo = async () => {
     try {
-      const novosItens = itens.filter((i) => i.novo === true);
-
-      if (novosItens.length === 0) return;
-
       const payload = {
-        venda_id: id,
-        itens: novosItens.map((i) => ({
-          produto_id: i.produto_id,
-          quantidade: Number(i.quantidade),
-          valor_unitario: Number(i.valor_unitario),
+        cliente_id: venda.cliente_id,
+        vendedor_id: venda.vendedor_id ?? null,
+        data_venda: new Date(),
+        observacao: venda.observacao,
+        valor_total: venda.valor_total,
+        itens: itens.map((it) => ({
+          id: it.id || null,
+          produto_id: it.produto_id,
+          quantidade: Number(it.quantidade),
+          valor_unitario: Number(it.valor_unitario),
         })),
+        itens_excluidos: itensExcluidos,
       };
 
-      const resp = await fetch(
-        "http://localhost:3000/api/item/item-venda/criar",
+      const { resp, data } = await fetchJson(
+        `http://localhost:3000/api/venda/editar/${id}`,
         {
-          method: "POST",
+          method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         }
       );
 
-      const data = await resp.json();
-
       if (!resp.ok) {
-        console.error("Erro backend:", data);
-        toast.error("Erro ao salvar itens");
-        return;
+        console.error("Erro salvar tudo:", data);
+        toast.error(data?.msg || "Erro ao salvar venda");
+        console.log(payload);
+        return false;
       }
+
+      // sucesso: recarrega e retorna true
+      await fetchVenda();
+      return true;
     } catch (err) {
-      console.error("Erro salvar itens:", err);
-      toast.error("Erro ao salvar itens");
+      console.error("Erro salvarTudo:", err);
+      toast.error("Erro ao salvar venda");
+      return false;
     }
   };
 
-  // ============================
-  // EXCLUI ITEM
-  // ============================
-  const excluirItem = async (itemId) => {
-    if (!window.confirm("Deseja remover este item?")) return;
-
-    await fetch(`http://localhost:3000/api/item/item-venda/delete/${itemId}`, {
-      method: "DELETE",
-    });
-
-    fetchItens();
+  // excluir venda completa
+  const excluirVenda = async () => {
+    if (!window.confirm("Deseja excluir esta venda?")) return;
+    try {
+      const { resp } = await fetchJson(
+        `http://localhost:3000/api/venda/delete/${id}`,
+        { method: "DELETE" }
+      );
+      if (!resp.ok) {
+        toast.error("Erro ao excluir venda");
+        return;
+      }
+      toast.success("Venda excluída");
+      navigate("/venda");
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao excluir venda");
+    }
   };
 
-  // ============================
-  // SALVAR TUDO
-  // ============================
+  // submit do form
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    await salvarVenda();
-    await salvarItens();
-
-    toast.success("Venda atualizada!");
-    navigate("/venda");
+    setLoading(true);
+    const ok = await salvarTudo();
+    setLoading(false);
+    if (ok) {
+      toast.success("Venda atualizada!");
+      navigate("/venda");
+    }
   };
 
   return (
@@ -226,7 +242,6 @@ export function EditarVenda() {
           <div className="form-group">
             <label>Cliente:</label>
             <select
-              name="cliente_id"
               value={venda.cliente_id}
               onChange={(e) =>
                 setVenda({ ...venda, cliente_id: e.target.value })
@@ -236,23 +251,26 @@ export function EditarVenda() {
               <option value="">Selecione um cliente</option>
               {clientes.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.razaoSocialEmpresa}
+                  {c.razaoSocialEmpresa || c.nome || `#${c.id}`}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* ITENS DA VENDA */}
+          {/* ITENS */}
           <h3>Itens da Venda</h3>
 
+          {loading && <p>Carregando...</p>}
+
+          {itens.length === 0 && !loading && (
+            <p style={{ color: "#777" }}>Nenhum item. Use "Adicionar Item".</p>
+          )}
+
           {itens.map((item, index) => (
-            <div key={index} className="item-linha">
-              {/* PRODUTO */}
+            <div key={item.id ?? `novo-${index}`} className="item-linha">
               <select
                 value={item.produto_id}
-                onChange={(e) =>
-                  atualizarItem(index, "produto_id", e.target.value)
-                }
+                onChange={(e) => handleSelectProduto(index, e.target.value)}
                 required
               >
                 <option value="">Produto</option>
@@ -263,17 +281,15 @@ export function EditarVenda() {
                 ))}
               </select>
 
-              {/* QUANTIDADE */}
               <input
                 type="number"
+                min="1"
                 value={item.quantidade}
                 onChange={(e) =>
                   atualizarItem(index, "quantidade", e.target.value)
                 }
-                min="1"
               />
 
-              {/* VALOR UNIT */}
               <input
                 type="number"
                 step="0.01"
@@ -283,23 +299,19 @@ export function EditarVenda() {
                 }
               />
 
-              {/* SUBTOTAL */}
               <input
                 type="text"
                 readOnly
                 value={Number(item.subtotal || 0).toFixed(2)}
               />
 
-              {/* EXCLUIR */}
-              {item.id && (
-                <button
-                  type="button"
-                  className="btn-delete-item"
-                  onClick={() => excluirItem(item.id)}
-                >
-                  ❌
-                </button>
-              )}
+              <button
+                type="button"
+                className="btn-delete-item"
+                onClick={() => removerItem(index)}
+              >
+                ❌
+              </button>
             </div>
           ))}
 
@@ -311,7 +323,7 @@ export function EditarVenda() {
             ➕ Adicionar Item
           </button>
 
-          {/* OBSERVAÇÃO */}
+          {/* Observação */}
           <div className="form-group">
             <label>Observação:</label>
             <textarea
@@ -322,22 +334,33 @@ export function EditarVenda() {
             />
           </div>
 
-          {/* TOTAL */}
+          {/* Total */}
           <div className="form-group">
             <label>Total (R$):</label>
             <input type="text" value={venda.valor_total} readOnly />
           </div>
 
+          {/* Botões */}
           <div className="botoes-acoes">
-            <button type="submit" className="btn-salvar">
-              💾 Salvar Alterações
+            <button className="btn-salvar" disabled={loading} type="submit">
+              💾 {loading ? "Salvando..." : "Salvar Alterações"}
             </button>
+
             <button
               type="button"
               className="btn-voltar"
               onClick={() => navigate("/venda")}
             >
               ⬅️ Voltar
+            </button>
+
+            <button
+              type="button"
+              className="btn-excluir"
+              onClick={excluirVenda}
+              style={{ marginLeft: 8 }}
+            >
+              🗑️ Excluir Venda
             </button>
           </div>
         </form>

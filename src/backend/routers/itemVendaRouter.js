@@ -14,8 +14,8 @@ ItemVendaRouter.route("/item-venda/listar/:venda_id").get((req, res) =>
 );
 
 // Editar item específico
-ItemVendaRouter.route("/item-venda/editar/:id").put((req, res) =>
-  itemVendaController.editarItemVenda(req, res)
+ItemVendaRouter.route("/item-venda/editar/:venda_id/:produto_id").put(
+  (req, res) => itemVendaController.editarItemVenda(req, res)
 );
 
 // Excluir item da venda

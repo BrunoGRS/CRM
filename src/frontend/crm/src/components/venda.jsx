@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./css/venda.css";
+import "./css/novaVenda.css";
 import { Navbar } from "./navbar.jsx";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -117,6 +117,7 @@ export function RegistroVenda() {
         navigate("/venda");
       } else {
         toast.error("Erro ao registrar venda");
+        console.log(payload);
       }
     } catch {
       toast.error("Erro ao salvar venda");

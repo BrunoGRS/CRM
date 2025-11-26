@@ -1,247 +1,276 @@
-import modelVenda from "../models/modelVenda.js";
-import modelVendaItem from "../models/modelItemVenda.js";
+import Venda from "../models/modelVenda.js";
+import ItemVenda from "../models/modelItemVenda.js";
+import Produto from "../models/modelProduto.js";
+import { QueryTypes } from "sequelize";
 import { db } from "../database/database.js";
 
-// ======================================================
-// Criar Venda + Itens
-// ======================================================
-async function criarVenda(req, res) {
-  const transaction = await db.transaction();
-  try {
-    const venda = {
-      cliente_id: req.body.cliente_id,
-      vendedor_id: req.body.vendedor_id,
-      data_venda: req.body.data_venda || new Date(),
-      valor_total: req.body.valor_total,
-      observacao: req.body.observacao || null,
-    };
+class VendaController {
+  // ==========================================================
+  // CRIAR VENDA
+  // ==========================================================
+  async criarVenda(req, res) {
+    const t = await db.transaction();
+    try {
+      const {
+        cliente_id,
+        data_venda,
+        vendedor_id,
+        itens,
+        observacao,
+        valor_total,
+      } = req.body;
 
-    const itens = req.body.itens || [];
-
-    await modelVenda.sync();
-    await modelVendaItem.sync();
-
-    // Criar venda
-    const novaVenda = await modelVenda.create(venda, { transaction });
-
-    // Criar itens da venda
-    for (const item of itens) {
-      await modelVendaItem.create(
-        {
-          venda_id: novaVenda.id,
-          produto_id: item.produto_id,
-          quantidade: item.quantidade,
-          valor_unitario: item.valor_unitario,
-          valor_total: item.valor_total,
-        },
-        { transaction }
+      const venda = await Venda.create(
+        { cliente_id, data_venda, vendedor_id, observacao, valor_total },
+        { transaction: t }
       );
+
+      for (const item of itens) {
+        const produto = await Produto.findByPk(item.produto_id);
+
+        if (!produto) {
+          await t.rollback();
+          return res.status(400).json({ msg: "Produto não encontrado" });
+        }
+
+        await ItemVenda.create(
+          {
+            venda_id: venda.id,
+            produto_id: item.produto_id,
+            quantidade: item.quantidade,
+            valor_unitario: item.valor_unitario,
+          },
+          { transaction: t }
+        );
+      }
+
+      await t.commit();
+      return res
+        .status(201)
+        .json({ msg: "Venda criada com sucesso", venda_id: venda.id });
+    } catch (error) {
+      console.error("❌ ERRO NO CONTROLLER:");
+      console.error(error);
+      await t.rollback();
+      return res.status(500).json({ msg: "Erro ao criar venda", error });
     }
-
-    await transaction.commit();
-
-    return res
-      .status(201)
-      .send({ msg: "Venda registrada com sucesso!", venda: novaVenda });
-  } catch (error) {
-    console.error("Erro ao criar venda:", error);
-    await transaction.rollback();
-    return res.status(500).send({ msg: "Erro ao criar venda", error });
   }
-}
 
-// ======================================================
-// Listar vendas
-// ======================================================
-async function listarVendas(req, res) {
-  try {
-    const [rows] = await db.query(`
+  // ==========================================================
+  // LISTAR TODAS VENDAS
+  // ==========================================================
+  async listarVendas(req, res) {
+    try {
+      const vendas = await db.query(
+        `
       SELECT 
-        v.Id AS Codigo, 
-        c.razaoSocialEmpresa AS Cliente,  
-        v.valor_total AS Total, 
-        v.observacao AS Obs, 
-        DATE_FORMAT(v.data_venda, "%d/%m/%Y") AS Data
+        v.id AS id, 
+        c.razaoSocialEmpresa AS cliente,  
+        v.valor_total AS total, 
+        v.observacao AS obs, 
+        DATE_FORMAT(v.data_venda, "%d/%m/%Y") AS data
       FROM vendas v
       INNER JOIN cliente c ON c.id = v.cliente_id
-      ORDER BY v.id DESC;
-    `);
-
-    if (rows.length > 0) {
-      return res.status(200).send({ msg: rows });
-    } else {
-      return res.status(404).send({ msg: false });
-    }
-  } catch (error) {
-    console.error("Erro ao mostrar Vendas", error);
-    return res.status(500).send({ msg: false });
-  }
-}
-
-// ======================================================
-// Visualizar venda (detalhes + itens)
-// ======================================================
-async function visualizarVenda(req, res) {
-  try {
-    const { id } = req.params;
-
-    // Buscar dados da venda
-    const [venda] = await db.query(
-      `
-      SELECT 
-        v.Id AS Codigo,
-        c.razaoSocialEmpresa AS Cliente,
-        v.valor_total AS Total,
-        v.observacao AS Obs,
-        DATE_FORMAT(v.data_venda, "%d/%m/%Y") AS Data
-      FROM vendas v
-      INNER JOIN cliente c ON c.id = v.cliente_id
-      WHERE v.id = ?;
+      ORDER BY v.id DESC
       `,
-      { replacements: [id] }
-    );
-
-    if (!venda.length) {
-      return res.status(404).json({ msg: "Venda não encontrada." });
-    }
-
-    // Buscar itens da venda
-    const [itens] = await db.query(
-      `
-      SELECT 
-        i.id,
-        i.produto_id,
-        p.nome AS produto,
-        i.quantidade,
-        i.valor_unitario,
-        i.valor_total
-      FROM venda_itens i
-      INNER JOIN produtos p ON p.id = i.produto_id
-      WHERE i.venda_id = ?;
-      `,
-      { replacements: [id] }
-    );
-
-    return res.status(200).json({
-      venda: venda[0],
-      itens: itens,
-    });
-  } catch (error) {
-    console.error("Erro ao mostrar Venda", error);
-    return res.status(500).send({ msg: false });
-  }
-}
-
-// ======================================================
-// Visualizar venda somente pelo ID (simples)
-// ======================================================
-async function visualizarVendaId(req, res) {
-  try {
-    const { id } = req.params;
-    const data = await modelVenda.findByPk(id);
-
-    if (data) {
-      return res.status(200).json({ msg: data });
-    } else {
-      return res.status(404).json({ msg: "Venda não encontrada" });
-    }
-  } catch (error) {
-    console.error("Erro ao mostrar Venda", error);
-    return res.status(500).send({ msg: false });
-  }
-}
-
-// ======================================================
-// Editar Venda + Itens
-// ======================================================
-async function editarVenda(req, res) {
-  const transaction = await db.transaction();
-
-  try {
-    const { id } = req.params;
-    const venda = await modelVenda.findByPk(id);
-
-    if (!venda) {
-      return res.status(404).send({ msg: "Venda não encontrada" });
-    }
-
-    // Atualizar venda
-    await venda.update(
-      {
-        cliente_id: req.body.cliente_id,
-        vendedor_id: req.body.vendedor_id,
-        data_venda: req.body.data_venda,
-        valor_total: req.body.valor_total,
-        observacao: req.body.observacao,
-      },
-      { transaction }
-    );
-
-    // Atualizar itens
-    const itens = req.body.itens || [];
-
-    await modelVendaItem.destroy({
-      where: { venda_id: id },
-      transaction,
-    });
-
-    for (const item of itens) {
-      await modelVendaItem.create(
         {
-          venda_id: id,
-          produto_id: item.produto_id,
-          quantidade: item.quantidade,
-          valor_unitario: item.valor_unitario,
-          valor_total: item.valor_total,
-        },
-        { transaction }
+          type: QueryTypes.SELECT, // Isso garante que retorne apenas o array de objetos
+        }
       );
+
+      return res.json({ msg: vendas });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ msg: "Erro ao listar vendas", error });
     }
-
-    await transaction.commit();
-    return res.status(200).send({ msg: "Venda atualizada com sucesso" });
-  } catch (error) {
-    console.error("Erro ao editar venda:", error);
-    await transaction.rollback();
-    return res.status(500).send({ msg: "Erro ao editar venda", error });
   }
-}
 
-// ======================================================
-// Excluir Venda + Itens
-// ======================================================
-async function excluirVenda(req, res) {
-  const transaction = await db.transaction();
+  // ==========================================================
+  // VISUALIZAR VENDA ÚNICA
+  // ==========================================================
+  async visualizarVenda(req, res) {
+    try {
+      const { id } = req.params;
 
-  try {
+      const venda = await Venda.findByPk(id, {
+        include: [
+          {
+            model: ItemVenda,
+            as: "itens", // <--- OBRIGATÓRIO: Deve ser igual ao definido no Venda.js
+            include: [
+              {
+                model: Produto,
+                as: "produto", // <--- OBRIGATÓRIO: Deve ser igual ao definido no ItemVenda.js
+              },
+            ],
+          },
+        ],
+      });
+
+      if (!venda) {
+        return res.status(404).json({ msg: "Venda não encontrada" });
+      }
+
+      return res.json({ msg: venda });
+    } catch (error) {
+      console.error("❌ ERRO NO CONTROLLER:");
+      console.error(error);
+      return res
+        .status(500)
+        .json({ msg: "Erro ao visualizar venda", error: error.message });
+    }
+  }
+
+  async visualizarVendaGeralCompleta(req, res) {
+    try {
+      const vendas = await Venda.findAll({
+        // Ordena da mais recente para a mais antiga
+        order: [["id", "DESC"]],
+
+        include: [
+          {
+            model: ItemVenda,
+            as: "itens", // <--- TEM QUE SER IGUAL AO 'as' DO MODEL VENDA
+            attributes: ["id", "quantidade", "valor_unitario", "subtotal"], // Traz só o necessário
+            include: [
+              {
+                model: Produto,
+                as: "produto", // <--- TEM QUE SER IGUAL AO 'as' DO MODEL ITEMVENDA
+                attributes: ["id", "nome"], // Traz só o nome e id do produto
+              },
+            ],
+          },
+        ],
+      });
+
+      // Se a lista estiver vazia
+      if (vendas.length === 0) {
+        return res
+          .status(200)
+          .json({ message: "Nenhuma venda registrada ainda." });
+      }
+
+      return res.json(vendas);
+    } catch (error) {
+      console.error("❌ ERRO AO LISTAR VENDAS:", error);
+      return res.status(500).json({
+        msg: "Erro interno ao buscar vendas",
+        error: error.message,
+      });
+    }
+  }
+
+  // ==========================================================
+  // EDITAR VENDA + ITENS (UNIFICADO)
+  // ==========================================================
+  async editarVenda(req, res) {
+    const t = await db.transaction();
+    try {
+      const { id } = req.params;
+      const { cliente_id, data_venda, itens, valor_total } = req.body;
+
+      const venda = await Venda.findByPk(id);
+
+      if (!venda) {
+        await t.rollback();
+        return res.status(404).json({ msg: "Venda não encontrada" });
+      }
+
+      // Atualiza info da venda (SEM subtotal)
+      await venda.update(
+        { cliente_id, data_venda, valor_total },
+        { transaction: t }
+      );
+
+      // ================================
+      // ITENS EXISTENTES NO BANCO
+      // ================================
+      const itensExistentes = await ItemVenda.findAll({
+        where: { venda_id: id },
+        transaction: t,
+      });
+
+      const idsRecebidos = itens.map((i) => i.id).filter((id) => id !== null);
+
+      // REMOVER os que não vieram na requisição
+      for (const itemDb of itensExistentes) {
+        if (!idsRecebidos.includes(itemDb.id)) {
+          await itemDb.destroy({ transaction: t });
+        }
+      }
+
+      // ================================
+      // ATUALIZAR OU CRIAR ITENS
+      // ================================
+      for (const item of itens) {
+        const subtotal = Number(item.quantidade) * Number(item.valor_unitario);
+
+        if (item.id) {
+          // Atualiza item existente
+          await ItemVenda.update(
+            {
+              quantidade: item.quantidade,
+              valor_unitario: item.valor_unitario,
+            },
+            {
+              where: { id: item.id, venda_id: id },
+              transaction: t,
+            }
+          );
+        } else {
+          // Cria novo item
+          await ItemVenda.create(
+            {
+              venda_id: id,
+              produto_id: item.produto_id,
+              quantidade: item.quantidade,
+              valor_unitario: item.valor_unitario,
+            },
+            { transaction: t }
+          );
+        }
+      }
+
+      await t.commit();
+      return res.json({ msg: "Venda atualizada com sucesso" });
+    } catch (error) {
+      console.error(error);
+      await t.rollback();
+      return res.status(500).json({ msg: "Erro ao editar venda", error });
+    }
+  }
+
+  // ==========================================================
+  // EXCLUIR VENDA + ITENS
+  // ==========================================================
+  async excluirVenda(req, res) {
     const { id } = req.params;
 
-    const venda = await modelVenda.findByPk(id);
-    if (!venda) {
-      return res.status(404).send({ msg: "Venda não encontrada" });
+    const t = await db.transaction();
+    try {
+      const venda = await Venda.findByPk(id);
+
+      if (!venda) {
+        await t.rollback();
+        return res.status(404).json({ msg: "Venda não encontrada" });
+      }
+
+      // Exclui itens
+      await ItemVenda.destroy({
+        where: { venda_id: id },
+        transaction: t,
+      });
+
+      // Exclui venda
+      await venda.destroy({ transaction: t });
+
+      await t.commit();
+      return res.json({ msg: "Venda removida com sucesso" });
+    } catch (error) {
+      await t.rollback();
+      return res.status(500).json({ msg: "Erro ao excluir venda", error });
     }
-
-    await modelVendaItem.destroy({
-      where: { venda_id: id },
-      transaction,
-    });
-
-    await venda.destroy({ transaction });
-
-    await transaction.commit();
-    return res.status(200).send({ msg: "Venda excluída com sucesso" });
-  } catch (error) {
-    console.error("Erro ao excluir venda:", error);
-    await transaction.rollback();
-    return res.status(500).send({ msg: "Erro ao excluir venda", error });
   }
 }
 
-export default {
-  criarVenda,
-  listarVendas,
-  visualizarVenda,
-  editarVenda,
-  excluirVenda,
-  visualizarVendaId,
-};
+export default new VendaController();

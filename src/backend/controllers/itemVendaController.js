@@ -1,216 +1,210 @@
-import modelItemVenda from "../models/modelItemVenda.js";
-import modelVenda from "../models/modelVenda.js";
+import Venda from "../models/modelVenda.js";
+import ItemVenda from "../models/modelItemVenda.js";
+import Produto from "../models/modelProduto.js";
 import { db } from "../database/database.js";
 
-// Atualiza o total automaticamente conforme os itens
-async function atualizarTotalVenda(venda_id) {
-  const [resultado] = await db.query(
-    `SELECT SUM(subtotal) AS total FROM item_venda WHERE venda_id = ?`,
-    { replacements: [venda_id] }
-  );
-
-  const total = resultado[0].total || 0;
-
-  await modelVenda.update({ valor_total: total }, { where: { id: venda_id } });
-}
-
-/// Criar item(s) da venda - versão robusta
-async function salvarItensVenda(req, res) {
-  try {
-    let { venda_id, itens } = req.body;
-
-    // DEBUG: log do body quando inválido (ajuda a descobrir o que o front está mandando)
-    if (!venda_id || (!itens && itens !== undefined)) {
-      console.error(
-        "Payload inválido - ausência de venda_id ou itens:",
-        req.body
-      );
-    }
-
-    // Normaliza: permite enviar um único item como objeto ou um array de itens
-    if (!Array.isArray(itens)) {
-      if (itens && typeof itens === "object") {
-        itens = [itens];
-      } else {
-        itens = [];
-      }
-    }
-
-    // Validações básicas
-    const vendaIdNum = Number(venda_id);
-    if (!venda_id || Number.isNaN(vendaIdNum) || itens.length === 0) {
-      console.error("Dados inválidos:", { venda_id, itens });
-      return res
-        .status(400)
-        .send({
-          msg: "Dados inválidos: venda_id e ao menos 1 item são obrigatórios.",
-        });
-    }
-
-    // Valida cada item
-    const itensParaCriar = [];
-    for (const [idx, it] of itens.entries()) {
-      const produto_id = it.produto_id ?? it.produtoId ?? null;
-      const quantidade = Number(it.quantidade);
-      const valor_unitario = Number(it.valor_unitario ?? it.valorUnitario);
-
-      if (
-        !produto_id ||
-        Number.isNaN(quantidade) ||
-        Number.isNaN(valor_unitario)
-      ) {
-        return res.status(400).send({
-          msg: "Item inválido",
-          detalhe: `Item na posição ${idx} precisa de produto_id, quantidade (número) e valor_unitario (número).`,
-          itemRecebido: it,
-        });
-      }
-
-      if (quantidade <= 0 || valor_unitario < 0) {
-        return res.status(400).send({
-          msg: "Valores inválidos no item",
-          detalhe: `Quantidade deve ser > 0 e valor_unitario >= 0 (pos ${idx}).`,
-          itemRecebido: it,
-        });
-      }
-
-      itensParaCriar.push({
-        venda_id: vendaIdNum,
-        produto_id,
-        quantidade,
-        valor_unitario,
-        subtotal: quantidade * valor_unitario,
-      });
-    }
-
-    // sincroniza model (se necessário) - mantenho, mas geralmente não é preciso em produção
-    await modelItemVenda.sync();
-
-    // Use transação para criar todos os itens
-    const transaction = await db.transaction();
+class VendaController {
+  // ==========================================================
+  // CRIAR VENDA
+  // ==========================================================
+  async criarVenda(req, res) {
+    const t = await db.transaction();
     try {
-      const itensCriados = [];
-      for (const novo of itensParaCriar) {
-        const criado = await modelItemVenda.create(novo, { transaction });
-        itensCriados.push(criado);
+      const { cliente_id, data_venda, status, itens } = req.body;
+
+      const venda = await Venda.create(
+        { cliente_id, data_venda, status },
+        { transaction: t }
+      );
+
+      for (const item of itens) {
+        const produto = await Produto.findByPk(item.produto_id);
+
+        if (!produto) {
+          await t.rollback();
+          return res.status(400).json({ msg: "Produto não encontrado" });
+        }
+
+        const subtotal = Number(item.quantidade) * Number(item.valor_unitario);
+
+        await ItemVenda.create(
+          {
+            venda_id: venda.id,
+            produto_id: item.produto_id,
+            quantidade: item.quantidade,
+            valor_unitario: item.valor_unitario,
+            subtotal,
+          },
+          { transaction: t }
+        );
       }
 
-      await transaction.commit();
+      await t.commit();
+      return res.json({ msg: "Venda criada com sucesso", venda_id: venda.id });
+    } catch (error) {
+      await t.rollback();
+      return res.status(500).json({ msg: "Erro ao criar venda", error });
+    }
+  }
 
-      // Atualiza total da venda (fora da transação para evitar deadlocks com queries complexas)
-      await atualizarTotalVenda(vendaIdNum);
-
-      // Se criou apenas 1 item, retorno item; se criou vários, retorno array
-      return res.status(201).send({
-        msg:
-          itensCriados.length === 1
-            ? "Item criado com sucesso!"
-            : "Itens criados com sucesso!",
-        item: itensCriados.length === 1 ? itensCriados[0] : undefined,
-        itens: itensCriados.length > 1 ? itensCriados : undefined,
+  // ==========================================================
+  // LISTAR TODAS VENDAS
+  // ==========================================================
+  async listarVendas(req, res) {
+    try {
+      const vendas = await Venda.findAll({
+        include: [
+          {
+            model: ItemVenda,
+            include: [{ model: Produto }],
+          },
+        ],
       });
-    } catch (errTrans) {
-      await transaction.rollback();
-      console.error("Erro na transação ao criar itens:", errTrans);
-      return res
-        .status(500)
-        .send({
-          msg: "Erro ao criar itens (transação)",
-          error: errTrans.message || errTrans,
-        });
+
+      return res.json(vendas);
+    } catch (error) {
+      return res.status(500).json({ msg: "Erro ao listar vendas", error });
     }
-  } catch (error) {
-    console.error("Erro ao salvar item(s) da venda:", error);
-    return res
-      .status(500)
-      .send({ msg: "Erro ao salvar item(s)", error: error.message || error });
   }
-}
 
-// Buscar itens da venda
-async function listarItensVenda(req, res) {
-  try {
-    const { venda_id } = req.params;
+  // ==========================================================
+  // VISUALIZAR VENDA ÚNICA
+  // ==========================================================
+  async visualizarVenda(req, res) {
+    try {
+      const { id } = req.params;
 
-    const [rows] = await db.query(
-      `
-      SELECT 
-        iv.id,
-        iv.produto_id,
-        p.nome AS produto,
-        iv.quantidade,
-        iv.valor_unitario,
-        iv.subtotal
-      FROM item_venda iv
-      INNER JOIN produto p ON p.id = iv.produto_id
-      WHERE iv.venda_id = ?
-      `,
-      { replacements: [venda_id] }
-    );
+      const venda = await Venda.findByPk(id, {
+        include: [
+          {
+            model: ItemVenda,
+            include: [{ model: Produto }],
+          },
+        ],
+      });
 
-    return res.status(200).json({ itens: rows });
-  } catch (error) {
-    console.error("Erro ao buscar itens da venda:", error);
-    return res.status(500).json({ msg: "Erro ao buscar itens", error });
+      if (!venda) {
+        return res.status(404).json({ msg: "Venda não encontrada" });
+      }
+
+      return res.json(venda);
+    } catch (error) {
+      return res.status(500).json({ msg: "Erro ao visualizar venda", error });
+    }
   }
-}
 
-// Editar item
-async function editarItemVenda(req, res) {
-  try {
+  // ==========================================================
+  // EDITAR VENDA + ITENS (UNIFICADO)
+  // ==========================================================
+  async editarVenda(req, res) {
+    const t = await db.transaction();
+    try {
+      const { id } = req.params;
+      const { cliente_id, data_venda, status, itens } = req.body;
+
+      const venda = await Venda.findByPk(id);
+
+      if (!venda) {
+        await t.rollback();
+        return res.status(404).json({ msg: "Venda não encontrada" });
+      }
+
+      // Atualiza info da venda (SEM subtotal)
+      await venda.update(
+        { cliente_id, data_venda, status },
+        { transaction: t }
+      );
+
+      // ================================
+      // ITENS EXISTENTES NO BANCO
+      // ================================
+      const itensExistentes = await ItemVenda.findAll({
+        where: { venda_id: id },
+        transaction: t,
+      });
+
+      const idsRecebidos = itens.map((i) => i.id).filter((id) => id !== null);
+
+      // REMOVER os que não vieram na requisição
+      for (const itemDb of itensExistentes) {
+        if (!idsRecebidos.includes(itemDb.id)) {
+          await itemDb.destroy({ transaction: t });
+        }
+      }
+
+      // ================================
+      // ATUALIZAR OU CRIAR ITENS
+      // ================================
+      for (const item of itens) {
+        const subtotal = Number(item.quantidade) * Number(item.valor_unitario);
+
+        if (item.id) {
+          // Atualiza item existente
+          await ItemVenda.update(
+            {
+              quantidade: item.quantidade,
+              valor_unitario: item.valor_unitario,
+              subtotal,
+            },
+            {
+              where: { id: item.id, venda_id: id },
+              transaction: t,
+            }
+          );
+        } else {
+          // Cria novo item
+          await ItemVenda.create(
+            {
+              venda_id: id,
+              produto_id: item.produto_id,
+              quantidade: item.quantidade,
+              valor_unitario: item.valor_unitario,
+              subtotal,
+            },
+            { transaction: t }
+          );
+        }
+      }
+
+      await t.commit();
+      return res.json({ msg: "Venda atualizada com sucesso" });
+    } catch (error) {
+      await t.rollback();
+      return res.status(500).json({ msg: "Erro ao editar venda", error });
+    }
+  }
+
+  // ==========================================================
+  // EXCLUIR VENDA + ITENS
+  // ==========================================================
+  async excluirVenda(req, res) {
     const { id } = req.params;
 
-    const item = await modelItemVenda.findByPk(id);
+    const t = await db.transaction();
+    try {
+      const venda = await Venda.findByPk(id);
 
-    if (!item) {
-      return res.status(404).send({ msg: "Item não encontrado" });
+      if (!venda) {
+        await t.rollback();
+        return res.status(404).json({ msg: "Venda não encontrada" });
+      }
+
+      // Exclui itens
+      await ItemVenda.destroy({
+        where: { venda_id: id },
+        transaction: t,
+      });
+
+      // Exclui venda
+      await venda.destroy({ transaction: t });
+
+      await t.commit();
+      return res.json({ msg: "Venda removida com sucesso" });
+    } catch (error) {
+      await t.rollback();
+      return res.status(500).json({ msg: "Erro ao excluir venda", error });
     }
-
-    item.produto_id = req.body.produto_id;
-    item.quantidade = req.body.quantidade;
-    item.valor_unitario = req.body.valor_unitario;
-    item.subtotal = item.quantidade * item.valor_unitario;
-
-    await item.save();
-
-    await atualizarTotalVenda(item.venda_id);
-
-    return res.status(200).send({
-      msg: "Item atualizado com sucesso",
-      item,
-    });
-  } catch (error) {
-    console.error("Erro ao editar item:", error);
-    return res.status(500).send({ msg: "Erro ao editar item", error });
   }
 }
 
-// Excluir item
-async function excluirItemVenda(req, res) {
-  try {
-    const { id } = req.params;
-
-    const item = await modelItemVenda.findByPk(id);
-
-    if (!item) {
-      return res.status(404).send({ msg: "Item não encontrado" });
-    }
-
-    const venda_id = item.venda_id;
-
-    await item.destroy();
-    await atualizarTotalVenda(venda_id);
-
-    return res.status(200).send({ msg: "Item excluído com sucesso" });
-  } catch (error) {
-    console.error("Erro ao excluir item:", error);
-    return res.status(500).send({ msg: "Erro ao excluir item", error });
-  }
-}
-
-export default {
-  salvarItensVenda,
-  listarItensVenda,
-  editarItemVenda,
-  excluirItemVenda,
-};
+export default new VendaController();

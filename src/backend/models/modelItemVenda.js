@@ -1,5 +1,8 @@
 import { DataTypes } from "sequelize";
 import { db } from "../database/database.js";
+// 1. IMPORTANTE: Importe o model de Produto para fazer a ligação
+import modelProduto from "./modelProduto.js";
+// import modelVenda from "./Venda.js"; // Cuidado com importação circular aqui!
 
 const modelItemVenda = db.define(
   "item_venda",
@@ -35,5 +38,10 @@ const modelItemVenda = db.define(
     timestamps: false,
   }
 );
+
+modelItemVenda.belongsTo(modelProduto, {
+  foreignKey: "produto_id",
+  as: "produto",
+});
 
 export default modelItemVenda;

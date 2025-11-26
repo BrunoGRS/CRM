@@ -1,89 +1,112 @@
-/* ===== Estilos Globais ===== */
+/* ============================================
+   🎨 ESTILO GLOBAL — PADRÃO DA TELA DE VENDAS
+   ============================================ */
+:root {
+  --primary: #5d3a22;
+  --primary-light: #7a563f;
+  --primary-hover: #4c2f19;
+
+  --bg: #f7f7f7;
+  --white: #ffffff;
+
+  --text: #444;
+  --text-light: #666;
+
+  --border: #e1e1e1;
+  --border-dark: #d3d3d3;
+
+  --danger: #c0392b;
+  --danger-light: #e57373;
+  --blue: #2563eb;
+}
+
 body {
   font-family: "Segoe UI", Roboto, Arial, sans-serif;
-  background-color: #f6f7fb;
-  color: #333;
+  background-color: var(--bg);
+  color: var(--text);
   margin: 0;
   padding: 0;
 }
 
-/* ===== Área Principal ===== */
+/* ============================================
+   📌 ÁREA PRINCIPAL
+   ============================================ */
 .main-content .content {
   padding: 2rem;
   width: 100%;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
 }
 
-/* ===== Título ===== */
+/* ============================================
+   🏷 TÍTULO
+   ============================================ */
 .content h2 {
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 1.5rem;
+  color: var(--text);
+  margin-bottom: 1.4rem;
   margin-left: 50px;
 }
 
-/* ===== Botão Criar Novo ===== */
+/* ============================================
+   ➕ BOTÃO CRIAR NOVO — PADRÃO DE VENDAS
+   ============================================ */
 .btn-criar-novo {
-  padding: 10px 18px;
+  padding: 10px 20px;
   font-size: 1rem;
   font-weight: 600;
-  border-radius: 12px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  background-color: rgb(127, 247, 127);
-  color: #1f2937;
+  transition: 0.3s ease;
+  background: var(--primary);
+  color: white;
   margin-left: 50px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn-criar-novo:hover {
-  background-color: rgb(65, 194, 65);
-  color: #fff;
+  background: var(--primary-hover);
   transform: scale(1.03);
 }
 
-/* ===== Modal (Formulário Popup) ===== */
+/* ============================================
+   🪟 MODAL
+   ============================================ */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 50;
 }
 
 .modal-content {
-  background: #fff;
-  width: 450px;
+  background: white;
+  width: 460px;
   max-width: 95%;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  padding: 2rem;
-  animation: aparecer 0.2s ease-in-out;
+  padding: 1.8rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: modalFade 0.25s ease-in-out;
 }
 
-@keyframes aparecer {
+@keyframes modalFade {
   from {
-    transform: scale(0.9);
     opacity: 0;
+    transform: translateY(-8px);
   }
   to {
-    transform: scale(1);
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* ===== Cabeçalho do Modal ===== */
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -94,190 +117,171 @@ body {
 .modal-header h3 {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .modal-close {
-  background: transparent;
+  background: none;
   border: none;
   font-size: 1.4rem;
   cursor: pointer;
-  color: #9ca3af;
-  transition: color 0.2s ease;
+  color: #666;
 }
 
 .modal-close:hover {
-  color: #ef4444;
+  color: var(--danger);
 }
 
-/* ===== Formulário do Produto ===== */
+/* ============================================
+   📝 FORMULÁRIO
+   ============================================ */
 .produto-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.produto-form input {
+.produto-form input,
+select {
   padding: 0.7rem 1rem;
-  border: 1px solid #d1d5db;
   border-radius: 8px;
+  border: 1px solid var(--border-dark);
   font-size: 0.9rem;
-  transition: all 0.2s ease-in-out;
+  background: var(--white);
+  color: var(--text);
+  transition: 0.2s ease;
 }
 
-.produto-form input:focus {
+.produto-form input:focus,
+select:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(93, 58, 34, 0.25);
 }
 
-/* ===== Botões do Formulário ===== */
+/* ============================================
+   🧭 BOTÕES DO FORMULÁRIO
+   ============================================ */
 .botoes-form {
   display: flex;
   justify-content: flex-end;
-  gap: 0.8rem;
+  gap: 10px;
   margin-top: 1rem;
 }
 
 .botoes-form button {
-  padding: 0.6rem 1.2rem;
+  padding: 0.7rem 1.3rem;
   font-size: 0.9rem;
   font-weight: 600;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: 0.2s;
 }
 
-/* Botão principal */
+/* Salvar */
 .botoes-form button[type="submit"] {
-  background: #2563eb;
+  background: var(--primary);
   color: white;
 }
-
 .botoes-form button[type="submit"]:hover {
-  background: #1e40af;
-  transform: scale(1.03);
+  background: var(--primary-hover);
 }
 
-/* Botão cancelar */
+/* Cancelar */
 .btn-cancelar {
-  background: #e5e7eb;
-  color: #374151;
+  background: #ddd;
+  color: #333;
 }
-
 .btn-cancelar:hover {
-  background: #d1d5db;
+  background: #ccc;
 }
 
-/* ===== Tabela ===== */
+/* ============================================
+   📊 TABELA — MESMO VISUAL DA TELA DE VENDAS
+   ============================================ */
 .user-table {
-  width: 80%;
-  border-collapse: collapse;
-  background: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  width: 90%;
   margin: 0 auto;
+  border-collapse: separate;
+  border-spacing: 0 8px;
 }
 
-.user-table thead {
-  background: #f1f5f9;
-  color: #111827;
-  font-weight: 600;
+.user-table thead th {
+  background: none;
+  color: #888;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-bottom: 6px;
 }
 
-.user-table th,
-.user-table td {
-  padding: 0.9rem 1rem;
-  text-align: left;
-  border-bottom: 1px solid #e5e7eb;
+/* Linhas */
+.user-table tbody tr {
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .user-table tbody tr:hover {
-  background: #f9fafb;
-  transition: background 0.2s;
+  background: #f5f5f5;
 }
 
-/* ===== Botões da Tabela ===== */
+.user-table td {
+  padding: 0.9rem 1rem;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+/* ============================================
+   🔘 BOTÕES DA TABELA
+   ============================================ */
 .button-editar,
 .button-excluir {
   padding: 6px 12px;
   font-size: 0.8rem;
-  font-weight: 500;
-  border-radius: 6px;
-  border: 1px solid transparent;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: 0.3s ease;
+  border: none;
+  font-weight: 600;
 }
 
 /* Editar */
 .button-editar {
-  background-color: #eff6ff;
-  border: 1px solid #3b82f6;
-  color: #2563eb;
+  background: var(--primary-light);
+  color: white;
 }
 .button-editar:hover {
-  background-color: #2563eb;
-  color: #fff;
+  background: var(--primary);
 }
 
 /* Excluir */
 .button-excluir {
-  background-color: #fef2f2;
-  border: 1px solid #ef4444;
-  color: #dc2626;
-  margin-left: 6px;
+  background: var(--danger-light);
+  color: white;
 }
 .button-excluir:hover {
-  background-color: #ef4444;
-  color: #fff;
+  background: var(--danger);
 }
 
-/* ===== Mensagem Vazia ===== */
-.empty-message {
-  margin-top: 1rem;
-  color: #6b7280;
-  font-size: 0.95rem;
-  text-align: center;
-}
-
-/* ===== Caixa de Seleção Permissão ===== */
-
-select {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
-
-select:focus {
-  border-color: #007bff;
-  outline: none;
-}
-
-/* ===== Responsividade ===== */
+/* ============================================
+   📱 RESPONSIVIDADE
+   ============================================ */
 @media (max-width: 768px) {
   .user-table {
-    width: 100%;
-  }
-
-  .produto-form {
-    gap: 0.7rem;
-  }
-
-  .botoes-form {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .botoes-form button {
     width: 100%;
   }
 
   .modal-content {
     width: 95%;
     padding: 1.2rem;
+  }
+
+  .botoes-form {
+    flex-direction: column;
+  }
+
+  .botoes-form button {
+    width: 100%;
   }
 }
