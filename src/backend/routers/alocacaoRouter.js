@@ -16,6 +16,6 @@ AlocacaoRouter.post("/criar", (req, res) => alocacaoController.criar(req, res));
 AlocacaoRouter.put("/editar/:id", (req, res) =>
   alocacaoController.editar(req, res)
 );
-AlocacaoRouter.delete("/deletar/:id", (req, res) =>
+AlocacaoRouter.delete("/delete/:id", (req, res) =>
   alocacaoController.deletar(req, res)
 );

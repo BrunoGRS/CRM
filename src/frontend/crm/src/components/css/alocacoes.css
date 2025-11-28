@@ -1,235 +1,184 @@
-/* ====================================== */
-/*   ESTILOS RESTRITOS A .aloc-container   */
-/* ====================================== */
+/* =======================================================
+   ESTILOS ESPECÍFICOS — LISTA DE ALOCAÇÕES
+   (não interfere em mais nada do sistema)
+   ======================================================= */
 
-.aloc-container h1 {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  color: #222;
+.lista-container .titulo {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1.4rem;
+  margin-left: 55px;
 }
 
-/* Botão Nova Alocação */
-.aloc-container .btn-add {
-  padding: 12px 18px;
-  background: #4a90e2;
-  color: white;
+/* Área superior: botão + busca */
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 1.2rem;
+}
+
+/* Botão NOVA ALOCAÇÃO */
+.btn-novo {
+  background: var(--primary);
+  color: var(--white);
   border: none;
-  border-radius: 10px;
+  border-radius: 6px;
+  padding: 0.7rem 1.3rem;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 15px;
-  margin-bottom: 20px;
-  transition: 0.2s;
+  transition: 0.3s ease;
 }
 
-.aloc-container .btn-add:hover {
-  background: #357abd;
+.btn-novo:hover {
+  background: #4c2f19;
 }
 
 /* Campo de busca */
-.aloc-container .input-busca {
-  width: 100%;
-  padding: 12px 15px;
-  border: 1px solid #d0d7de;
-  border-radius: 10px;
-  margin-bottom: 20px;
-  font-size: 15px;
-  transition: 0.2s;
-  background: white;
-}
-
-.aloc-container .input-busca:focus {
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
-  outline: none;
-}
-
-/* Tabela */
-.aloc-container .aloc-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
-
-.aloc-container .aloc-table thead {
-  background: #eef2f7;
-}
-
-.aloc-container .aloc-table th {
-  padding: 14px;
-  text-align: left;
-  font-size: 14px;
+.campo-busca {
+  width: 280px;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #d3d3d3;
+  background: #ffffff;
+  font-size: 0.9rem;
   color: #444;
-  font-weight: 600;
-  border-bottom: 1px solid #ddd;
+  outline: none;
+  transition: 0.25s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
-.aloc-container .aloc-table td {
-  padding: 12px 14px;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
+.campo-busca:focus {
+  border-color: #5d3a22;
+  box-shadow: 0 0 0 3px rgba(93, 58, 34, 0.25);
 }
 
-.aloc-container .aloc-table tbody tr:hover {
-  background: #f7f9fc;
-}
+/* =======================================================
+   TABELA
+   ======================================================= */
 
-/* Botões editar/excluir */
-.aloc-container .btn-edit {
-  background: #ffd966;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  margin-right: 8px;
-  transition: 0.2s;
-}
-
-.aloc-container .btn-edit:hover {
-  background: #f7c843;
-}
-
-.aloc-container .btn-del {
-  background: #ff6b6b;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  color: white;
-  transition: 0.2s;
-}
-
-.aloc-container .btn-del:hover {
-  background: #e25656;
-}
-
-/* Modal */
-.aloc-container .modal-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
+.tabela {
   width: 100%;
-  height: 100%;
-  background: rgba(20, 20, 20, 0.45);
+  border-collapse: separate;
+  border-spacing: 0 6px;
+}
+
+/* Cabeçalho */
+.tabela th {
+  text-align: left;
+  padding: 0.9rem 1rem;
+  font-size: 0.72rem;
+  color: #999;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+/* Linhas */
+.tabela tbody tr {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: 0.2s;
+}
+
+.tabela tbody tr:hover {
+  background: #f5f5f5;
+}
+
+/* Células */
+.tabela td {
+  padding: 0.9rem 1rem;
+  font-size: 0.88rem;
+  color: #444;
+  border-bottom: none !important;
+}
+
+/* Larguras específicas */
+.tabela th:nth-child(1),
+.tabela td:nth-child(1) {
+  width: 8%;
+}
+.tabela th:nth-child(2),
+.tabela td:nth-child(2) {
+  width: 20%;
+}
+.tabela th:nth-child(3),
+.tabela td:nth-child(3) {
+  width: 16%;
+}
+.tabela th:nth-child(4),
+.tabela td:nth-child(4) {
+  width: 16%;
+}
+.tabela th:nth-child(5),
+.tabela td:nth-child(5) {
+  width: 16%;
+}
+.tabela th:nth-child(6),
+.tabela td:nth-child(6) {
+  width: 16%;
+}
+.tabela th:nth-child(7),
+.tabela td:nth-child(7) {
+  width: 8%;
+}
+
+/* =======================================================
+   PAGINAÇÃO
+   ======================================================= */
+.paginacao {
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: fadeIn 0.2s;
+  gap: 18px;
+  margin-top: 1.8rem;
 }
 
-.aloc-container .modal {
-  background: white;
-  width: 520px;
-  padding: 25px;
-  border-radius: 14px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  animation: slideUp 0.25s;
-}
-
-.aloc-container .modal h2 {
-  text-align: center;
-  margin-top: 0;
-  margin-bottom: 15px;
-  font-size: 22px;
-}
-
-.aloc-container .modal-body-scroll {
-  max-height: 380px;
-  overflow-y: auto;
-  padding-right: 5px;
-}
-
-/* Formulário dentro do modal */
-.aloc-container .form-grid {
-  display: flex;
-  flex-direction: column;
-}
-
-.aloc-container .form-grid label {
+.paginacao button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #ddd;
+  cursor: pointer;
+  transition: 0.2s;
   font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 4px;
 }
 
-.aloc-container .form-grid input,
-.aloc-container .form-grid select,
-.aloc-container .form-grid textarea {
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid #d0d7de;
-  margin-bottom: 16px;
-  background: #fafafa;
-  transition: 0.2s;
+.paginacao button:hover:not(:disabled) {
+  background: #c9c9c9;
 }
 
-.aloc-container .form-grid input:focus,
-.aloc-container .form-grid select:focus,
-.aloc-container .form-grid textarea:focus {
-  border-color: #4a90e2;
-  background: white;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.25);
+.paginacao button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.aloc-container textarea {
-  resize: none;
-  height: 70px;
+.paginacao span {
+  font-size: 0.9rem;
+  color: #444;
 }
 
-/* Botões modal */
-.aloc-container .modal-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-.aloc-container .btn-save {
-  flex: 1;
-  margin-right: 10px;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  background: #4caf50;
-  color: white;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s;
-}
-
-.aloc-container .btn-save:hover {
-  background: #3e8e41;
-}
-
-.aloc-container .btn-cancel {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  background: #b6b6b6;
-  color: white;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s;
-}
-
-.aloc-container .btn-cancel:hover {
-  background: #999;
-}
-
-/* Responsivo */
-@media (max-width: 600px) {
-  .aloc-container .modal {
-    width: 92%;
+/* =======================================================
+   RESPONSIVIDADE
+   ======================================================= */
+@media (max-width: 780px) {
+  .tabela {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
   }
 
-  .aloc-container .btn-add {
-    width: 100%;
+  .top-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 
-  .aloc-container .input-busca {
+  .campo-busca {
     width: 100%;
   }
 }
