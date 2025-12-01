@@ -1,0 +1,258 @@
+/* =======================================================
+   CONTAINER PRINCIPAL
+   ======================================================= */
+.content {
+  padding: 30px;
+}
+
+.content h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1.4rem;
+}
+
+/* Botão novo */
+.btn-criar-novo {
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 6px;
+  padding: 0.7rem 1.3rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.btn-criar-novo:hover {
+  background: #4c2f19;
+}
+
+/* Campo de busca */
+.input-busca {
+  width: 300px;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #d3d3d3;
+  background: #ffffff;
+  font-size: 0.9rem;
+  color: #444;
+  outline: none;
+  transition: 0.25s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  margin-bottom: 20px;
+}
+
+.input-busca:focus {
+  border-color: #5d3a22;
+  box-shadow: 0 0 0 3px rgba(93, 58, 34, 0.25);
+}
+
+/* =======================================================
+   TABELA DE LISTAGEM
+   ======================================================= */
+.venda-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+}
+
+.venda-table th {
+  text-align: left;
+  padding: 0.9rem 1rem;
+  font-size: 0.72rem;
+  color: #999;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+.venda-table tbody tr {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: 0.2s;
+}
+
+.venda-table tbody tr:hover {
+  background: #f5f5f5;
+}
+
+.venda-table td {
+  padding: 0.9rem 1rem;
+  font-size: 0.88rem;
+  color: #444;
+  border-bottom: none !important;
+}
+
+/* Botões da tabela */
+.btn-editar {
+  background: #2775ff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: white;
+  cursor: pointer;
+  margin-right: 6px;
+  transition: 0.25s;
+}
+
+.btn-editar:hover {
+  background: #1d5dcc;
+}
+
+.btn-excluir {
+  background: #d9534f;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: white;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.btn-excluir:hover {
+  background: #b73f3c;
+}
+
+/* =======================================================
+   PAGINAÇÃO
+   ======================================================= */
+.paginacao-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.btn-paginacao {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #ddd;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 14px;
+}
+
+.btn-paginacao:hover:not(:disabled) {
+  background: #c9c9c9;
+}
+
+.btn-paginacao.ativo {
+  background: #5d3a22;
+  color: white;
+}
+
+.btn-paginacao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =======================================================
+   MODAL DE CONFIRMAÇÃO
+   ======================================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  background: white;
+  width: 380px;
+  padding: 24px;
+  border-radius: 10px;
+  text-align: center;
+  animation: fadeIn 0.25s ease;
+}
+
+.modal h3 {
+  font-size: 1.25rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.modal p {
+  font-size: 0.92rem;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.btn-confirmar {
+  background: #d9534f;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+  flex: 1;
+}
+
+.btn-confirmar:hover {
+  background: #b73f3c;
+}
+
+.btn-cancelar {
+  background: #ccc;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  transition: 0.2s;
+  flex: 1;
+}
+
+.btn-cancelar:hover {
+  background: #b5b5b5;
+}
+
+/* Animação */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* =======================================================
+   RESPONSIVIDADE
+   ======================================================= */
+@media (max-width: 780px) {
+  .venda-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .input-busca {
+    width: 100%;
+  }
+}

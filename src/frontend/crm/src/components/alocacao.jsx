@@ -9,6 +9,9 @@ const ListaAlocacoes = () => {
   const [alocacoes, setAlocacoes] = useState([]);
   const [busca, setBusca] = useState("");
 
+  // modal de exclusão
+  const [deleteId, setDeleteId] = useState(null);
+
   // paginação
   const [paginaAtual, setPaginaAtual] = useState(1);
   const itensPorPagina = 10;
@@ -31,13 +34,13 @@ const ListaAlocacoes = () => {
     const texto = busca.toLowerCase();
     return (
       item.id.toString().includes(texto) ||
-      item.cliente?.nome?.toLowerCase().includes(texto) ||
-      item.maquina?.nome?.toLowerCase().includes(texto) ||
+      item.cliente?.toLowerCase().includes(texto) ||
+      item.maquina?.toLowerCase().includes(texto) ||
       item.status?.toLowerCase().includes(texto)
     );
   };
 
-  // PAGINAÇÃO
+  // paginação
   const dadosFiltrados = alocacoes.filter(filtrar);
   const totalPaginas = Math.ceil(dadosFiltrados.length / itensPorPagina);
   const inicio = (paginaAtual - 1) * itensPorPagina;
@@ -51,7 +54,7 @@ const ListaAlocacoes = () => {
         `http://localhost:3000/api/alocacao/pdf/${id}`
       );
 
-      const blob = await response.blob(); // ← fetch usa blob()
+      const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
 
@@ -64,14 +67,14 @@ const ListaAlocacoes = () => {
     }
   };
 
-  const deletar = async (id) => {
-    if (!window.confirm("Deseja realmente excluir esta alocação?")) return;
-
+  // confirmar exclusão
+  const deletar = async () => {
     try {
-      await fetch(`http://localhost:3000/api/alocacao/delete/${id}`, {
+      await fetch(`http://localhost:3000/api/alocacao/delete/${deleteId}`, {
         method: "DELETE",
       });
 
+      setDeleteId(null);
       carregarAlocacoes();
     } catch (error) {
       console.error("Erro ao excluir alocação:", error);
@@ -118,25 +121,16 @@ const ListaAlocacoes = () => {
             {exibidos.map((item) => (
               <tr key={item.id}>
                 <td>{item.id}</td>
-                <td>{item.maquina?.nome || "-"}</td>
-                <td>{item.cliente?.nome || "-"}</td>
+                <td>{item.maquina}</td>
+                <td>{item.cliente}</td>
                 <td>{item.data_inicio}</td>
                 <td>{item.data_fim || "-"}</td>
                 <td>{item.status}</td>
 
                 <MenuAcoes
                   onEditar={() => navigate(`/alocacao/editar/${item.id}`)}
-                  onExcluir={() => deletar(item.id)}
-                  onPDF={() => {
-                    const alocacaoParaPDF = alocacoes.find(
-                      (a) => a.id === item.id
-                    );
-                    if (alocacaoParaPDF) {
-                      gerarPDFBrastalia(alocacaoParaPDF);
-                    } else {
-                      toast.warning("Dados completos carregando...");
-                    }
-                  }}
+                  onExcluir={() => setDeleteId(item.id)}
+                  onPDF={() => gerarPDF(item.id)}
                 />
               </tr>
             ))}
@@ -164,6 +158,32 @@ const ListaAlocacoes = () => {
           </button>
         </div>
       </main>
+
+      {/* ================================
+          MODAL DE CONFIRMAÇÃO DE EXCLUSÃO
+      =================================*/}
+      {deleteId && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <h2 className="modal-header">Confirmar Exclusão</h2>
+
+            <p>Tem certeza que deseja excluir esta alocação?</p>
+
+            <div className="modal-footer">
+              <button
+                className="btn btn-secondary"
+                onClick={() => setDeleteId(null)}
+              >
+                Cancelar
+              </button>
+
+              <button className="btn btn-danger" onClick={deletar}>
+                Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

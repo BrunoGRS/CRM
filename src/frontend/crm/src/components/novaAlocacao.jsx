@@ -9,6 +9,9 @@ export default function AlocacaoCriar() {
 
   const [clientes, setClientes] = useState([]);
   const [produtos, setProdutos] = useState([]);
+  const [produtosSelecionados, setProdutosSelecionados] = useState([]);
+
+  const [modalAberto, setModalAberto] = useState(false);
 
   // CAMPOS DO ENDEREÇO
   const [cep, setCep] = useState("");
@@ -30,7 +33,6 @@ export default function AlocacaoCriar() {
     observacoes: "",
   });
 
-  // BUSCAR CEP VIA VIACEP
   const buscarCEP = async (valor) => {
     const somenteNumeros = valor.replace(/\D/g, "");
 
@@ -49,7 +51,6 @@ export default function AlocacaoCriar() {
     }
   };
 
-  // BUSCAR CLIENTES
   const fetchClientes = async () => {
     try {
       const resp = await fetch("http://localhost:3000/api/cliente/listar");
@@ -60,7 +61,6 @@ export default function AlocacaoCriar() {
     }
   };
 
-  // BUSCAR PRODUTOS
   const fetchProdutos = async () => {
     try {
       const resp = await fetch("http://localhost:3000/api/produto/listar");
@@ -76,18 +76,27 @@ export default function AlocacaoCriar() {
     fetchProdutos();
   }, []);
 
-  // MONTA O CAMPO ÚNICO PARA SALVAR NO BANCO
   const gerarEnderecoUnico = () => {
     return `${logradouro}, ${numero} - ${bairro} - ${cidade}/${uf}, CEP ${cep}`;
   };
 
-  // SALVAR
+  const adicionarProduto = (id) => {
+    if (!produtosSelecionados.includes(id)) {
+      setProdutosSelecionados([...produtosSelecionados, id]);
+    }
+  };
+
+  const removerProduto = (id) => {
+    setProdutosSelecionados(produtosSelecionados.filter((p) => p !== id));
+  };
+
   const salvar = async () => {
     const enderecoFinal = gerarEnderecoUnico();
 
     const payload = {
       ...form,
       local_instalacao: enderecoFinal,
+      produtos: produtosSelecionados,
     };
 
     try {
@@ -104,7 +113,7 @@ export default function AlocacaoCriar() {
 
       toast.success("Alocação criada!");
       navigate("/alocacao");
-    } catch (error) {
+    } catch {
       toast.error("Erro ao salvar");
     }
   };
@@ -114,8 +123,7 @@ export default function AlocacaoCriar() {
       <Navbar />
 
       <div className="aloc-form">
-        {/* PRODUTO */}
-        <label>Máquina / Produto</label>
+        <label>Máquina / Produto (principal)</label>
         <select
           value={form.maquina_id}
           onChange={(e) => setForm({ ...form, maquina_id: e.target.value })}
@@ -128,7 +136,6 @@ export default function AlocacaoCriar() {
           ))}
         </select>
 
-        {/* CLIENTE */}
         <label>Cliente</label>
         <select
           value={form.cliente_id}
@@ -142,7 +149,6 @@ export default function AlocacaoCriar() {
           ))}
         </select>
 
-        {/* DATAS */}
         <label>Data Início</label>
         <input
           type="date"
@@ -157,7 +163,6 @@ export default function AlocacaoCriar() {
           onChange={(e) => setForm({ ...form, data_fim: e.target.value })}
         />
 
-        {/* STATUS */}
         <label>Status</label>
         <select
           value={form.status}
@@ -170,7 +175,6 @@ export default function AlocacaoCriar() {
           <option value="reservada">Reservada</option>
         </select>
 
-        {/* RESPONSÁVEL */}
         <label>Responsável Instalação</label>
         <input
           type="text"
@@ -180,6 +184,7 @@ export default function AlocacaoCriar() {
           }
         />
 
+        {/* ENDEREÇO */}
         <div className="form-grid">
           <div>
             <label>CEP</label>
@@ -234,8 +239,8 @@ export default function AlocacaoCriar() {
             <input
               type="text"
               value={uf}
-              onChange={(e) => setUf(e.target.value)}
               maxLength={2}
+              onChange={(e) => setUf(e.target.value)}
             />
           </div>
         </div>
@@ -245,13 +250,11 @@ export default function AlocacaoCriar() {
           onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
         ></textarea>
 
-        {/* ARQUIVOS */}
         <div className="file-input-container">
           <label>Anexos</label>
           <input type="file" multiple className="file-input" />
         </div>
 
-        {/* BOTÕES */}
         <div className="aloc-btns">
           <button className="btn-save" onClick={salvar}>
             Salvar
@@ -261,6 +264,30 @@ export default function AlocacaoCriar() {
           </button>
         </div>
       </div>
+
+      {modalAberto && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h3>Adicionar Produtos</h3>
+            <select onChange={(e) => adicionarProduto(Number(e.target.value))}>
+              <option value="">Selecione</option>
+              {produtos.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.nome}
+                </option>
+              ))}
+            </select>
+
+            <button
+              className="btn-save"
+              style={{ marginTop: 15 }}
+              onClick={() => setModalAberto(false)}
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

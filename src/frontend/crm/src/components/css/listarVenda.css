@@ -93,9 +93,10 @@ h2 {
 
 /* ====== LINHAS ====== */
 .venda-table tbody tr {
-  background: var(--white);
+  background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: 0.2s;
 }
 
 .venda-table tbody tr:hover {

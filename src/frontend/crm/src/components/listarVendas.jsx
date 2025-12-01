@@ -12,10 +12,36 @@ export const ListarVendas = () => {
   const [busca, setBusca] = useState("");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
-  const [itensPorPagina] = useState(10); // Exibe 10 itens por vez
+  const [itensPorPagina] = useState(10);
 
   const navigate = useNavigate();
 
+  // ======================================================
+  // STATE DO MODAL DE CONFIRMAÇÃO
+  // ======================================================
+  const [modalAberto, setModalAberto] = useState(false);
+  const [idParaExcluir, setIdParaExcluir] = useState(null);
+
+  const abrirModalExclusao = (id) => {
+    setIdParaExcluir(id);
+    setModalAberto(true);
+  };
+
+  const fecharModal = () => {
+    setModalAberto(false);
+    setIdParaExcluir(null);
+  };
+
+  const confirmarExclusao = () => {
+    if (idParaExcluir) {
+      excluirVenda(idParaExcluir);
+    }
+    fecharModal();
+  };
+
+  // ======================================================
+  // GERAR PDF (mantive igual)
+  // ======================================================
   const gerarPDFBrastalia = (dadosVenda) => {
     if (!dadosVenda) {
       toast.error("Erro: Dados da venda não carregados.");
@@ -171,20 +197,17 @@ export const ListarVendas = () => {
     fetchVendasGeral();
   }, []);
 
-  // Resetar para página 1 quando fizer uma busca nova
   useEffect(() => {
     setPaginaAtual(1);
   }, [busca]);
 
   // ======================================================
-  // LÓGICA DE FILTRO E PAGINAÇÃO
+  // FILTRAGEM + PAGINAÇÃO
   // ======================================================
-
-  // 1. Primeiro filtra
   const vendasFiltradas = vendas.filter((v) => {
     const txt = busca.toLowerCase();
     return (
-      String(v.id).toLowerCase().includes(txt) || // Ajustado de 'codigo' para 'id'
+      String(v.id).toLowerCase().includes(txt) ||
       String(v.cliente || "")
         .toLowerCase()
         .includes(txt) ||
@@ -194,21 +217,13 @@ export const ListarVendas = () => {
     );
   });
 
-  // 2. Calcula índices para paginação
   const indexUltimoItem = paginaAtual * itensPorPagina;
   const indexPrimeiroItem = indexUltimoItem - itensPorPagina;
-
-  // 3. Faria os itens que vão aparecer NA TELA AGORA
   const vendasAtuais = vendasFiltradas.slice(
     indexPrimeiroItem,
     indexUltimoItem
   );
-
-  // 4. Calcula total de páginas
   const totalPaginas = Math.ceil(vendasFiltradas.length / itensPorPagina);
-
-  // 5. Função para mudar página
-  const mudarPagina = (numeroPagina) => setPaginaAtual(numeroPagina);
 
   // ======================================================
   // RENDER
@@ -252,7 +267,6 @@ export const ListarVendas = () => {
                 </tr>
               </thead>
               <tbody>
-                {/* Usamos 'vendasAtuais' em vez de 'vendasFiltradas' aqui */}
                 {vendasAtuais.map((venda) => (
                   <tr key={venda.id}>
                     <td>{venda.id}</td>
@@ -264,16 +278,14 @@ export const ListarVendas = () => {
                     <td>
                       <MenuAcoes
                         onEditar={() => navigate(`/venda/editar/${venda.id}`)}
-                        onExcluir={() => excluirVenda(venda.id)}
+                        onExcluir={() => abrirModalExclusao(venda.id)}
                         onPDF={() => {
                           const vendaParaPDF = vendasGeral.find(
                             (v) => v.id === venda.id
                           );
-                          if (vendaParaPDF) {
-                            gerarPDFBrastalia(vendaParaPDF);
-                          } else {
-                            toast.warning("Dados completos carregando...");
-                          }
+                          vendaParaPDF
+                            ? gerarPDFBrastalia(vendaParaPDF)
+                            : toast.warning("Dados completos carregando...");
                         }}
                       />
                     </td>
@@ -282,18 +294,10 @@ export const ListarVendas = () => {
               </tbody>
             </table>
 
-            {/* --- COMPONENTE DE PAGINAÇÃO --- */}
-            <div
-              className="paginacao-container"
-              style={{
-                marginTop: "20px",
-                display: "flex",
-                justifyContent: "center",
-                gap: "10px",
-              }}
-            >
+            {/* PAGINAÇÃO */}
+            <div className="paginacao-container">
               <button
-                onClick={() => mudarPagina(paginaAtual - 1)}
+                onClick={() => setPaginaAtual(paginaAtual - 1)}
                 disabled={paginaAtual === 1}
                 className="btn-paginacao"
               >
@@ -303,23 +307,17 @@ export const ListarVendas = () => {
               {Array.from({ length: totalPaginas }, (_, index) => (
                 <button
                   key={index + 1}
-                  onClick={() => mudarPagina(index + 1)}
+                  onClick={() => setPaginaAtual(index + 1)}
                   className={`btn-paginacao ${
                     paginaAtual === index + 1 ? "ativo" : ""
                   }`}
-                  style={{
-                    fontWeight: paginaAtual === index + 1 ? "bold" : "normal",
-                    backgroundColor:
-                      paginaAtual === index + 1 ? "#4b2e2a" : "#ddd",
-                    color: paginaAtual === index + 1 ? "#fff" : "#000",
-                  }}
                 >
                   {index + 1}
                 </button>
               ))}
 
               <button
-                onClick={() => mudarPagina(paginaAtual + 1)}
+                onClick={() => setPaginaAtual(paginaAtual + 1)}
                 disabled={paginaAtual === totalPaginas}
                 className="btn-paginacao"
               >
@@ -329,6 +327,28 @@ export const ListarVendas = () => {
           </>
         )}
       </main>
+
+      {/* ======================================================
+          MODAL DE CONFIRMAÇÃO DE EXCLUSÃO
+      ====================================================== */}
+      {modalAberto && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">Confirmar Exclusão</div>
+
+            <p>Tem certeza que deseja excluir esta venda?</p>
+
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={fecharModal}>
+                Cancelar
+              </button>
+              <button className="btn btn-danger" onClick={confirmarExclusao}>
+                Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

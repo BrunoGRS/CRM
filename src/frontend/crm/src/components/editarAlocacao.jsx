@@ -1,11 +1,26 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import "./css/editarAlocacao.css";
 import { Navbar } from "./navbar";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import "./css/novaAlocacao.css";
 
 export function EditarAlocacao() {
-  const { id } = useParams();
   const navigate = useNavigate();
+  const { id } = useParams();
+
+  const [clientes, setClientes] = useState([]);
+  const [produtos, setProdutos] = useState([]);
+  const [produtosSelecionados, setProdutosSelecionados] = useState([]);
+
+  const [modalAberto, setModalAberto] = useState(false);
+
+  // ENDEREÇO
+  const [cep, setCep] = useState("");
+  const [logradouro, setLogradouro] = useState("");
+  const [numero, setNumero] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [uf, setUf] = useState("");
 
   const [form, setForm] = useState({
     maquina_id: "",
@@ -13,55 +28,14 @@ export function EditarAlocacao() {
     data_inicio: "",
     data_fim: "",
     status: "",
-    cep: "",
-    rua: "",
-    bairro: "",
-    cidade: "",
-    uf: "",
-    numero: "",
-    complemento: "",
     local_instalacao: "",
     responsavel_instalacao: "",
     observacoes: "",
   });
 
-  // ===========================
-  // BUSCAR ALOCAÇÃO POR ID
-  // ===========================
-  useEffect(() => {
-    async function carregar() {
-      try {
-        const r = await fetch(
-          `http://localhost:3000/api/alocacao/buscar/${id}`
-        );
-        const dados = await r.json();
-
-        // Preenche o formulário com informações vindas da API
-        setForm((prev) => ({
-          ...prev,
-          maquina_id: dados.maquina_id || "",
-          cliente_id: dados.cliente_id || "",
-          data_inicio: dados.data_inicio || "",
-          data_fim: dados.data_fim || "",
-          status: dados.status || "",
-          local_instalacao: dados.local_instalacao || "",
-          responsavel_instalacao: dados.responsavel_instalacao || "",
-          observacoes: dados.observacoes || "",
-        }));
-      } catch (error) {
-        console.error("Erro ao buscar alocação:", error);
-      }
-    }
-
-    carregar();
-  }, [id]);
-
-  // ===========================
-  // BUSCAR CEP
-  // ===========================
+  // Buscar CEP
   const buscarCEP = async (valor) => {
     const somenteNumeros = valor.replace(/\D/g, "");
-
     if (somenteNumeros.length === 8) {
       const response = await fetch(
         `https://viacep.com.br/ws/${somenteNumeros}/json/`
@@ -69,236 +43,336 @@ export function EditarAlocacao() {
       const data = await response.json();
 
       if (!data.erro) {
-        setLogradouro(data.logradouro);
-        setBairro(data.bairro);
-        setCidade(data.localidade);
-        setUf(data.uf);
+        setLogradouro(data.logradouro || "");
+        setBairro(data.bairro || "");
+        setCidade(data.localidade || "");
+        setUf(data.uf || "");
       }
     }
   };
 
-  // ===========================
-  // SALVAR ALOCAÇÃO (PUT)
-  // ===========================
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // monta o local_instalacao final
-    const enderecoCompleto = `${form.rua}, ${form.numero || "s/n"} - ${
-      form.bairro
-    }, ${form.cidade}/${form.uf} - CEP ${form.cep}${
-      form.complemento ? " (" + form.complemento + ")" : ""
-    }`;
-
+  const fetchClientes = async () => {
     try {
-      const r = await fetch(`http://localhost:3000/api/alocacao/editar/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          maquina_id: form.maquina_id,
-          cliente_id: form.cliente_id,
-          data_inicio: form.data_inicio,
-          data_fim: form.data_fim,
-          status: form.status,
-          local_instalacao: enderecoCompleto,
-          responsavel_instalacao: form.responsavel_instalacao,
-          observacoes: form.observacoes,
-        }),
+      const resp = await fetch("http://localhost:3000/api/cliente/listar");
+      const data = await resp.json();
+      setClientes(Array.isArray(data.msg) ? data.msg : []);
+    } catch {
+      toast.error("Erro ao carregar clientes");
+    }
+  };
+
+  const fetchProdutos = async () => {
+    try {
+      const resp = await fetch("http://localhost:3000/api/produto/listar");
+      const data = await resp.json();
+      setProdutos(Array.isArray(data.msg) ? data.msg : []);
+    } catch {
+      toast.error("Erro ao carregar máquinas/produtos");
+    }
+  };
+
+  const fetchAlocacao = async () => {
+    try {
+      const resp = await fetch(
+        `http://localhost:3000/api/alocacao/buscar/${id}`
+      );
+      const al = await resp.json();
+
+      setForm({
+        maquina_id: al.maquina_id || "",
+        cliente_id: al.cliente_id || "",
+        data_inicio: al.data_inicio?.split("T")[0] || "",
+        data_fim: al.data_fim?.split("T")[0] || "",
+        status: al.status || "",
+        local_instalacao: al.local_instalacao || "",
+        responsavel_instalacao: al.responsavel_instalacao || "",
+        observacoes: al.observacoes || "",
       });
 
-      if (!r.ok) {
-        alert("Erro ao atualizar alocação!");
+      // PRODUTOS SELECIONADOS
+      if (Array.isArray(al.produtos)) {
+        setProdutosSelecionados(al.produtos.map((p) => p.id));
+      }
+
+      // QUEBRAR ENDEREÇO
+      if (al.local_instalacao) {
+        const endereco = al.local_instalacao;
+
+        const cepMatch = endereco.match(/CEP\s(\d{5}-?\d{3})/);
+        setCep(cepMatch ? cepMatch[1].replace("-", "") : "");
+
+        const partes = endereco.split(",");
+        setLogradouro(partes[0] || "");
+        setNumero(partes[1]?.trim() || "");
+
+        const bairroMatch = endereco.match(/-\s([^-\n]*)\s-/);
+        setBairro(bairroMatch ? bairroMatch[1].trim() : "");
+
+        const cidadeUfMatch = endereco.match(/-\s([\w\s]+)\/([A-Z]{2})/);
+        if (cidadeUfMatch) {
+          setCidade(cidadeUfMatch[1].trim());
+          setUf(cidadeUfMatch[2]);
+        }
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Erro ao carregar dados da alocação");
+    }
+  };
+
+  useEffect(() => {
+    fetchClientes();
+    fetchProdutos();
+    fetchAlocacao();
+  }, [id]);
+
+  const gerarEnderecoUnico = () =>
+    `${logradouro}, ${numero} - ${bairro} - ${cidade}/${uf}, CEP ${cep}`;
+
+  const adicionarProduto = (id) => {
+    if (!produtosSelecionados.includes(id)) {
+      setProdutosSelecionados([...produtosSelecionados, id]);
+    }
+  };
+
+  const removerProduto = (id) => {
+    setProdutosSelecionados(produtosSelecionados.filter((p) => p !== id));
+  };
+
+  const salvar = async () => {
+    const payload = {
+      ...form,
+      local_instalacao: gerarEnderecoUnico(),
+      produtos: produtosSelecionados,
+    };
+
+    try {
+      const resp = await fetch(
+        "http://localhost:3000/api/alocacao/editar/" + id,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!resp.ok) {
+        toast.error("Erro ao salvar alocação");
         return;
       }
 
-      alert("Alocação atualizada com sucesso!");
-      navigate("/alocacoes");
-    } catch (error) {
-      console.error("Erro ao salvar:", error);
+      toast.success("Alocação atualizada!");
+      navigate("/alocacao");
+    } catch {
+      toast.error("Erro ao salvar");
     }
   };
 
-  // Atualiza os campos
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
   return (
-    <div className="alocacao-container">
+    <section className="aloc-container">
       <Navbar />
-      <h2>Editar Alocação #{id}</h2>
 
-      <form className="alocacao-form" onSubmit={handleSubmit}>
-        {/* CAMPOS PRINCIPAIS */}
+      <div className="aloc-form">
+        {/* MÁQUINA */}
+        <label>Máquina / Produto</label>
+        <select
+          value={form.maquina_id}
+          onChange={(e) => setForm({ ...form, maquina_id: e.target.value })}
+        >
+          <option value="">Selecione</option>
+          {produtos.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.nome}
+            </option>
+          ))}
+        </select>
 
-        <div className="form-group">
-          <label>Máquina</label>
-          <input
-            type="text"
-            name="maquina_id"
-            value={form.maquina_id}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        {/* CLIENTE */}
+        <label>Cliente</label>
+        <select
+          value={form.cliente_id}
+          onChange={(e) => setForm({ ...form, cliente_id: e.target.value })}
+        >
+          <option value="">Selecione</option>
+          {clientes.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.fantasiaEmpresa || c.razaoSocialEmpresa}
+            </option>
+          ))}
+        </select>
 
-        <div className="form-group">
-          <label>Cliente</label>
-          <input
-            type="text"
-            name="cliente_id"
-            value={form.cliente_id}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <label>Data Início</label>
+        <input
+          type="date"
+          value={form.data_inicio}
+          onChange={(e) => setForm({ ...form, data_inicio: e.target.value })}
+        />
 
-        <div className="double-row">
-          <div className="form-group">
-            <label>Data Início</label>
-            <input
-              type="date"
-              name="data_inicio"
-              value={form.data_inicio}
-              onChange={handleChange}
-            />
-          </div>
+        <label>Data Fim</label>
+        <input
+          type="date"
+          value={form.data_fim}
+          onChange={(e) => setForm({ ...form, data_fim: e.target.value })}
+        />
 
-          <div className="form-group">
-            <label>Data Fim</label>
-            <input
-              type="date"
-              name="data_fim"
-              value={form.data_fim}
-              onChange={handleChange}
-            />
-          </div>
-        </div>
+        <label>Status</label>
+        <select
+          value={form.status}
+          onChange={(e) => setForm({ ...form, status: e.target.value })}
+        >
+          <option value="">Selecione</option>
+          <option value="ativa">Ativa</option>
+          <option value="encerrada">Encerrada</option>
+          <option value="em_manutencao">Em manutenção</option>
+          <option value="reservada">Reservada</option>
+        </select>
 
-        {/* STATUS */}
-        <div className="form-group">
-          <label>Status</label>
-          <select name="status" value={form.status} onChange={handleChange}>
-            <option value="">Selecione</option>
-            <option value="ATIVA">ATIVA</option>
-            <option value="FINALIZADA">FINALIZADA</option>
-            <option value="MANUTENCAO">MANUTENÇÃO</option>
-          </select>
-        </div>
+        <label>Responsável Instalação</label>
+        <input
+          type="text"
+          value={form.responsavel_instalacao}
+          onChange={(e) =>
+            setForm({ ...form, responsavel_instalacao: e.target.value })
+          }
+        />
 
-        {/* CEP + ENDEREÇO */}
-        <h3>Local de Instalação</h3>
-
-        <div className="cep-row">
+        {/* ENDEREÇO */}
+        <div className="form-grid">
           <div>
             <label>CEP</label>
             <input
               type="text"
-              name="cep"
-              maxLength={8}
-              value={form.cep}
-              onChange={handleChange}
+              value={cep}
+              onChange={(e) => {
+                setCep(e.target.value);
+                buscarCEP(e.target.value);
+              }}
             />
           </div>
 
-          <button type="button" className="btn-cep" onClick={buscarCEP}>
-            Buscar CEP
-          </button>
-        </div>
-
-        <div className="double-row">
-          <div className="form-group">
-            <label>Rua</label>
+          <div>
+            <label>Logradouro</label>
             <input
               type="text"
-              name="rua"
-              value={form.rua}
-              onChange={handleChange}
+              value={logradouro}
+              onChange={(e) => setLogradouro(e.target.value)}
             />
           </div>
 
-          <div className="form-group">
+          <div>
             <label>Número</label>
             <input
               type="text"
-              name="numero"
-              value={form.numero}
-              onChange={handleChange}
-              placeholder="s/n"
+              value={numero}
+              onChange={(e) => setNumero(e.target.value)}
             />
           </div>
-        </div>
 
-        <div className="double-row">
-          <div className="form-group">
+          <div>
             <label>Bairro</label>
             <input
               type="text"
-              name="bairro"
-              value={form.bairro}
-              onChange={handleChange}
+              value={bairro}
+              onChange={(e) => setBairro(e.target.value)}
             />
           </div>
 
-          <div className="form-group">
+          <div>
             <label>Cidade</label>
             <input
               type="text"
-              name="cidade"
-              value={form.cidade}
-              onChange={handleChange}
+              value={cidade}
+              onChange={(e) => setCidade(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label>UF</label>
+            <input
+              type="text"
+              maxLength={2}
+              value={uf}
+              onChange={(e) => setUf(e.target.value.toUpperCase())}
             />
           </div>
         </div>
 
-        <div className="form-group small">
-          <label>UF</label>
-          <input
-            type="text"
-            name="uf"
-            maxLength={2}
-            value={form.uf}
-            onChange={handleChange}
-          />
-        </div>
+        <label>Observações</label>
+        <textarea
+          value={form.observacoes}
+          onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
+        ></textarea>
 
-        <div className="form-group">
-          <label>Complemento</label>
-          <input
-            type="text"
-            name="complemento"
-            value={form.complemento}
-            onChange={handleChange}
-          />
-        </div>
+        {/* PRODUTOS ADICIONAIS */}
+        <label>Produtos adicionais</label>
+        <ul className="lista-produtos">
+          {produtosSelecionados.map((id) => {
+            const prod = produtos.find((p) => p.id === id);
+            return (
+              <li key={id}>
+                {prod?.nome}
+                <button
+                  className="remove-produto"
+                  onClick={() => removerProduto(id)}
+                >
+                  Remover
+                </button>
+              </li>
+            );
+          })}
+        </ul>
 
-        {/* RESPONSÁVEL */}
-        <div className="form-group">
-          <label>Responsável pela Instalação</label>
-          <input
-            type="text"
-            name="responsavel_instalacao"
-            value={form.responsavel_instalacao}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* OBS */}
-        <div className="form-group">
-          <label>Observações</label>
-          <textarea
-            name="observacoes"
-            value={form.observacoes}
-            onChange={handleChange}
-            rows={4}
-          />
-        </div>
-
-        <button className="btn-salvar" type="submit">
-          Salvar Alterações
+        <button className="btn-alt" onClick={() => setModalAberto(true)}>
+          + Adicionar Produtos
         </button>
-      </form>
-    </div>
+
+        {/* ANEXOS */}
+        <div className="file-input-container">
+          <label>Anexos</label>
+          <input type="file" multiple className="file-input" />
+        </div>
+
+        <div className="aloc-btns">
+          <button className="btn-save" onClick={salvar}>
+            Salvar
+          </button>
+          <button className="btn-cancel" onClick={() => navigate("/alocacao")}>
+            Cancelar
+          </button>
+        </div>
+      </div>
+
+      {/* Modal */}
+      {modalAberto && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h3>Adicionar Produto</h3>
+
+            <select
+              onChange={(e) => {
+                const pid = Number(e.target.value);
+                if (pid) adicionarProduto(pid);
+              }}
+            >
+              <option value="">Selecione</option>
+              {produtos.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.nome}
+                </option>
+              ))}
+            </select>
+
+            <button
+              className="btn-save"
+              style={{ marginTop: 15 }}
+              onClick={() => setModalAberto(false)}
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
 

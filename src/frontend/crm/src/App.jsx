@@ -13,6 +13,8 @@ import Alocacao from "./components/alocacao.jsx";
 import NovaALocacao from "./components/novaAlocacao.jsx";
 import { PrivateRoute } from "./components/PrivateRoute.jsx";
 import { EditarAlocacao } from "./components/editarAlocacao.jsx";
+import { ListarManutencoes } from "./components/listarManutencoes.jsx";
+import { NovaManutencao } from "./components/novaManutencao.jsx";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -110,6 +112,24 @@ function App() {
           element={
             <PrivateRoute>
               <EditarAlocacao />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/manutencao"
+          element={
+            <PrivateRoute>
+              <ListarManutencoes />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/manutencao/nova"
+          element={
+            <PrivateRoute>
+              <NovaManutencao />
             </PrivateRoute>
           }
         />

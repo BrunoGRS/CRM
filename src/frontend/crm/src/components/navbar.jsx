@@ -39,7 +39,7 @@ export function Navbar() {
             <Link to="/alocacao">Alocações</Link>
           </li>
           <li>
-            <Link to="/manutencoes">Manutenções</Link>
+            <Link to="/manutencao">Manutenções</Link>
           </li>
         </ul>
       </nav>

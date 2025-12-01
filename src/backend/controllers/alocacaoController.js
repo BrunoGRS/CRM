@@ -1,4 +1,5 @@
 import Alocacao from "../models/modelAlocacao.js";
+import { db } from "../database/database.js";
 
 // Função para tratar datas inválidas ou vazias
 function normalizarData(valor) {
@@ -14,7 +15,20 @@ const alocacaoController = {
   // LISTAR TODAS
   listar: async (req, res) => {
     try {
-      const alocacoes = await Alocacao.findAll();
+      const [alocacoes] = await db.query(`
+        SELECT 
+          c.razaoSocialEmpresa AS cliente,
+          p.nome AS maquina,
+          a.data_inicio,
+          a.data_fim,
+          a.status,
+          a.id
+        FROM alocacoes a
+        INNER JOIN cliente c ON c.id = a.cliente_id
+        INNER JOIN produto p ON p.id = a.maquina_id
+        ORDER BY a.id DESC;
+      `);
+
       return res.status(200).json(alocacoes);
     } catch (error) {
       console.error("Erro ao listar alocações:", error);

@@ -1,48 +1,66 @@
 import { DataTypes } from "sequelize";
-import { db } from "../database/database.js";
+import sequelize from "../config/database.js";
 
-const modelManutencao = db.define(
-  "manutencao",
+const Manutencao = sequelize.define(
+  "manutencoes",
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
-    alocacao_id: {
+
+    equipamento_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    data_manutencao: {
-      type: DataTypes.DATE,
+
+    tipo_manutencao: {
+      type: DataTypes.ENUM("Preventiva", "Corretiva", "Urgente"),
       allowNull: false,
     },
-    tipo: {
-      type: DataTypes.ENUM("preventiva", "corretiva"),
+
+    data_solicitacao: {
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
+
+    data_execucao: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+    },
+
+    tecnico_responsavel: {
+      type: DataTypes.STRING(120),
+      allowNull: true,
+    },
+
     descricao: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
     },
+
     custo: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
+      defaultValue: 0.0,
     },
-    tecnico_responsavel: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
+
     status: {
-      type: DataTypes.ENUM("pendente", "em andamento", "finalizada"),
+      type: DataTypes.ENUM("Pendente", "Em execução", "Concluída"),
       allowNull: false,
-      defaultValue: "pendente",
+      defaultValue: "Pendente",
+    },
+
+    observacoes: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
   },
   {
-    tableName: "manutencao",
-    timestamps: true,
+    timestamps: true, // createdAt e updatedAt
+    tableName: "manutencoes",
   }
 );
 
-export default modelManutencao;
+export default Manutencao;
