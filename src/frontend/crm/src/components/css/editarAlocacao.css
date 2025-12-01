@@ -1,0 +1,135 @@
+/* ------------------------------ */
+/*  ESTILOS EXCLUSIVOS ALOCAÇÃO   */
+/* ------------------------------ */
+
+/* CARD DO FORMULÁRIO */
+.editar-aloc-form {
+  background: #fff;
+  padding: 30px 50px 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* DUAS COLUNAS = mais organizado */
+  gap: 18px 28px; /* espaço entre campos */
+  margin-top: 50px;
+  margin-left: 170px;
+  max-width: 1300px;
+}
+
+/* LABEL */
+.editar-aloc-form label {
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 5px;
+  display: block;
+}
+
+/* CAMPOS */
+.editar-aloc-form input,
+.editar-aloc-form select,
+.editar-aloc-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  height: 46px;
+  font-size: 15px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  display: flex;
+  align-items: center;
+}
+
+/* Textarea */
+.editar-aloc-form textarea {
+  height: 120px !important;
+  resize: vertical;
+}
+
+/* OBSERVAÇÕES ocupa linha inteira */
+.editar-aloc-form textarea {
+  grid-column: span 2;
+  min-height: 120px;
+  resize: vertical;
+}
+
+.file-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.file-input {
+  padding: 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  background: #f8f9fa;
+  cursor: pointer;
+}
+
+/* NOVA DIV CEP */
+.cep-container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-top: 35px; /* distância do bloco acima */
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 28px;
+}
+
+/* BOTÕES */
+.editar-btns {
+  grid-column: span 2;
+  display: flex;
+  justify-content: flex-start;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.btn-save,
+.btn-cancel {
+  padding: 10px 24px;
+  font-size: 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-save {
+  background: #2f7d32;
+  color: white;
+}
+
+.btn-save:hover {
+  background: #276b2a;
+}
+
+.btn-cancel {
+  background: #c62828;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: #a61f1f;
+}
+
+/* RESPONSIVO */
+@media (max-width: 900px) {
+  .editar-aloc-form {
+    grid-template-columns: 1fr;
+  }
+
+  .editar-aloc-form textarea,
+  .editar-btns {
+    grid-column: span 1;
+  }
+
+  .editar-btns {
+    flex-direction: column;
+  }
+}

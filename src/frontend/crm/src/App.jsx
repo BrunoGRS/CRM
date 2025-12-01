@@ -12,6 +12,7 @@ import { EditarVenda } from "./components/editarVenda.jsx";
 import Alocacao from "./components/alocacao.jsx";
 import NovaALocacao from "./components/novaAlocacao.jsx";
 import { PrivateRoute } from "./components/PrivateRoute.jsx";
+import { EditarAlocacao } from "./components/editarAlocacao.jsx";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -100,6 +101,15 @@ function App() {
           element={
             <PrivateRoute>
               <NovaALocacao />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/alocacao/editar/:id"
+          element={
+            <PrivateRoute>
+              <EditarAlocacao />
             </PrivateRoute>
           }
         />
