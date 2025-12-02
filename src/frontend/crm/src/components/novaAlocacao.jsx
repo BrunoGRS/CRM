@@ -10,10 +10,9 @@ export default function AlocacaoCriar() {
   const [clientes, setClientes] = useState([]);
   const [produtos, setProdutos] = useState([]);
   const [produtosSelecionados, setProdutosSelecionados] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
 
-  const [modalAberto, setModalAberto] = useState(false);
-
-  // CAMPOS DO ENDEREÇO
+  // ENDEREÇO
   const [cep, setCep] = useState("");
   const [logradouro, setLogradouro] = useState("");
   const [numero, setNumero] = useState("");
@@ -21,7 +20,6 @@ export default function AlocacaoCriar() {
   const [cidade, setCidade] = useState("");
   const [uf, setUf] = useState("");
 
-  // FORM PRINCIPAL
   const [form, setForm] = useState({
     maquina_id: "",
     cliente_id: "",
@@ -33,9 +31,9 @@ export default function AlocacaoCriar() {
     observacoes: "",
   });
 
+  // BUSCAR CEP
   const buscarCEP = async (valor) => {
     const somenteNumeros = valor.replace(/\D/g, "");
-
     if (somenteNumeros.length === 8) {
       const response = await fetch(
         `https://viacep.com.br/ws/${somenteNumeros}/json/`
@@ -43,13 +41,23 @@ export default function AlocacaoCriar() {
       const data = await response.json();
 
       if (!data.erro) {
-        setLogradouro(data.logradouro);
-        setBairro(data.bairro);
-        setCidade(data.localidade);
-        setUf(data.uf);
+        setLogradouro(data.logradouro || "");
+        setBairro(data.bairro || "");
+        setCidade(data.localidade || "");
+        setUf(data.uf || "");
       }
     }
   };
+
+  async function fetchUsuarios() {
+    try {
+      const resp = await fetch("http://localhost:3000/api/usuario/listar");
+      const data = await resp.json();
+      if (Array.isArray(data.msg)) setUsuarios(data.msg);
+    } catch (err) {
+      toast.error("Erro ao carregar usuários");
+    }
+  }
 
   const fetchClientes = async () => {
     try {
@@ -74,11 +82,11 @@ export default function AlocacaoCriar() {
   useEffect(() => {
     fetchClientes();
     fetchProdutos();
+    fetchUsuarios();
   }, []);
 
-  const gerarEnderecoUnico = () => {
-    return `${logradouro}, ${numero} - ${bairro} - ${cidade}/${uf}, CEP ${cep}`;
-  };
+  const gerarEnderecoUnico = () =>
+    `${logradouro}, ${numero} - ${bairro} - ${cidade}/${uf}, CEP ${cep}`;
 
   const adicionarProduto = (id) => {
     if (!produtosSelecionados.includes(id)) {
@@ -91,11 +99,9 @@ export default function AlocacaoCriar() {
   };
 
   const salvar = async () => {
-    const enderecoFinal = gerarEnderecoUnico();
-
     const payload = {
       ...form,
-      local_instalacao: enderecoFinal,
+      local_instalacao: gerarEnderecoUnico(),
       produtos: produtosSelecionados,
     };
 
@@ -111,7 +117,7 @@ export default function AlocacaoCriar() {
         return;
       }
 
-      toast.success("Alocação criada!");
+      toast.success("Alocação criada com sucesso!");
       navigate("/alocacao");
     } catch {
       toast.error("Erro ao salvar");
@@ -123,7 +129,8 @@ export default function AlocacaoCriar() {
       <Navbar />
 
       <div className="aloc-form">
-        <label>Máquina / Produto (principal)</label>
+        {/* PRODUTO PRINCIPAL */}
+        <label>Máquina / Produto</label>
         <select
           value={form.maquina_id}
           onChange={(e) => setForm({ ...form, maquina_id: e.target.value })}
@@ -136,6 +143,7 @@ export default function AlocacaoCriar() {
           ))}
         </select>
 
+        {/* CLIENTE */}
         <label>Cliente</label>
         <select
           value={form.cliente_id}
@@ -175,14 +183,21 @@ export default function AlocacaoCriar() {
           <option value="reservada">Reservada</option>
         </select>
 
+        {/* RESPONSÁVEL INSTALAÇÃO */}
         <label>Responsável Instalação</label>
-        <input
-          type="text"
+        <select
           value={form.responsavel_instalacao}
           onChange={(e) =>
             setForm({ ...form, responsavel_instalacao: e.target.value })
           }
-        />
+        >
+          <option value="">Selecione</option>
+          {usuarios.map((u) => (
+            <option key={u.id} value={u.id}>
+              {u.nome}
+            </option>
+          ))}
+        </select>
 
         {/* ENDEREÇO */}
         <div className="form-grid">
@@ -238,18 +253,20 @@ export default function AlocacaoCriar() {
             <label>UF</label>
             <input
               type="text"
-              value={uf}
               maxLength={2}
-              onChange={(e) => setUf(e.target.value)}
+              value={uf}
+              onChange={(e) => setUf(e.target.value.toUpperCase())}
             />
           </div>
         </div>
 
+        {/* OBSERVAÇÕES */}
         <textarea
           value={form.observacoes}
           onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
         ></textarea>
 
+        {/* ANEXOS */}
         <div className="file-input-container">
           <label>Anexos</label>
           <input type="file" multiple className="file-input" />
@@ -264,30 +281,6 @@ export default function AlocacaoCriar() {
           </button>
         </div>
       </div>
-
-      {modalAberto && (
-        <div className="modal-overlay">
-          <div className="modal-box">
-            <h3>Adicionar Produtos</h3>
-            <select onChange={(e) => adicionarProduto(Number(e.target.value))}>
-              <option value="">Selecione</option>
-              {produtos.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.nome}
-                </option>
-              ))}
-            </select>
-
-            <button
-              className="btn-save"
-              style={{ marginTop: 15 }}
-              onClick={() => setModalAberto(false)}
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
-      )}
     </section>
   );
 }

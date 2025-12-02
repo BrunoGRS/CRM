@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js";
+import { db } from "../database/database.js";
 
-const Manutencao = sequelize.define(
+const Manutencao = db.define(
   "manutencoes",
   {
     id: {
@@ -13,10 +13,16 @@ const Manutencao = sequelize.define(
     equipamento_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: "produto", // conforme seu SQL: REFERENCES produto(id)
+        key: "id",
+      },
+      onUpdate: "CASCADE",
+      onDelete: "RESTRICT",
     },
 
     tipo_manutencao: {
-      type: DataTypes.ENUM("Preventiva", "Corretiva", "Urgente"),
+      type: DataTypes.ENUM("preventiva", "corretiva", "inspecao"),
       allowNull: false,
     },
 
@@ -30,26 +36,32 @@ const Manutencao = sequelize.define(
       allowNull: true,
     },
 
-    tecnico_responsavel: {
-      type: DataTypes.STRING(120),
-      allowNull: true,
+    responsavel_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "usuario", // conforme seu SQL: REFERENCES usuario(id)
+        key: "id",
+      },
+      onUpdate: "CASCADE",
+      onDelete: "RESTRICT",
     },
 
     descricao: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: false,
     },
 
-    custo: {
+    custo_total: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: true,
-      defaultValue: 0.0,
+      allowNull: false,
+      defaultValue: 0,
     },
 
     status: {
-      type: DataTypes.ENUM("Pendente", "Em execução", "Concluída"),
+      type: DataTypes.ENUM("aberta", "em_execucao", "concluida", "cancelada"),
       allowNull: false,
-      defaultValue: "Pendente",
+      defaultValue: "aberta",
     },
 
     observacoes: {
@@ -58,8 +70,9 @@ const Manutencao = sequelize.define(
     },
   },
   {
-    timestamps: true, // createdAt e updatedAt
     tableName: "manutencoes",
+    timestamps: true, // created_at / updated_at
+    underscored: true, // usa snake_case (created_at) em vez de camelCase
   }
 );
 

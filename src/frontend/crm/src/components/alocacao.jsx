@@ -67,7 +67,7 @@ const ListaAlocacoes = () => {
     }
   };
 
-  // confirmar exclusão
+  // EXCLUIR
   const deletar = async () => {
     try {
       await fetch(`http://localhost:3000/api/alocacao/delete/${deleteId}`, {
@@ -79,6 +79,48 @@ const ListaAlocacoes = () => {
     } catch (error) {
       console.error("Erro ao excluir alocação:", error);
     }
+  };
+
+  // ============================================
+  // FUNÇÃO PARA EXPORTAR CSV (IGUAL MANUTENÇÕES)
+  // ============================================
+  const exportarCSV = () => {
+    if (!alocacoes || alocacoes.length === 0) {
+      alert("Nenhuma alocação encontrada para exportar.");
+      return;
+    }
+
+    const cabecalho = [
+      "ID",
+      "Máquina",
+      "Cliente",
+      "Data Início",
+      "Data Fim",
+      "Status",
+    ];
+
+    const linhas = alocacoes.map((item) => [
+      item.id,
+      item.maquina || "",
+      item.cliente || "",
+      item.data_inicio || "",
+      item.data_fim || "",
+      item.status || "",
+    ]);
+
+    const csvString = [cabecalho, ...linhas]
+      .map((linha) => linha.map((col) => `"${col}"`).join(","))
+      .join("\n");
+
+    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "alocacoes.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -93,6 +135,10 @@ const ListaAlocacoes = () => {
             onClick={() => navigate("/alocacao/nova")}
           >
             + Nova Alocação
+          </button>
+
+          <button className="btn-exportar" onClick={exportarCSV}>
+            📄 Exportar CSV
           </button>
 
           <input
@@ -159,9 +205,7 @@ const ListaAlocacoes = () => {
         </div>
       </main>
 
-      {/* ================================
-          MODAL DE CONFIRMAÇÃO DE EXCLUSÃO
-      =================================*/}
+      {/* MODAL DE CONFIRMAÇÃO */}
       {deleteId && (
         <div className="modal-overlay">
           <div className="modal-container">

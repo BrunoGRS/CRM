@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "./css/listarManutencoes.css";
 import { Navbar } from "./navbar";
+import MenuAcoes from "./menuAcoes.jsx";
 
 export const ListarManutencoes = () => {
   const [manutencoes, setManutencoes] = useState([]);
@@ -12,7 +13,7 @@ export const ListarManutencoes = () => {
   const [itensPorPagina] = useState(10);
 
   const [idParaExcluir, setIdParaExcluir] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const [modalAberto, setModalAberto] = useState(false);
 
   const navigate = useNavigate();
 
@@ -20,13 +21,14 @@ export const ListarManutencoes = () => {
   const fetchManutencoes = async () => {
     try {
       const response = await fetch(
-        "http://localhost:3000/api/manutencao/listar"
+        "http://localhost:3000/api/manutencao/listarGeral"
       );
 
       const data = await response.json();
       const lista = Array.isArray(data.msg) ? data.msg : [];
 
       setManutencoes(lista);
+      console.log(data);
     } catch (error) {
       toast.error("Erro ao listar manutenções");
     }
@@ -45,8 +47,8 @@ export const ListarManutencoes = () => {
     const txt = busca.toLowerCase();
     return (
       String(m.id).includes(txt) ||
-      String(m.alocacao_id).includes(txt) ||
-      (m.tipo || "").toLowerCase().includes(txt) ||
+      String(m.equipamento_id).includes(txt) ||
+      (m.tipo_manutencao || "").toLowerCase().includes(txt) ||
       (m.status || "").toLowerCase().includes(txt)
     );
   });
@@ -57,15 +59,18 @@ export const ListarManutencoes = () => {
   const listaAtual = listaFiltrada.slice(indexPrimeiro, indexUltimo);
   const totalPaginas = Math.ceil(listaFiltrada.length / itensPorPagina);
 
-  const mudarPagina = (num) => setPaginaAtual(num);
-
-  // Excluir
-  const abrirModalExcluir = (id) => {
+  // MODAL EXCLUSÃO
+  const abrirModalExclusao = (id) => {
     setIdParaExcluir(id);
-    setShowModal(true);
+    setModalAberto(true);
   };
 
-  const excluirManutencao = async () => {
+  const fecharModal = () => {
+    setModalAberto(false);
+    setIdParaExcluir(null);
+  };
+
+  const confirmarExclusao = async () => {
     try {
       const response = await fetch(
         `http://localhost:3000/api/manutencao/excluir/${idParaExcluir}`,
@@ -74,20 +79,66 @@ export const ListarManutencoes = () => {
 
       if (response.status === 200) {
         toast.success("Manutenção excluída com sucesso!");
-        setShowModal(false);
         fetchManutencoes();
       } else {
         toast.error("Erro ao excluir manutenção.");
       }
-    } catch (error) {
+    } catch {
       toast.error("Erro ao excluir manutenção.");
     }
+
+    fecharModal();
   };
 
   const formatarData = (d) => {
     if (!d) return "-";
     const data = new Date(d);
     return data.toLocaleDateString("pt-BR");
+  };
+
+  // ===============================
+  // FUNÇÃO PARA EXPORTAR CSV
+  // ===============================
+  const exportarCSV = () => {
+    if (!manutencoes || manutencoes.length === 0) {
+      return toast.warn("Nenhuma manutenção para exportar.");
+    }
+
+    const cabecalho = [
+      "ID",
+      "Equipamento",
+      "Cliente",
+      "Data Solicitação",
+      "Data Execução",
+      "Tipo",
+      "Status",
+      "Técnico",
+    ];
+
+    const linhas = manutencoes.map((m) => [
+      m.id,
+      m.maquina || "",
+      m.cliente || "",
+      formatarData(m.data_solicitacao),
+      formatarData(m.data_execucao),
+      m.tipo_manutencao || "",
+      m.status || "",
+      m.nome || "",
+    ]);
+
+    const csvArray = [cabecalho, ...linhas]
+      .map((linha) => linha.map((col) => `"${col}"`).join(","))
+      .join("\n");
+
+    const blob = new Blob([csvArray], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "manutencoes.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -97,17 +148,23 @@ export const ListarManutencoes = () => {
       <main className="content">
         <h2>Lista de Manutenções</h2>
 
-        <button
-          className="btn-criar-novo"
-          onClick={() => navigate("/manutencao/nova")}
-        >
-          + Nova Manutenção
-        </button>
+        <div className="botoes-superiores">
+          <button
+            className="btn-criar-novo"
+            onClick={() => navigate("/manutencao/nova")}
+          >
+            + Nova Manutenção
+          </button>
+
+          <button className="btn-exportar" onClick={exportarCSV}>
+            📄 Exportar CSV
+          </button>
+        </div>
 
         <input
           type="text"
           className="input-busca"
-          placeholder="Buscar por ID, alocação, tipo ou status..."
+          placeholder="Buscar por ID, equipamento, tipo ou status..."
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
         />
@@ -120,8 +177,9 @@ export const ListarManutencoes = () => {
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Alocação</th>
-                  <th>Data</th>
+                  <th>Equipamento</th>
+                  <th>Cliente</th>
+                  <th>Execução</th>
                   <th>Tipo</th>
                   <th>Status</th>
                   <th>Técnico</th>
@@ -133,36 +191,22 @@ export const ListarManutencoes = () => {
                 {listaAtual.map((m) => (
                   <tr key={m.id}>
                     <td>{m.id}</td>
-                    <td>{m.alocacao_id}</td>
-                    <td>{formatarData(m.data_manutencao)}</td>
-                    <td>{m.tipo}</td>
+                    <td>{m.maquina}</td>
+                    <td>{formatarData(m.data_solicitacao)}</td>
+                    <td>{formatarData(m.data_execucao)}</td>
+                    <td>{m.tipo_manutencao}</td>
 
                     <td>
-                      <span
-                        className={`status-badge status-${m.status
-                          .replace(" ", "-")
-                          .toLowerCase()}`}
-                      >
-                        {m.status}
-                      </span>
+                      <span className={m.status}>{m.Status}</span>
                     </td>
 
-                    <td>{m.tecnico_responsavel}</td>
+                    <td>{m.nome}</td>
 
                     <td>
-                      <button
-                        className="btn-editar"
-                        onClick={() => navigate(`/manutencao/editar/${m.id}`)}
-                      >
-                        Editar
-                      </button>
-
-                      <button
-                        className="btn-excluir"
-                        onClick={() => abrirModalExcluir(m.id)}
-                      >
-                        Excluir
-                      </button>
+                      <MenuAcoes
+                        onEditar={() => navigate(`/manutencao/editar/${m.id}`)}
+                        onExcluir={() => abrirModalExclusao(m.id)}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -172,7 +216,7 @@ export const ListarManutencoes = () => {
             {/* PAGINAÇÃO */}
             <div className="paginacao-container">
               <button
-                onClick={() => mudarPagina(paginaAtual - 1)}
+                onClick={() => setPaginaAtual(paginaAtual - 1)}
                 disabled={paginaAtual === 1}
                 className="btn-paginacao"
               >
@@ -185,14 +229,14 @@ export const ListarManutencoes = () => {
                   className={`btn-paginacao ${
                     paginaAtual === i + 1 ? "ativo" : ""
                   }`}
-                  onClick={() => mudarPagina(i + 1)}
+                  onClick={() => setPaginaAtual(i + 1)}
                 >
                   {i + 1}
                 </button>
               ))}
 
               <button
-                onClick={() => mudarPagina(paginaAtual + 1)}
+                onClick={() => setPaginaAtual(paginaAtual + 1)}
                 disabled={paginaAtual === totalPaginas}
                 className="btn-paginacao"
               >
@@ -203,23 +247,20 @@ export const ListarManutencoes = () => {
         )}
 
         {/* MODAL CONFIRMAÇÃO */}
-
-        {showModal && (
+        {modalAberto && (
           <div className="modal-overlay">
-            <div className="modal">
-              <h3>Confirmar Exclusão</h3>
+            <div className="modal-container">
+              <div className="modal-header">Confirmar Exclusão</div>
+
               <p>Tem certeza que deseja excluir esta manutenção?</p>
 
-              <div className="modal-actions">
-                <button className="btn-confirmar" onClick={excluirManutencao}>
-                  Confirmar
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={fecharModal}>
+                  Cancelar
                 </button>
 
-                <button
-                  className="btn-cancelar"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancelar
+                <button className="btn btn-danger" onClick={confirmarExclusao}>
+                  Excluir
                 </button>
               </div>
             </div>

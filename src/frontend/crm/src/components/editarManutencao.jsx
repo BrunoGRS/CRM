@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
-import "./css/novaManutencao.css";
+import "./css/novaManutencao.css"; // usa o mesmo CSS
 import { Navbar } from "./navbar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
-export function NovaManutencao({ onClose, atualizarLista }) {
+export function EditarManutencao({ onClose, atualizarLista }) {
+  const { id } = useParams(); // pega ID da URL
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     equipamento_id: "",
     tipo_manutencao: "",
@@ -17,92 +20,104 @@ export function NovaManutencao({ onClose, atualizarLista }) {
     observacoes: "",
   });
 
-  const navigate = useNavigate();
   const [produtos, setProdutos] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState(null);
 
-  // 🔥 BUSCAR PRODUTOS
+  // 🔥 Carregar produtos
   async function fetchProdutos() {
     try {
       const resp = await fetch("http://localhost:3000/api/produto/listar");
       const data = await resp.json();
-      if (Array.isArray(data.msg)) {
-        setProdutos(data.msg);
-      }
+      if (Array.isArray(data.msg)) setProdutos(data.msg);
     } catch (err) {
       console.log("Erro ao carregar produtos", err);
     }
   }
 
+  // 🔥 Carregar usuários
   async function fetchUsuarios() {
     try {
       const resp = await fetch("http://localhost:3000/api/usuario/listar");
       const data = await resp.json();
-      if (Array.isArray(data.msg)) {
-        setUsuarios(data.msg);
-      }
+      if (Array.isArray(data.msg)) setUsuarios(data.msg);
     } catch (err) {
       console.log("Erro ao carregar usuários", err);
+    }
+  }
+
+  // 🔥 Carregar dados da manutenção
+  async function fetchManutencao() {
+    try {
+      const resp = await fetch(
+        `http://localhost:3000/api/manutencao/listar/${id}`
+      );
+      const data = await resp.json();
+
+      if (resp.ok && data.msg) {
+        setForm({
+          equipamento_id: data.msg.equipamento_id ?? "",
+          tipo_manutencao: data.msg.tipo_manutencao ?? "",
+          data_solicitacao: data.msg.data_solicitacao?.substring(0, 10) ?? "",
+          data_execucao: data.msg.data_execucao?.substring(0, 10) ?? "",
+          responsavel_id: data.msg.responsavel_id ?? "",
+          descricao: data.msg.descricao ?? "",
+          custo_total: data.msg.custo_total ?? "",
+          status: data.msg.status ?? "",
+          observacoes: data.msg.observacoes ?? "",
+        });
+      }
+    } catch (err) {
+      console.log("Erro ao carregar manutenção", err);
     }
   }
 
   useEffect(() => {
     fetchProdutos();
     fetchUsuarios();
+    fetchManutencao();
   }, []);
 
   function atualizarCampo(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
+  // 🔥 salvar edição
   async function salvar() {
     setLoading(true);
     setMsg(null);
 
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/manutencao/criar",
+      const resp = await fetch(
+        `http://localhost:3000/api/manutencao/editar/${id}`,
         {
-          method: "POST",
+          method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(form),
         }
       );
 
-      const result = await response.json();
+      const result = await resp.json();
 
-      if (response.ok) {
-        setMsg({ tipo: "sucesso", texto: result.msg });
+      if (resp.ok) {
+        toast.success("Manutenção atualizada com sucesso!");
         if (atualizarLista) atualizarLista();
-        setTimeout(() => onClose && onClose(), 800);
-        toast.success("Manutenção Cadastrada com sucesso!");
         navigate("/manutencao");
       } else {
-        setMsg({
-          tipo: "erro",
-          texto: result.msg || "Erro ao registrar manutenção.",
-        });
+        setMsg({ tipo: "erro", texto: result.msg || "Erro ao atualizar." });
       }
-    } catch (error) {
-      setMsg({
-        tipo: "erro",
-        texto: "Erro de comunicação com o servidor.",
-      });
+    } catch (err) {
+      setMsg({ tipo: "erro", texto: "Erro de comunicação com o servidor." });
     }
 
     setLoading(false);
   }
 
-  async function voltarTelaInicial() {
-    navigate("/manutencao");
-  }
-
   return (
     <div className="modal-manutencao-container">
       <div className="modal-manutencao">
-        <h2>Registrar Nova Manutenção</h2>
+        <h2>Editar Manutenção #{id}</h2>
 
         {msg && (
           <div className={msg.tipo === "sucesso" ? "msg-sucesso" : "msg-erro"}>
@@ -111,7 +126,6 @@ export function NovaManutencao({ onClose, atualizarLista }) {
         )}
 
         <div className="linha">
-          {/* Equipamento */}
           <div className="campo">
             <label>Equipamento / Máquina</label>
             <select
@@ -122,13 +136,12 @@ export function NovaManutencao({ onClose, atualizarLista }) {
               <option value="">Selecione</option>
               {produtos.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.nome} {p.modelo ? `- ${p.modelo}` : ""}
+                  {p.nome}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Tipo */}
           <div className="campo">
             <label>Tipo de Manutenção</label>
             <select
@@ -166,7 +179,6 @@ export function NovaManutencao({ onClose, atualizarLista }) {
           </div>
         </div>
 
-        {/* Responsável */}
         <div className="linha">
           <div className="campo">
             <label>Responsável</label>
@@ -229,12 +241,15 @@ export function NovaManutencao({ onClose, atualizarLista }) {
         </div>
 
         <div className="acoes">
-          <button className="btn-cancelar" onClick={voltarTelaInicial}>
+          <button
+            className="btn-cancelar"
+            onClick={() => navigate("/manutencao")}
+          >
             Cancelar
           </button>
 
           <button className="btn-salvar" onClick={salvar} disabled={loading}>
-            {loading ? "Salvando..." : "Salvar"}
+            {loading ? "Salvando..." : "Salvar Alterações"}
           </button>
         </div>
       </div>
@@ -242,4 +257,4 @@ export function NovaManutencao({ onClose, atualizarLista }) {
   );
 }
 
-export default NovaManutencao;
+export default EditarManutencao;

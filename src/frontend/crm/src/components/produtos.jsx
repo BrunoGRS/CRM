@@ -18,6 +18,10 @@ export const Produtos = () => {
   const [IdProduto, setIdProduto] = useState("");
   const [mostrarModal, setMostrarModal] = useState(false);
 
+  // Novo estado para o modal de opções
+  const [mostrarOpcoes, setMostrarOpcoes] = useState(false);
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
+
   // Criar Produto
   const criarProduto = async (e) => {
     e.preventDefault();
@@ -164,27 +168,13 @@ export const Produtos = () => {
                   <td>{p.estoque}</td>
                   <td>
                     <button
-                      className="button-editar"
+                      className="button-opcoes"
                       onClick={() => {
-                        setFormData({
-                          nome: p.nome,
-                          preco: p.preco,
-                          estoque: p.estoque,
-                          categoria_id: p.categoria_id || "",
-                          marca_id: p.marca_id || "",
-                        });
-                        setBotao(false);
-                        setIdProduto(p.id);
-                        setMostrarModal(true);
+                        setProdutoSelecionado(p);
+                        setMostrarOpcoes(true);
                       }}
                     >
-                      Editar
-                    </button>
-                    <button
-                      className="button-excluir"
-                      onClick={() => excluirProduto(p.id)}
-                    >
-                      Excluir
+                      •••
                     </button>
                   </td>
                 </tr>
@@ -193,7 +183,56 @@ export const Produtos = () => {
           </table>
         )}
 
-        {/* MODAL */}
+        {/* MODAL OPÇÕES */}
+        {mostrarOpcoes && produtoSelecionado && (
+          <div className="modal-overlay">
+            <div className="modal-content modal-opcoes">
+              <div className="modal-header">
+                <h3>Opções</h3>
+                <button
+                  className="modal-close"
+                  onClick={() => setMostrarOpcoes(false)}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="opcoes-container">
+                <button
+                  className="btn-opcao"
+                  onClick={() => {
+                    setFormData({
+                      nome: produtoSelecionado.nome,
+                      preco: produtoSelecionado.preco,
+                      estoque: produtoSelecionado.estoque,
+                      categoria_id: produtoSelecionado.categoria_id || "",
+                      marca_id: produtoSelecionado.marca_id || "",
+                    });
+
+                    setIdProduto(produtoSelecionado.id);
+                    setBotao(false);
+                    setMostrarOpcoes(false);
+                    setMostrarModal(true);
+                  }}
+                >
+                  ✏ Editar
+                </button>
+
+                <button
+                  className="btn-opcao btn-excluir"
+                  onClick={() => {
+                    excluirProduto(produtoSelecionado.id);
+                    setMostrarOpcoes(false);
+                  }}
+                >
+                  🗑 Excluir
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL CRIAÇÃO/EDIÇÃO */}
         {mostrarModal && (
           <div className="modal-overlay">
             <div className="modal-content">

@@ -1,25 +1,25 @@
-// EditarVenda.jsx
+// EditarContrato.jsx
 import React, { useState, useEffect } from "react";
 import "./css/editarVenda.css";
 import { Navbar } from "./navbar.jsx";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
 
-export function EditarVenda() {
-  const { id } = useParams(); // id da venda
+export function EditarContrato() {
+  const { id } = useParams(); // id do contrato
   const navigate = useNavigate();
 
   const [clientes, setClientes] = useState([]);
   const [produtos, setProdutos] = useState([]);
 
-  const [venda, setVenda] = useState({
+  const [contrato, setContrato] = useState({
     cliente_id: "",
     observacao: "",
     valor_total: 0,
   });
 
   const [itens, setItens] = useState([]);
-  const [itensExcluidos, setItensExcluidos] = useState([]); // ids a excluir
+  const [itensExcluidos, setItensExcluidos] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const fetchJson = async (url, options = {}) => {
@@ -28,7 +28,6 @@ export function EditarVenda() {
     return { resp, data };
   };
 
-  // fetch clientes/produtos
   const fetchClientes = async () => {
     try {
       const { resp, data } = await fetchJson(
@@ -53,24 +52,24 @@ export function EditarVenda() {
     }
   };
 
-  // buscar venda + itens (unificado)
-  const fetchVenda = async () => {
+  const fetchContrato = async () => {
     if (!id) return;
     try {
       const { resp, data } = await fetchJson(
-        `http://localhost:3000/api/venda/${id}`
+        `http://localhost:3000/api/contrato/${id}`
       );
+
       if (!resp.ok) {
-        toast.error("Venda não encontrada");
-        navigate("/venda");
+        toast.error("Contrato não encontrado");
+        navigate("/contrato");
         return;
       }
-      // data.venda (model) e data.itens (array)
-      const v = data.msg;
-      setVenda({
-        cliente_id: v.cliente_id,
-        observacao: v.observacao || "",
-        valor_total: v.valor_total || 0,
+
+      const c = data.msg;
+      setContrato({
+        cliente_id: c.cliente_id,
+        observacao: c.observacao || "",
+        valor_total: c.valor_total || 0,
       });
 
       const itensTratados = (data.msg.itens || []).map((it) => ({
@@ -79,11 +78,11 @@ export function EditarVenda() {
         quantidade: Number(it.quantidade),
         valor_unitario: Number(it.valor_unitario),
       }));
+
       setItens(itensTratados);
       setItensExcluidos([]);
-      console.log(data.msg.itens);
     } catch (err) {
-      toast.error("Erro ao carregar venda");
+      toast.error("Erro ao carregar contrato");
     }
   };
 
@@ -92,26 +91,25 @@ export function EditarVenda() {
     const carregar = async () => {
       setLoading(true);
       await Promise.all([fetchClientes(), fetchProdutos()]);
-      await fetchVenda();
+      await fetchContrato();
       setLoading(false);
     };
     carregar();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  // recalcular total no front (apenas visual)
   useEffect(() => {
     const total = itens.reduce((acc, it) => acc + Number(it.subtotal || 0), 0);
-    setVenda((prev) => ({ ...prev, valor_total: Number(total).toFixed(2) }));
+    setContrato((prev) => ({ ...prev, valor_total: Number(total).toFixed(2) }));
   }, [itens]);
 
-  // helpers de UI
   const atualizarItem = (index, campo, valor) => {
     setItens((prev) => {
       const lista = [...prev];
       lista[index][campo] = valor;
+
       const qtd = Number(lista[index].quantidade || 0);
       const vu = Number(lista[index].valor_unitario || 0);
+
       lista[index].subtotal = Number((qtd * vu).toFixed(2));
       return lista;
     });
@@ -120,12 +118,13 @@ export function EditarVenda() {
   const handleSelectProduto = (index, produtoId) => {
     const produto = produtos.find((p) => String(p.id) === String(produtoId));
     atualizarItem(index, "produto_id", produtoId);
-    if (produto)
+    if (produto) {
       atualizarItem(
         index,
         "valor_unitario",
         Number(produto.preco ?? produto.valor ?? 0)
       );
+    }
   };
 
   const adicionarItem = () => {
@@ -141,7 +140,6 @@ export function EditarVenda() {
     ]);
   };
 
-  // marcar item para exclusão (se já existente)
   const removerItem = (index) => {
     setItens((prev) => {
       const lista = [...prev];
@@ -154,15 +152,13 @@ export function EditarVenda() {
     });
   };
 
-  // salvar venda (unificado): PUT /api/venda/salvar/:id
   const salvarTudo = async () => {
     try {
       const payload = {
-        cliente_id: venda.cliente_id,
-        vendedor_id: venda.vendedor_id ?? null,
-        data_venda: new Date(),
-        observacao: venda.observacao,
-        valor_total: venda.valor_total,
+        cliente_id: contrato.cliente_id,
+        data_contrato: new Date(),
+        observacao: contrato.observacao,
+        valor_total: contrato.valor_total,
         itens: itens.map((it) => ({
           id: it.id || null,
           produto_id: it.produto_id,
@@ -173,7 +169,7 @@ export function EditarVenda() {
       };
 
       const { resp, data } = await fetchJson(
-        `http://localhost:3000/api/venda/editar/${id}`,
+        `http://localhost:3000/api/contrato/editar/${id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -182,51 +178,49 @@ export function EditarVenda() {
       );
 
       if (!resp.ok) {
-        console.error("Erro salvar tudo:", data);
-        toast.error(data?.msg || "Erro ao salvar venda");
-        console.log(payload);
+        toast.error(data?.msg || "Erro ao salvar contrato");
         return false;
       }
 
-      // sucesso: recarrega e retorna true
-      await fetchVenda();
+      await fetchContrato();
       return true;
     } catch (err) {
-      console.error("Erro salvarTudo:", err);
-      toast.error("Erro ao salvar venda");
+      console.error("Erro:", err);
+      toast.error("Erro ao salvar contrato");
       return false;
     }
   };
 
-  // excluir venda completa
-  const excluirVenda = async () => {
-    if (!window.confirm("Deseja excluir esta venda?")) return;
+  const excluirContrato = async () => {
+    if (!window.confirm("Deseja excluir este contrato?")) return;
+
     try {
       const { resp } = await fetchJson(
-        `http://localhost:3000/api/venda/delete/${id}`,
+        `http://localhost:3000/api/contrato/delete/${id}`,
         { method: "DELETE" }
       );
+
       if (!resp.ok) {
-        toast.error("Erro ao excluir venda");
+        toast.error("Erro ao excluir contrato");
         return;
       }
-      toast.success("Venda excluída");
-      navigate("/venda");
+
+      toast.success("Contrato excluído");
+      navigate("/contrato");
     } catch (err) {
       console.error(err);
-      toast.error("Erro ao excluir venda");
+      toast.error("Erro ao excluir contrato");
     }
   };
 
-  // submit do form
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     const ok = await salvarTudo();
     setLoading(false);
     if (ok) {
-      toast.success("Venda atualizada!");
-      navigate("/venda");
+      toast.success("Contrato atualizado!");
+      navigate("/contrato");
     }
   };
 
@@ -234,17 +228,17 @@ export function EditarVenda() {
     <section>
       <Navbar />
 
-      <section className="venda-container">
-        <h2>✏️ Editar Venda</h2>
+      <section className="contrato-container">
+        <h2>✏️ Editar Contrato</h2>
 
-        <form className="venda-form" onSubmit={handleSubmit}>
+        <form className="contrato-form" onSubmit={handleSubmit}>
           {/* CLIENTE */}
           <div className="form-group">
             <label>Cliente:</label>
             <select
-              value={venda.cliente_id}
+              value={contrato.cliente_id}
               onChange={(e) =>
-                setVenda({ ...venda, cliente_id: e.target.value })
+                setContrato({ ...contrato, cliente_id: e.target.value })
               }
               required
             >
@@ -258,7 +252,7 @@ export function EditarVenda() {
           </div>
 
           {/* ITENS */}
-          <h3>Itens da Venda</h3>
+          <h3>Itens do Contrato</h3>
 
           {loading && <p>Carregando...</p>}
 
@@ -327,9 +321,9 @@ export function EditarVenda() {
           <div className="form-group">
             <label>Observação:</label>
             <textarea
-              value={venda.observacao}
+              value={contrato.observacao}
               onChange={(e) =>
-                setVenda({ ...venda, observacao: e.target.value })
+                setContrato({ ...contrato, observacao: e.target.value })
               }
             />
           </div>
@@ -337,7 +331,7 @@ export function EditarVenda() {
           {/* Total */}
           <div className="form-group">
             <label>Total (R$):</label>
-            <input type="text" value={venda.valor_total} readOnly />
+            <input type="text" value={contrato.valor_total} readOnly />
           </div>
 
           {/* Botões */}
@@ -349,7 +343,7 @@ export function EditarVenda() {
             <button
               type="button"
               className="btn-voltar"
-              onClick={() => navigate("/venda")}
+              onClick={() => navigate("/contrato")}
             >
               ⬅️ Voltar
             </button>
@@ -357,10 +351,10 @@ export function EditarVenda() {
             <button
               type="button"
               className="btn-excluir"
-              onClick={excluirVenda}
+              onClick={excluirContrato}
               style={{ marginLeft: 8 }}
             >
-              🗑️ Excluir Venda
+              🗑️ Excluir Contrato
             </button>
           </div>
         </form>
@@ -369,4 +363,4 @@ export function EditarVenda() {
   );
 }
 
-export default EditarVenda;
+export default EditarContrato;

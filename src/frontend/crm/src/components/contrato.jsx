@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
-import "./css/novaVenda.css";
+import "./css/novaVenda.css"; // você pode renomear depois
 import { Navbar } from "./navbar.jsx";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-export function RegistroVenda() {
+export function RegistroContrato() {
   const [clientes, setClientes] = useState([]);
-  const [produtos, setProdutos] = useState([]);
+  const [servicos, setServicos] = useState([]);
   const [itens, setItens] = useState([
-    { produto_id: "", quantidade: 1, valor_unitario: 0, subtotal: 0 },
+    { servico_id: "", quantidade: 1, valor_unitario: 0, subtotal: 0 },
   ]);
-  const [venda, setVenda] = useState({
+
+  const [contrato, setContrato] = useState({
     cliente_id: "",
     observacao: "",
     valor_total: 0,
@@ -18,34 +19,34 @@ export function RegistroVenda() {
 
   const navigate = useNavigate();
 
-  // Atualiza total da venda
+  // Atualiza total do contrato
   useEffect(() => {
     const total = itens.reduce(
       (acc, item) => acc + Number(item.subtotal || 0),
       0
     );
-    setVenda((prev) => ({ ...prev, valor_total: total.toFixed(2) }));
+    setContrato((prev) => ({ ...prev, valor_total: total.toFixed(2) }));
   }, [itens]);
 
-  const handleVendaChange = (e) => {
+  const handleContratoChange = (e) => {
     const { name, value } = e.target;
-    setVenda({ ...venda, [name]: value });
+    setContrato({ ...contrato, [name]: value });
   };
 
-  // Busca clientes e produtos
+  // Busca clientes e serviços
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [resClientes, resProdutos] = await Promise.all([
+        const [resClientes, resServicos] = await Promise.all([
           fetch("http://localhost:3000/api/cliente/listar"),
-          fetch("http://localhost:3000/api/produto/listar"),
+          fetch("http://localhost:3000/api/servico/listar"),
         ]);
 
         const clientesData = await resClientes.json();
-        const produtosData = await resProdutos.json();
+        const servicosData = await resServicos.json();
 
         setClientes(Array.isArray(clientesData.msg) ? clientesData.msg : []);
-        setProdutos(Array.isArray(produtosData.msg) ? produtosData.msg : []);
+        setServicos(Array.isArray(servicosData.msg) ? servicosData.msg : []);
       } catch {
         toast.error("Erro ao carregar dados");
       }
@@ -53,16 +54,16 @@ export function RegistroVenda() {
     fetchData();
   }, []);
 
-  // Atualiza produto e recalcula subtotal
+  // Atualiza itens e recalcula subtotal
   const handleItemChange = (index, e) => {
     const { name, value } = e.target;
     const updatedItens = [...itens];
     updatedItens[index][name] = value;
 
-    if (name === "produto_id") {
-      const prod = produtos.find((p) => p.id === Number(value));
-      if (prod) {
-        updatedItens[index].valor_unitario = prod.preco;
+    if (name === "servico_id") {
+      const srv = servicos.find((s) => s.id === Number(value));
+      if (srv) {
+        updatedItens[index].valor_unitario = srv.preco;
       }
     }
 
@@ -73,54 +74,52 @@ export function RegistroVenda() {
     setItens(updatedItens);
   };
 
-  // Adiciona linha de produto
+  // Adicionar item
   const addItem = () => {
     setItens([
       ...itens,
-      { produto_id: "", quantidade: 1, valor_unitario: 0, subtotal: 0 },
+      { servico_id: "", quantidade: 1, valor_unitario: 0, subtotal: 0 },
     ]);
   };
 
-  // Remove linha de produto
+  // Remover item
   const removeItem = (index) => {
     const updatedItens = itens.filter((_, i) => i !== index);
     setItens(updatedItens);
   };
 
-  // Envia para o back-end
+  // Enviar para o backend
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!venda.cliente_id || itens.length === 0) {
-      toast.warn("Selecione o cliente e adicione pelo menos um produto.");
+    if (!contrato.cliente_id || itens.length === 0) {
+      toast.warn("Selecione o cliente e adicione pelo menos um serviço.");
       return;
     }
 
     const payload = {
-      cliente_id: venda.cliente_id,
-      vendedor_id: 1,
-      data_venda: new Date(),
-      valor_total: venda.valor_total,
-      observacao: venda.observacao,
+      cliente_id: contrato.cliente_id,
+      data_contrato: new Date(),
+      valor_total: contrato.valor_total,
+      observacao: contrato.observacao,
       itens,
     };
 
     try {
-      const response = await fetch("http://localhost:3000/api/venda/criar", {
+      const response = await fetch("http://localhost:3000/api/contrato/criar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (response.status === 201) {
-        toast.success("Venda registrada com sucesso!");
-        navigate("/venda");
+        toast.success("Contrato registrado com sucesso!");
+        navigate("/contrato");
       } else {
-        toast.error("Erro ao registrar venda");
-        console.log(payload);
+        toast.error("Erro ao registrar contrato");
       }
     } catch {
-      toast.error("Erro ao salvar venda");
+      toast.error("Erro ao salvar contrato");
     }
   };
 
@@ -128,14 +127,16 @@ export function RegistroVenda() {
     <section className="venda-page">
       <Navbar />
       <div className="venda-wrapper">
-        <h2>💼 Registro de Venda</h2>
+        <h2>📄 Registro de Contrato</h2>
+
         <form onSubmit={handleSubmit}>
+          {/* CLIENTE */}
           <div className="form-group">
             <label>Cliente:</label>
             <select
               name="cliente_id"
-              value={venda.cliente_id}
-              onChange={handleVendaChange}
+              value={contrato.cliente_id}
+              onChange={handleContratoChange}
               required
             >
               <option value="">Selecione um cliente</option>
@@ -147,19 +148,21 @@ export function RegistroVenda() {
             </select>
           </div>
 
-          <h3>🧾 Itens da Venda</h3>
+          {/* ITENS DO CONTRATO */}
+          <h3>🧾 Serviços do Contrato</h3>
+
           {itens.map((item, index) => (
             <div key={index} className="produto-row">
               <select
-                name="produto_id"
-                value={item.produto_id}
+                name="servico_id"
+                value={item.servico_id}
                 onChange={(e) => handleItemChange(index, e)}
                 required
               >
-                <option value="">Selecione o produto</option>
-                {produtos.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.nome}
+                <option value="">Selecione o serviço</option>
+                {servicos.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.nome}
                   </option>
                 ))}
               </select>
@@ -195,31 +198,35 @@ export function RegistroVenda() {
           ))}
 
           <button type="button" className="btn-add" onClick={addItem}>
-            ➕ Adicionar Produto
+            ➕ Adicionar Serviço
           </button>
 
+          {/* OBSERVAÇÕES */}
           <div className="form-group">
             <label>Observação:</label>
             <textarea
               name="observacao"
-              value={venda.observacao}
-              onChange={handleVendaChange}
+              value={contrato.observacao}
+              onChange={handleContratoChange}
               placeholder="Informações adicionais..."
             />
           </div>
 
+          {/* TOTAL */}
           <div className="total-display">
-            <strong>Total da Venda:</strong> R$ {venda.valor_total}
+            <strong>Total do Contrato:</strong> R$ {contrato.valor_total}
           </div>
 
+          {/* AÇÕES */}
           <div className="botoes-acoes">
             <button type="submit" className="btn-salvar">
-              💾 Salvar Venda
+              💾 Salvar Contrato
             </button>
+
             <button
               type="button"
               className="btn-voltar"
-              onClick={() => navigate("/venda")}
+              onClick={() => navigate("/contrato")}
             >
               ⬅️ Voltar
             </button>
@@ -230,4 +237,4 @@ export function RegistroVenda() {
   );
 }
 
-export default RegistroVenda;
+export default RegistroContrato;

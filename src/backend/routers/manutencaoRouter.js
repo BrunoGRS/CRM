@@ -13,6 +13,14 @@ ManutencaoRouter.get("/listar", (req, res) =>
   manutencaoController.listarManutencoes(req, res)
 );
 
+ManutencaoRouter.get("/listarGeral", (req, res) =>
+  manutencaoController.listarGeralManutencao(req, res)
+);
+
+ManutencaoRouter.get("/listar/:id", (req, res) =>
+  manutencaoController.listarManutencaoPorId(req, res)
+);
+
 // Editar manutenção
 ManutencaoRouter.put("/editar/:id", (req, res) =>
   manutencaoController.editarManutencao(req, res)

@@ -230,6 +230,26 @@
   background: #b5b5b5;
 }
 
+.btn-exportar {
+  background-color: #17a00b;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 12px;
+  transition: 0.2s;
+}
+
+.btn-exportar:hover {
+  background-color: #2ed14a;
+}
+
+.btn-exportar:active {
+  transform: scale(0.97);
+}
+
 /* Animação */
 @keyframes fadeIn {
   from {

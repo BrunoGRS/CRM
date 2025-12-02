@@ -10,6 +10,7 @@ export function EditarAlocacao() {
 
   const [clientes, setClientes] = useState([]);
   const [produtos, setProdutos] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
   const [produtosSelecionados, setProdutosSelecionados] = useState([]);
 
   const [modalAberto, setModalAberto] = useState(false);
@@ -71,6 +72,16 @@ export function EditarAlocacao() {
     }
   };
 
+  const fetchUsuarios = async () => {
+    try {
+      const resp = await fetch("http://localhost:3000/api/usuario/listar");
+      const data = await resp.json();
+      setUsuarios(Array.isArray(data.msg) ? data.msg : []);
+    } catch {
+      toast.error("Erro ao carregar responsáveis");
+    }
+  };
+
   const fetchAlocacao = async () => {
     try {
       const resp = await fetch(
@@ -89,12 +100,11 @@ export function EditarAlocacao() {
         observacoes: al.observacoes || "",
       });
 
-      // PRODUTOS SELECIONADOS
       if (Array.isArray(al.produtos)) {
         setProdutosSelecionados(al.produtos.map((p) => p.id));
       }
 
-      // QUEBRAR ENDEREÇO
+      // Quebrar endereço
       if (al.local_instalacao) {
         const endereco = al.local_instalacao;
 
@@ -123,6 +133,7 @@ export function EditarAlocacao() {
   useEffect(() => {
     fetchClientes();
     fetchProdutos();
+    fetchUsuarios(); // <-- AGORA BUSCA USUÁRIOS
     fetchAlocacao();
   }, [id]);
 
@@ -227,14 +238,21 @@ export function EditarAlocacao() {
           <option value="reservada">Reservada</option>
         </select>
 
+        {/* RESPONSÁVEL */}
         <label>Responsável Instalação</label>
-        <input
-          type="text"
+        <select
           value={form.responsavel_instalacao}
           onChange={(e) =>
             setForm({ ...form, responsavel_instalacao: e.target.value })
           }
-        />
+        >
+          <option value="">Selecione</option>
+          {usuarios.map((u) => (
+            <option key={u.id} value={u.id}>
+              {u.nome}
+            </option>
+          ))}
+        </select>
 
         {/* ENDEREÇO */}
         <div className="form-grid">
@@ -297,34 +315,10 @@ export function EditarAlocacao() {
           </div>
         </div>
 
-        <label>Observações</label>
         <textarea
           value={form.observacoes}
           onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
         ></textarea>
-
-        {/* PRODUTOS ADICIONAIS */}
-        <label>Produtos adicionais</label>
-        <ul className="lista-produtos">
-          {produtosSelecionados.map((id) => {
-            const prod = produtos.find((p) => p.id === id);
-            return (
-              <li key={id}>
-                {prod?.nome}
-                <button
-                  className="remove-produto"
-                  onClick={() => removerProduto(id)}
-                >
-                  Remover
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-
-        <button className="btn-alt" onClick={() => setModalAberto(true)}>
-          + Adicionar Produtos
-        </button>
 
         {/* ANEXOS */}
         <div className="file-input-container">
@@ -341,37 +335,6 @@ export function EditarAlocacao() {
           </button>
         </div>
       </div>
-
-      {/* Modal */}
-      {modalAberto && (
-        <div className="modal-overlay">
-          <div className="modal-box">
-            <h3>Adicionar Produto</h3>
-
-            <select
-              onChange={(e) => {
-                const pid = Number(e.target.value);
-                if (pid) adicionarProduto(pid);
-              }}
-            >
-              <option value="">Selecione</option>
-              {produtos.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.nome}
-                </option>
-              ))}
-            </select>
-
-            <button
-              className="btn-save"
-              style={{ marginTop: 15 }}
-              onClick={() => setModalAberto(false)}
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
-      )}
     </section>
   );
 }

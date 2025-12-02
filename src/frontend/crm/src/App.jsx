@@ -6,15 +6,16 @@ import { Usuarios } from "./components/usuario.jsx";
 import { Body } from "./components/body.jsx";
 import { Produtos } from "./components/produtos.jsx";
 import { Prospect } from "./components/prospect.jsx";
-import { RegistroVenda } from "./components/venda.jsx";
-import { ListarVendas } from "./components/listarVendas.jsx";
-import { EditarVenda } from "./components/editarVenda.jsx";
+import { RegistroContrato } from "./components/contrato.jsx";
+import { ListarContratos } from "./components/listarContratos.jsx";
+import { EditarContrato } from "./components/editarContrato.jsx";
 import Alocacao from "./components/alocacao.jsx";
 import NovaALocacao from "./components/novaAlocacao.jsx";
 import { PrivateRoute } from "./components/PrivateRoute.jsx";
 import { EditarAlocacao } from "./components/editarAlocacao.jsx";
 import { ListarManutencoes } from "./components/listarManutencoes.jsx";
 import { NovaManutencao } from "./components/novaManutencao.jsx";
+import { EditarManutencao } from "./components/editarManutencao.jsx";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -63,28 +64,28 @@ function App() {
         />
 
         <Route
-          path="/venda"
+          path="/contrato"
           element={
             <PrivateRoute>
-              <ListarVendas />
+              <ListarContratos />
             </PrivateRoute>
           }
         />
 
         <Route
-          path="/venda/nova"
+          path="/contrato/nova"
           element={
             <PrivateRoute>
-              <RegistroVenda />
+              <RegistroContrato />
             </PrivateRoute>
           }
         />
 
         <Route
-          path="/venda/editar/:id"
+          path="/contrato/editar/:id"
           element={
             <PrivateRoute>
-              <EditarVenda />
+              <EditarContrato />
             </PrivateRoute>
           }
         />
@@ -130,6 +131,15 @@ function App() {
           element={
             <PrivateRoute>
               <NovaManutencao />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/manutencao/editar/:id"
+          element={
+            <PrivateRoute>
+              <EditarManutencao />
             </PrivateRoute>
           }
         />
