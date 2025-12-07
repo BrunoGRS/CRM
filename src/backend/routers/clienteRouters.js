@@ -15,6 +15,10 @@ ClienteRouter.route("/listar").get((req, res) =>
   clienteController.mostrarCliente(req, res)
 );
 
+ClienteRouter.route("/listar").get((req, res) =>
+  clienteController.mostrarCliente(req, res)
+);
+
 ClienteRouter.route("/delete/:id").delete((req, res) =>
   clienteController.deleteCliente(req, res)
 );

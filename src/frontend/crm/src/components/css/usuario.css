@@ -90,6 +90,8 @@ body {
   background: white;
   width: 460px;
   max-width: 95%;
+  max-height: 90vh; /* 🔹 impede que o modal ultrapasse a tela */
+  overflow-y: auto; /* 🔹 ativa rolagem vertical */
   border-radius: 12px;
   padding: 1.8rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -203,15 +205,13 @@ select:focus {
 .user-table {
   width: 90%;
   margin: 0 auto;
-  border-collapse: separate;
-  border-spacing: 0 8px;
+  border-collapse: collapse;
 }
 
 .user-table thead th {
   background: none;
   color: #888;
   font-size: 0.78rem;
-  text-transform: uppercase;
   letter-spacing: 0.5px;
   padding-bottom: 6px;
 }
@@ -262,6 +262,66 @@ select:focus {
 }
 .button-excluir:hover {
   background: var(--danger);
+}
+
+/*=======================================================
+  botão
+  cnpj
+  =======================================================*/
+
+.linha-cnpj {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-receita {
+  background-color: #0077cc;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+  height: 38px;
+  white-space: nowrap;
+}
+
+.btn-receita:hover {
+  background-color: #005fa3;
+}
+
+.paginacao-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.btn-paginacao {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #ddd;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 14px;
+}
+
+.btn-paginacao:hover:not(:disabled) {
+  background: #c9c9c9;
+}
+
+.btn-paginacao.ativo {
+  background: #5d3a22;
+  color: white;
+}
+
+.btn-paginacao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ============================================

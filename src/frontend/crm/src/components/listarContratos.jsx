@@ -8,7 +8,6 @@ import MenuAcoes from "./menuAcoes.jsx";
 
 export const ListarContratos = () => {
   const [contratos, setContratos] = useState([]);
-  const [contratosGeral, setContratosGeral] = useState([]);
   const [busca, setBusca] = useState("");
 
   const [paginaAtual, setPaginaAtual] = useState(1);
@@ -16,9 +15,6 @@ export const ListarContratos = () => {
 
   const navigate = useNavigate();
 
-  // ======================================================
-  // MODAL
-  // ======================================================
   const [modalAberto, setModalAberto] = useState(false);
   const [idParaExcluir, setIdParaExcluir] = useState(null);
 
@@ -37,11 +33,9 @@ export const ListarContratos = () => {
     fecharModal();
   };
 
-  // ======================================================
-  // GERAR PDF — versão simplificada para CONTRATOS
-  // ======================================================
   const gerarPDFContrato = (contrato) => {
     if (!contrato) {
+      console.log(contrato);
       toast.error("Erro: Dados do contrato não carregados.");
       return;
     }
@@ -49,39 +43,68 @@ export const ListarContratos = () => {
     const doc = new jsPDF();
 
     // Cabeçalho
-    doc.setFillColor(50, 50, 50);
-    doc.rect(0, 0, 210, 25, "F");
+    doc.setFillColor(40, 40, 40);
+    doc.rect(0, 0, 210, 20, "F");
+
     doc.setFontSize(16);
     doc.setTextColor(255, 255, 255);
-    doc.text("Contrato - Registro", 14, 16);
+    doc.text("Contrato - Registro Completo", 10, 13);
 
-    let y = 40;
+    let y = 35;
 
-    const addLine = (label, value) => {
-      doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0);
-      doc.text(`${label}:`, 14, y);
-      doc.setFont("helvetica", "bold");
-      doc.text(String(value ?? "-"), 60, y);
-      doc.setFont("helvetica", "normal");
+    const titulo = (t) => {
+      doc.setFontSize(14);
+      doc.setTextColor(30, 30, 30);
+      doc.text(t, 10, y);
       y += 8;
     };
 
-    addLine("Código", contrato.id);
-    addLine("Cliente", contrato.cliente_nome);
-    addLine("CPF/CNPJ", contrato.cliente_documento);
-    addLine("Data Início", contrato.data_inicio);
-    addLine("Data Fim", contrato.data_fim || "-");
-    addLine("Valor Mensal", `R$ ${Number(contrato.valor_mensal).toFixed(2)}`);
-    addLine("Desc. do Serviço", contrato.descricao_servico);
-    addLine("Observações", contrato.observacao || "-");
+    const linha = (label, value) => {
+      doc.setFontSize(11);
+      doc.setTextColor(70, 70, 70);
+      doc.text(`${label}:`, 10, y);
+      doc.setTextColor(20, 20, 20);
+      doc.text(String(value || "-"), 60, y);
+      y += 7;
+    };
+
+    titulo("Dados do Contrato");
+    linha("Código", contrato.id);
+    linha("Cliente", contrato.cliente);
+    linha("Número do Contrato", contrato.numero_contrato);
+    linha("Título", contrato.titulo);
+    linha("Tipo de Contrato", contrato.tipo_contrato);
+
+    doc.line(10, y, 200, y);
+    y += 8;
+
+    titulo("Datas");
+    linha("Assinatura", contrato.data_assinatura);
+    linha("Início", contrato.inicio);
+    linha("Fim", contrato.fim);
+
+    doc.line(10, y, 200, y);
+    y += 8;
+
+    titulo("Valores");
+    linha("Valor Mensal", `R$ ${Number(contrato.valor_mensal).toFixed(2)}`);
+    linha("Valor Total", `R$ ${Number(contrato.valor_total).toFixed(2)}`);
+
+    doc.line(10, y, 200, y);
+    y += 8;
+
+    titulo("Informações Gerais");
+    linha("Status", contrato.status);
+    linha("Responsável", contrato.nome);
+
+    // Rodapé
+    doc.setFontSize(10);
+    doc.setTextColor(120, 120, 120);
+    doc.text("Documento gerado automaticamente", 10, 290);
 
     doc.save(`contrato_${contrato.id}.pdf`);
   };
 
-  // ======================================================
-  // BUSCAR CONTRATOS
-  // ======================================================
   const fetchContratos = async () => {
     try {
       const response = await fetch("http://localhost:3000/api/contrato/listar");
@@ -120,9 +143,6 @@ export const ListarContratos = () => {
     setPaginaAtual(1);
   }, [busca]);
 
-  // ======================================================
-  // FILTRAGEM + PAGINAÇÃO
-  // ======================================================
   const contratosFiltrados = contratos.filter((c) => {
     const txt = busca.toLowerCase();
     return (
@@ -146,9 +166,6 @@ export const ListarContratos = () => {
 
   const totalPaginas = Math.ceil(contratosFiltrados.length / itensPorPagina);
 
-  // ======================================================
-  // RENDER
-  // ======================================================
   return (
     <div className="layout">
       <Navbar />
@@ -180,7 +197,7 @@ export const ListarContratos = () => {
                 <tr>
                   <th>Código</th>
                   <th>Cliente</th>
-                  <th>CPF/CNPJ</th>
+                  <th>Tipo de Contrato</th>
                   <th>Data Início</th>
                   <th>Valor Mensal</th>
                   <th>Observações</th>
@@ -192,23 +209,21 @@ export const ListarContratos = () => {
                 {contratosAtuais.map((c) => (
                   <tr key={c.id}>
                     <td>{c.id}</td>
-                    <td>{c.cliente_nome}</td>
-                    <td>{c.cliente_documento}</td>
-                    <td>{c.data_inicio}</td>
-                    <td>R$ {Number(c.valor_mensal).toFixed(2)}</td>
-                    <td>{c.observacao || "-"}</td>
+                    <td>{c.cliente}</td>
+                    <td>{c.tipo_contrato}</td>
+                    <td>{c.inicio}</td>
+                    <td>R$ {Number(c.valor_total)}</td>
+                    <td>{c.status || "-"}</td>
 
                     <td>
                       <MenuAcoes
                         onEditar={() => navigate(`/contrato/editar/${c.id}`)}
                         onExcluir={() => abrirModalExclusao(c.id)}
                         onPDF={() => {
-                          const dados = contratosGeral.find(
+                          const dados = contratosAtuais.find(
                             (x) => x.id === c.id
                           );
-                          dados
-                            ? gerarPDFContrato(dados)
-                            : toast.warning("Carregando dados...");
+                          gerarPDFContrato(dados);
                         }}
                       />
                     </td>

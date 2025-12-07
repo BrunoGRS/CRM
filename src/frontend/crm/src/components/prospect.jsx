@@ -3,10 +3,14 @@ import "./css/usuario.css";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { Navbar } from "./navbar";
+import MenuAcoes from "./menuAcoes";
 
 export const Prospect = () => {
   const { id } = useParams();
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const [itensPorPagina] = useState(10);
   const [prospects, setProspects] = useState([]);
+
   const [formData, setFormData] = useState({
     nome_contato: "",
     fantasiaEmpresa: "",
@@ -21,24 +25,32 @@ export const Prospect = () => {
     complemento: "",
     cnpj_cpf: "",
   });
+
   const [botao, setBotao] = useState(true);
   const [IdProspect, setIdProspect] = useState("");
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [value, setValue] = useState("");
 
+  // ============================
+  // 🔹 PAGINAÇÃO CORRIGIDA
+  // ============================
+  const listaFiltrada = prospects; // pronto para futura busca/filtro
+
+  const indexUltimo = paginaAtual * itensPorPagina;
+  const indexPrimeiro = indexUltimo - itensPorPagina;
+
+  const listaAtual = listaFiltrada.slice(indexPrimeiro, indexUltimo);
+
+  const totalPaginas = Math.ceil(listaFiltrada.length / itensPorPagina);
+
+  // FORMATADORES
   function formatCpfCnpj(value) {
-    // Remove tudo que não é número
     const onlyNumbers = value.replace(/\D/g, "");
-
-    // CPF: 11 dígitos, CNPJ: 14 dígitos
     if (onlyNumbers.length <= 11) {
-      // Formata como CPF: 999.999.999-99
       return onlyNumbers
         .replace(/(\d{3})(\d)/, "$1.$2")
         .replace(/(\d{3})(\d)/, "$1.$2")
         .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
     } else {
-      // Formata como CNPJ: 99.999.999/9999-99
       return onlyNumbers
         .replace(/^(\d{2})(\d)/, "$1.$2")
         .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
@@ -48,6 +60,49 @@ export const Prospect = () => {
   }
 
   const onlyNumbers = (value) => value.replace(/\D/g, "");
+
+  // 🔍 BUSCA CNPJ — BRASILAPI
+  const buscarNaReceita = async () => {
+    const cnpjNumerico = onlyNumbers(formData.cnpj_cpf);
+
+    if (cnpjNumerico.length !== 14) {
+      toast.error("Para consulta, informe um CNPJ válido!");
+      return;
+    }
+
+    try {
+      toast.info("Consultando dados do CNPJ...", { autoClose: 1800 });
+
+      const response = await fetch(
+        `https://brasilapi.com.br/api/cnpj/v1/${cnpjNumerico}`
+      );
+
+      if (!response.ok) {
+        toast.error("CNPJ não encontrado ou API indisponível");
+        return;
+      }
+
+      const data = await response.json();
+
+      setFormData({
+        ...formData,
+        razaoSocialEmpresa: data.razao_social || "",
+        fantasiaEmpresa: data.nome_fantasia || "",
+        email: data.email || "",
+        telefone: data.telefone || "",
+        cidade: data.municipio || "",
+        bairro: data.bairro || "",
+        ruaEndereco: data.logradouro || "",
+        numeroEndereco: data.numero || "",
+        complemento: data.complemento || "",
+      });
+
+      toast.success("Dados importados com sucesso!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao consultar BrasilAPI");
+    }
+  };
 
   const criarProspect = async (e) => {
     e.preventDefault();
@@ -91,6 +146,57 @@ export const Prospect = () => {
       complemento: "",
       cnpj_cpf: "",
     });
+  };
+
+  const exportarCSV = () => {
+    if (!prospects || prospects.length === 0) {
+      alert("Nenhum prospect encontrado para exportar.");
+      return;
+    }
+
+    const cabecalho = [
+      "Nome Contato",
+      "Fantasia Empresa",
+      "Razão Social",
+      "E-mail",
+      "Telefone",
+      "Status",
+      "Cidade",
+      "Bairro",
+      "Rua",
+      "Número",
+      "Complemento",
+      "CNPJ/CPF",
+    ];
+
+    const linhas = prospects.map((item) => [
+      item.nome_contato || "",
+      item.fantasiaEmpresa || "",
+      item.razaoSocialEmpresa || "",
+      item.email || "",
+      item.telefone || "",
+      item.status || "",
+      item.cidade || "",
+      item.bairro || "",
+      item.ruaEndereco || "",
+      item.numeroEndereco || "",
+      item.complemento || "",
+      item.cnpj_cpf || "",
+    ]);
+
+    const csvString = [cabecalho, ...linhas]
+      .map((linha) => linha.map((col) => `"${col}"`).join(","))
+      .join("\n");
+
+    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "prospects.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const fetchProspect = async () => {
@@ -163,7 +269,6 @@ export const Prospect = () => {
       <main className="content">
         <h2>Gerenciamento de Prospect</h2>
 
-        {/* Botão principal */}
         <button
           className="btn-criar-novo"
           onClick={() => {
@@ -175,30 +280,45 @@ export const Prospect = () => {
           + Criar Novo Prospect
         </button>
 
-        {/* Modal do formulário */}
+        <button className="btn-exportar" onClick={exportarCSV}>
+          📄 Exportar CSV
+        </button>
+
+        {/* Modal */}
         {mostrarFormulario && (
           <div className="modal-overlay">
             <div className="modal-content">
               <h3>{botao ? "Novo Prospect" : "Editar Prospect"}</h3>
+
               <form
                 className="produto-form"
                 onSubmit={
                   botao ? criarProspect : (e) => editarProspect(e, IdProspect)
                 }
               >
-                <input
-                  type="text"
-                  placeholder="CPF/CNPJ"
-                  value={formData.cnpj_cpf}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      cnpj_cpf: formatCpfCnpj(e.target.value),
-                    })
-                  }
-                  maxLength={18}
-                  required
-                />
+                <div className="linha-cnpj">
+                  <input
+                    type="text"
+                    placeholder="CPF/CNPJ"
+                    value={formData.cnpj_cpf}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        cnpj_cpf: formatCpfCnpj(e.target.value),
+                      })
+                    }
+                    maxLength={18}
+                    required
+                  />
+
+                  <button
+                    type="button"
+                    className="btn-receita"
+                    onClick={buscarNaReceita}
+                  >
+                    Buscar Receita
+                  </button>
+                </div>
 
                 <input
                   type="text"
@@ -286,7 +406,10 @@ export const Prospect = () => {
                   placeholder="Número"
                   value={formData.numeroEndereco}
                   onChange={(e) =>
-                    setFormData({ ...formData, numeroEndereco: e.target.value })
+                    setFormData({
+                      ...formData,
+                      numeroEndereco: e.target.value,
+                    })
                   }
                 />
                 <input
@@ -294,7 +417,10 @@ export const Prospect = () => {
                   placeholder="Complemento"
                   value={formData.complemento}
                   onChange={(e) =>
-                    setFormData({ ...formData, complemento: e.target.value })
+                    setFormData({
+                      ...formData,
+                      complemento: e.target.value,
+                    })
                   }
                 />
 
@@ -315,23 +441,24 @@ export const Prospect = () => {
           </div>
         )}
 
-        {prospects.length === 0 ? (
+        {/* LISTAGEM */}
+        {listaAtual.length === 0 ? (
           <p>Nenhum Prospect encontrado.</p>
         ) : (
           <table className="user-table">
             <thead>
               <tr>
-                <th>CNPJ/CPF</th>
-                <th>Razão Social</th>
-                <th>Email</th>
-                <th>Telefone</th>
-                <th>Cidade</th>
-                <th>Bairro</th>
-                <th>Ações</th>
+                <td>CNPJ/CPF</td>
+                <td>Razão Social</td>
+                <td>Email</td>
+                <td>Telefone</td>
+                <td>Cidade</td>
+                <td>Bairro</td>
+                <td>Ações</td>
               </tr>
             </thead>
             <tbody>
-              {prospects.map((p) => (
+              {listaAtual.map((p) => (
                 <tr key={p.id}>
                   <td>{p.cnpj_cpf}</td>
                   <td>{p.razaoSocialEmpresa}</td>
@@ -339,10 +466,10 @@ export const Prospect = () => {
                   <td>{p.telefone}</td>
                   <td>{p.cidade}</td>
                   <td>{p.bairro}</td>
+
                   <td>
-                    <button
-                      className="button-editar"
-                      onClick={() => {
+                    <MenuAcoes
+                      onEditar={() => {
                         setFormData({
                           nome_contato: p.nome_contato || "",
                           fantasiaEmpresa: p.fantasiaEmpresa || "",
@@ -361,21 +488,45 @@ export const Prospect = () => {
                         setIdProspect(p.id);
                         setMostrarFormulario(true);
                       }}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      className="button-excluir"
-                      onClick={() => excluirProspect(p.id)}
-                    >
-                      Excluir
-                    </button>
+                      onExcluir={() => excluirProspect(p.id)}
+                    />
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
+
+        {/* PAGINAÇÃO */}
+        <div className="paginacao-container">
+          <button
+            onClick={() => setPaginaAtual(paginaAtual - 1)}
+            disabled={paginaAtual === 1}
+            className="btn-paginacao"
+          >
+            Anterior
+          </button>
+
+          {Array.from({ length: totalPaginas }, (_, i) => (
+            <button
+              key={i + 1}
+              className={`btn-paginacao ${
+                paginaAtual === i + 1 ? "ativo" : ""
+              }`}
+              onClick={() => setPaginaAtual(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+
+          <button
+            onClick={() => setPaginaAtual(paginaAtual + 1)}
+            disabled={paginaAtual === totalPaginas}
+            className="btn-paginacao"
+          >
+            Próximo
+          </button>
+        </div>
       </main>
     </div>
   );

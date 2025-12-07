@@ -266,12 +266,6 @@ export default function AlocacaoCriar() {
           onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
         ></textarea>
 
-        {/* ANEXOS */}
-        <div className="file-input-container">
-          <label>Anexos</label>
-          <input type="file" multiple className="file-input" />
-        </div>
-
         <div className="aloc-btns">
           <button className="btn-save" onClick={salvar}>
             Salvar

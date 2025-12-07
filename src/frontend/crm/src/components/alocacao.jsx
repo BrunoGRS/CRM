@@ -3,16 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { Navbar } from "./navbar.jsx";
 import MenuAcoes from "./menuAcoes.jsx";
 import "./css/alocacoes.css";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const ListaAlocacoes = () => {
   const navigate = useNavigate();
   const [alocacoes, setAlocacoes] = useState([]);
   const [busca, setBusca] = useState("");
 
-  // modal de exclusão
   const [deleteId, setDeleteId] = useState(null);
 
-  // paginação
   const [paginaAtual, setPaginaAtual] = useState(1);
   const itensPorPagina = 10;
 
@@ -30,6 +30,11 @@ const ListaAlocacoes = () => {
     carregarAlocacoes();
   }, []);
 
+  // RESETAR PÁGINA AO DIGITAR NA BUSCA
+  useEffect(() => {
+    setPaginaAtual(1);
+  }, [busca]);
+
   const filtrar = (item) => {
     const texto = busca.toLowerCase();
     return (
@@ -40,31 +45,68 @@ const ListaAlocacoes = () => {
     );
   };
 
-  // paginação
-  const dadosFiltrados = alocacoes.filter(filtrar);
-  const totalPaginas = Math.ceil(dadosFiltrados.length / itensPorPagina);
-  const inicio = (paginaAtual - 1) * itensPorPagina;
-  const fim = inicio + itensPorPagina;
-  const exibidos = dadosFiltrados.slice(inicio, fim);
+  // FILTRO + PAGINAÇÃO
+  const listaFiltrada = alocacoes.filter(filtrar);
 
-  // PDF
-  const gerarPDF = async (id) => {
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/alocacao/pdf/${id}`
-      );
+  const indexUltimo = paginaAtual * itensPorPagina;
+  const indexPrimeiro = indexUltimo - itensPorPagina;
+  const listaAtual = listaFiltrada.slice(indexPrimeiro, indexUltimo);
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
+  const totalPaginas = Math.ceil(listaFiltrada.length / itensPorPagina);
 
-      link.href = url;
-      link.setAttribute("download", `alocacao_${id}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-    } catch (error) {
-      console.error("Erro ao gerar PDF:", error);
-    }
+  const gerarPDF = (aloc) => {
+    const doc = new jsPDF();
+
+    const marrom = "#4B2E1E";
+    const dourado = "#C6A667";
+
+    // Cabeçalho
+    doc.setFillColor(marrom);
+    doc.rect(0, 0, 210, 30, "F");
+
+    doc.setFontSize(18);
+    doc.setTextColor(255, 255, 255);
+    doc.text("Relatório de Alocação de Máquina", 14, 18);
+
+    doc.setFontSize(12);
+    doc.text("Brasitália Café Chapecó", 150, 18);
+
+    // Título
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(14);
+    doc.text(`Alocação #${aloc.id}`, 14, 45);
+
+    // Tabela principal
+    autoTable(doc, {
+      startY: 55,
+      head: [["Campo", "Detalhes"]],
+      headStyles: {
+        fillColor: marrom,
+        textColor: 255,
+        halign: "center",
+      },
+      body: [
+        ["Máquina", aloc.maquina || "-"],
+        ["Cliente", aloc.cliente || "-"],
+        ["Data Início", aloc.data_inicio],
+        ["Data Fim", aloc.data_fim],
+        ["Status", aloc.status || "-"],
+      ],
+      styles: { fontSize: 11, cellPadding: 4 },
+      alternateRowStyles: { fillColor: "#f8f3ed" },
+      theme: "grid",
+    });
+
+    // Rodapé
+    doc.setFontSize(10);
+    doc.setTextColor(marrom);
+    doc.text(
+      "Relatório gerado automaticamente pelo sistema Brasitália Café.",
+      14,
+      doc.internal.pageSize.height - 10
+    );
+
+    doc.save(`alocacao_${aloc.id}.pdf`);
   };
 
   // EXCLUIR
@@ -81,9 +123,7 @@ const ListaAlocacoes = () => {
     }
   };
 
-  // ============================================
-  // FUNÇÃO PARA EXPORTAR CSV (IGUAL MANUTENÇÕES)
-  // ============================================
+  // EXPORTAR CSV
   const exportarCSV = () => {
     if (!alocacoes || alocacoes.length === 0) {
       alert("Nenhuma alocação encontrada para exportar.");
@@ -164,7 +204,7 @@ const ListaAlocacoes = () => {
           </thead>
 
           <tbody>
-            {exibidos.map((item) => (
+            {listaAtual.map((item) => (
               <tr key={item.id}>
                 <td>{item.id}</td>
                 <td>{item.maquina}</td>
@@ -172,35 +212,46 @@ const ListaAlocacoes = () => {
                 <td>{item.data_inicio}</td>
                 <td>{item.data_fim || "-"}</td>
                 <td>{item.status}</td>
-
-                <MenuAcoes
-                  onEditar={() => navigate(`/alocacao/editar/${item.id}`)}
-                  onExcluir={() => setDeleteId(item.id)}
-                  onPDF={() => gerarPDF(item.id)}
-                />
+                <td>
+                  <MenuAcoes
+                    onEditar={() => navigate(`/alocacao/editar/${item.id}`)}
+                    onExcluir={() => setDeleteId(item.id)}
+                    onPDF={() => gerarPDF(item.id)}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        {/* PAGINAÇÃO */}
-        <div className="paginacao">
+        {/* PAGINAÇÃO IGUAL A MANUTENÇÕES */}
+        <div className="paginacao-container">
           <button
+            onClick={() => setPaginaAtual(paginaAtual - 1)}
             disabled={paginaAtual === 1}
-            onClick={() => setPaginaAtual((p) => p - 1)}
+            className="btn-paginacao"
           >
-            ← Anterior
+            Anterior
           </button>
 
-          <span>
-            Página {paginaAtual} de {totalPaginas || 1}
-          </span>
+          {Array.from({ length: totalPaginas }, (_, i) => (
+            <button
+              key={i + 1}
+              className={`btn-paginacao ${
+                paginaAtual === i + 1 ? "ativo" : ""
+              }`}
+              onClick={() => setPaginaAtual(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
 
           <button
+            onClick={() => setPaginaAtual(paginaAtual + 1)}
             disabled={paginaAtual === totalPaginas}
-            onClick={() => setPaginaAtual((p) => p + 1)}
+            className="btn-paginacao"
           >
-            Próxima →
+            Próximo
           </button>
         </div>
       </main>

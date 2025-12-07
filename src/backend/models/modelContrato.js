@@ -17,7 +17,7 @@ const modelContrato = db.define(
     },
     usuario_responsavel_id: {
       type: Sequelize.INTEGER,
-      allowNull: true,
+      allowNull: false,
     },
 
     // DADOS DO CONTRATO

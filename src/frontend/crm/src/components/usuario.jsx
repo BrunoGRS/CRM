@@ -3,6 +3,7 @@ import "./css/usuario.css";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { Navbar } from "./navbar";
+import MenuAcoes from "./menuAcoes";
 
 export const Usuarios = () => {
   const { id } = useParams();
@@ -285,38 +286,30 @@ export const Usuarios = () => {
             <tbody>
               {users.map((u) => (
                 <tr key={u.id}>
-                  <td>{u.id}</td>
-                  <td>{u.nome}</td>
-                  <td>{u.usuario}</td>
-                  <td>{u.email}</td>
-                  <td>{u.telefone ? formatPhone(u.telefone) : "-"}</td>
+                  <th>{u.id}</th>
+                  <th>{u.nome}</th>
+                  <th>{u.usuario}</th>
+                  <th>{u.email}</th>
+                  <th>{u.telefone ? formatPhone(u.telefone) : "-"}</th>
                   <th>{u.Permissao}</th>
-                  <td>
-                    <button
-                      className="button-editar"
-                      onClick={() => {
+                  <th>
+                    <MenuAcoes
+                      onEditar={() => {
                         setFormData({
                           nome: u.nome,
                           usuario: u.usuario,
                           email: u.email,
-                          senha: u.senha,
-                          telefone: formatPhone(u.telefone || ""),
-                          IdPermissao: u.IdPermissao,
+                          senha: u.senha || null,
+                          telefone: u.telefone || null,
+                          IdPermissao: u.Permissao,
                         });
                         setBotao(false);
                         setIdUser(u.id);
                         setMostrarFormulario(true);
                       }}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      className="button-excluir"
-                      onClick={() => excluirUsuario(u.id)}
-                    >
-                      Excluir
-                    </button>
-                  </td>
+                      onExcluir={() => excluirUsuario(u.id)}
+                    />
+                  </th>
                 </tr>
               ))}
             </tbody>

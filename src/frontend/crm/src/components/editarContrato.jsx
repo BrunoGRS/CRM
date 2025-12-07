@@ -1,364 +1,339 @@
 // EditarContrato.jsx
 import React, { useState, useEffect } from "react";
-import "./css/editarVenda.css";
 import { Navbar } from "./navbar.jsx";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
+import "./css/novaVenda.css";
 
 export function EditarContrato() {
-  const { id } = useParams(); // id do contrato
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [clientes, setClientes] = useState([]);
-  const [produtos, setProdutos] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
+
+  const [loading, setLoading] = useState(true);
 
   const [contrato, setContrato] = useState({
     cliente_id: "",
-    observacao: "",
-    valor_total: 0,
+    usuario_responsavel_id: "",
+    numero_contrato: "",
+    titulo: "",
+    tipo_contrato: "",
+    descricao: "",
+    data_assinatura: "",
+    data_inicio: "",
+    data_fim: "",
+    valor_total: "",
+    valor_mensal: "",
+    forma_pagamento: "",
+    status: "ATIVO",
+    arquivo: null,
   });
 
-  const [itens, setItens] = useState([]);
-  const [itensExcluidos, setItensExcluidos] = useState([]);
-  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    const carregar = async () => {
+      try {
+        const [cliRes, usuRes, contratoRes] = await Promise.all([
+          fetch("http://localhost:3000/api/cliente/listar"),
+          fetch("http://localhost:3000/api/usuario/listar"),
+          fetch(`http://localhost:3000/api/contrato/${id}`),
+        ]);
 
-  const fetchJson = async (url, options = {}) => {
-    const resp = await fetch(url, options);
-    const data = await resp.json().catch(() => null);
-    return { resp, data };
-  };
+        const clientesData = await cliRes.json();
+        const usuariosData = await usuRes.json();
+        const contratoData = await contratoRes.json();
 
-  const fetchClientes = async () => {
-    try {
-      const { resp, data } = await fetchJson(
-        "http://localhost:3000/api/cliente/listar"
-      );
-      if (resp.ok && Array.isArray(data.msg)) setClientes(data.msg);
-    } catch (err) {
-      console.error(err);
-      toast.error("Erro ao buscar clientes");
-    }
-  };
+        setClientes(clientesData.msg || []);
+        setUsuarios(usuariosData.msg || []);
 
-  const fetchProdutos = async () => {
-    try {
-      const { resp, data } = await fetchJson(
-        "http://localhost:3000/api/produto/listar"
-      );
-      if (resp.ok && Array.isArray(data.msg)) setProdutos(data.msg);
-    } catch (err) {
-      console.error(err);
-      toast.error("Erro ao buscar produtos");
-    }
-  };
+        const c = contratoData.msg;
 
-  const fetchContrato = async () => {
-    if (!id) return;
-    try {
-      const { resp, data } = await fetchJson(
-        `http://localhost:3000/api/contrato/${id}`
-      );
-
-      if (!resp.ok) {
-        toast.error("Contrato não encontrado");
-        navigate("/contrato");
-        return;
+        setContrato({
+          cliente_id: c.cliente_id ?? "",
+          usuario_responsavel_id: c.usuario_responsavel_id ?? "",
+          numero_contrato: c.numero_contrato ?? "",
+          titulo: c.titulo ?? "",
+          tipo_contrato: c.tipo_contrato ?? "",
+          descricao: c.descricao ?? "",
+          data_assinatura: c.data_assinatura?.substring(0, 10) ?? "",
+          data_inicio: c.data_inicio?.substring(0, 10) ?? "",
+          data_fim: c.data_fim?.substring(0, 10) ?? "",
+          valor_total: c.valor_total ?? "",
+          valor_mensal: c.valor_mensal ?? "",
+          forma_pagamento: c.forma_pagamento ?? "",
+          status: c.status ?? "ATIVO",
+          arquivo: null,
+        });
+      } catch (err) {
+        console.error(err);
+        toast.error("Erro ao carregar dados.");
       }
 
-      const c = data.msg;
-      setContrato({
-        cliente_id: c.cliente_id,
-        observacao: c.observacao || "",
-        valor_total: c.valor_total || 0,
-      });
-
-      const itensTratados = (data.msg.itens || []).map((it) => ({
-        id: it.id,
-        produto_id: it.produto_id,
-        quantidade: Number(it.quantidade),
-        valor_unitario: Number(it.valor_unitario),
-      }));
-
-      setItens(itensTratados);
-      setItensExcluidos([]);
-    } catch (err) {
-      toast.error("Erro ao carregar contrato");
-    }
-  };
-
-  useEffect(() => {
-    if (!id) return;
-    const carregar = async () => {
-      setLoading(true);
-      await Promise.all([fetchClientes(), fetchProdutos()]);
-      await fetchContrato();
       setLoading(false);
     };
+
     carregar();
   }, [id]);
 
-  useEffect(() => {
-    const total = itens.reduce((acc, it) => acc + Number(it.subtotal || 0), 0);
-    setContrato((prev) => ({ ...prev, valor_total: Number(total).toFixed(2) }));
-  }, [itens]);
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
 
-  const atualizarItem = (index, campo, valor) => {
-    setItens((prev) => {
-      const lista = [...prev];
-      lista[index][campo] = valor;
-
-      const qtd = Number(lista[index].quantidade || 0);
-      const vu = Number(lista[index].valor_unitario || 0);
-
-      lista[index].subtotal = Number((qtd * vu).toFixed(2));
-      return lista;
-    });
-  };
-
-  const handleSelectProduto = (index, produtoId) => {
-    const produto = produtos.find((p) => String(p.id) === String(produtoId));
-    atualizarItem(index, "produto_id", produtoId);
-    if (produto) {
-      atualizarItem(
-        index,
-        "valor_unitario",
-        Number(produto.preco ?? produto.valor ?? 0)
-      );
-    }
-  };
-
-  const adicionarItem = () => {
-    setItens((prev) => [
-      ...prev,
-      {
-        id: null,
-        produto_id: "",
-        quantidade: 1,
-        valor_unitario: 0,
-        subtotal: 0,
-      },
-    ]);
-  };
-
-  const removerItem = (index) => {
-    setItens((prev) => {
-      const lista = [...prev];
-      const item = lista[index];
-      if (item && item.id) {
-        setItensExcluidos((prevIds) => [...prevIds, item.id]);
-      }
-      lista.splice(index, 1);
-      return lista;
-    });
-  };
-
-  const salvarTudo = async () => {
-    try {
-      const payload = {
-        cliente_id: contrato.cliente_id,
-        data_contrato: new Date(),
-        observacao: contrato.observacao,
-        valor_total: contrato.valor_total,
-        itens: itens.map((it) => ({
-          id: it.id || null,
-          produto_id: it.produto_id,
-          quantidade: Number(it.quantidade),
-          valor_unitario: Number(it.valor_unitario),
-        })),
-        itens_excluidos: itensExcluidos,
-      };
-
-      const { resp, data } = await fetchJson(
-        `http://localhost:3000/api/contrato/editar/${id}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!resp.ok) {
-        toast.error(data?.msg || "Erro ao salvar contrato");
-        return false;
-      }
-
-      await fetchContrato();
-      return true;
-    } catch (err) {
-      console.error("Erro:", err);
-      toast.error("Erro ao salvar contrato");
-      return false;
-    }
-  };
-
-  const excluirContrato = async () => {
-    if (!window.confirm("Deseja excluir este contrato?")) return;
-
-    try {
-      const { resp } = await fetchJson(
-        `http://localhost:3000/api/contrato/delete/${id}`,
-        { method: "DELETE" }
-      );
-
-      if (!resp.ok) {
-        toast.error("Erro ao excluir contrato");
-        return;
-      }
-
-      toast.success("Contrato excluído");
-      navigate("/contrato");
-    } catch (err) {
-      console.error(err);
-      toast.error("Erro ao excluir contrato");
+    if (files) {
+      setContrato({ ...contrato, arquivo: files[0] });
+    } else {
+      setContrato({ ...contrato, [name]: value });
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    const ok = await salvarTudo();
-    setLoading(false);
-    if (ok) {
+
+    const formData = new FormData();
+
+    Object.keys(contrato).forEach((key) => {
+      formData.append(key, contrato[key]);
+    });
+
+    try {
+      const resp = await fetch(
+        `http://localhost:3000/api/contrato/editar/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(contrato),
+        }
+      );
+
+      if (!resp.ok) {
+        toast.error("Erro ao salvar alterações");
+        return;
+      }
+
       toast.success("Contrato atualizado!");
       navigate("/contrato");
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao enviar dados");
     }
   };
 
+  if (loading) return <p style={{ padding: 30 }}>Carregando...</p>;
+
   return (
-    <section>
+    <section className="contrato-page">
       <Navbar />
 
-      <section className="contrato-container">
-        <h2>✏️ Editar Contrato</h2>
+      <div className="contrato-container">
+        <h1 className="titulo">
+          <span>✏️</span> Editar Contrato
+        </h1>
 
-        <form className="contrato-form" onSubmit={handleSubmit}>
-          {/* CLIENTE */}
-          <div className="form-group">
-            <label>Cliente:</label>
-            <select
-              value={contrato.cliente_id}
-              onChange={(e) =>
-                setContrato({ ...contrato, cliente_id: e.target.value })
-              }
-              required
-            >
-              <option value="">Selecione um cliente</option>
-              {clientes.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.razaoSocialEmpresa || c.nome || `#${c.id}`}
-                </option>
-              ))}
-            </select>
-          </div>
+        <form onSubmit={handleSubmit} className="formulario">
+          {/* CARD 1 - CLIENTE */}
+          <div className="card">
+            <h2 className="card-title">Informações do Cliente</h2>
 
-          {/* ITENS */}
-          <h3>Itens do Contrato</h3>
-
-          {loading && <p>Carregando...</p>}
-
-          {itens.length === 0 && !loading && (
-            <p style={{ color: "#777" }}>Nenhum item. Use "Adicionar Item".</p>
-          )}
-
-          {itens.map((item, index) => (
-            <div key={item.id ?? `novo-${index}`} className="item-linha">
+            <div className="form-row">
+              <label>Cliente</label>
               <select
-                value={item.produto_id}
-                onChange={(e) => handleSelectProduto(index, e.target.value)}
+                name="cliente_id"
+                value={contrato.cliente_id}
+                onChange={handleChange}
                 required
               >
-                <option value="">Produto</option>
-                {produtos.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.nome}
+                <option value="">Selecione...</option>
+                {clientes.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.razaoSocialEmpresa}
                   </option>
                 ))}
               </select>
+            </div>
 
-              <input
-                type="number"
-                min="1"
-                value={item.quantidade}
-                onChange={(e) =>
-                  atualizarItem(index, "quantidade", e.target.value)
-                }
-              />
+            <div className="form-row">
+              <label>Responsável Interno</label>
+              <select
+                name="usuario_responsavel_id"
+                value={contrato.usuario_responsavel_id}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Selecione...</option>
+                {usuarios.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-              <input
-                type="number"
-                step="0.01"
-                value={item.valor_unitario}
-                onChange={(e) =>
-                  atualizarItem(index, "valor_unitario", e.target.value)
-                }
-              />
+          {/* CARD 2 - DADOS DO CONTRATO */}
+          <div className="card">
+            <h2 className="card-title">Dados do Contrato</h2>
 
-              <input
-                type="text"
-                readOnly
-                value={Number(item.subtotal || 0).toFixed(2)}
+            <div className="form-grid">
+              <div>
+                <label>Número do Contrato</label>
+                <input
+                  type="text"
+                  name="numero_contrato"
+                  value={contrato.numero_contrato}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <label>Título</label>
+                <input
+                  type="text"
+                  name="titulo"
+                  value={contrato.titulo}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <label>Tipo</label>
+                <input
+                  type="text"
+                  name="tipo_contrato"
+                  value={contrato.tipo_contrato}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <label>Forma de Pagamento</label>
+                <input
+                  type="text"
+                  name="forma_pagamento"
+                  value={contrato.forma_pagamento}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <label>Status</label>
+                <select
+                  name="status"
+                  value={contrato.status}
+                  onChange={handleChange}
+                >
+                  <option value="ATIVO">ATIVO</option>
+                  <option value="INATIVO">INATIVO</option>
+                  <option value="CANCELADO">CANCELADO</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="form-row full">
+              <label>Descrição</label>
+              <textarea
+                name="descricao"
+                value={contrato.descricao}
+                onChange={handleChange}
               />
+            </div>
+          </div>
+
+          {/* CARD 3 - DATAS */}
+          <div className="card">
+            <h2 className="card-title">Datas</h2>
+
+            <div className="form-grid">
+              <div>
+                <label>Assinatura</label>
+                <input
+                  type="date"
+                  name="data_assinatura"
+                  value={contrato.data_assinatura}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <label>Início</label>
+                <input
+                  type="date"
+                  name="data_inicio"
+                  value={contrato.data_inicio}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <label>Fim</label>
+                <input
+                  type="date"
+                  name="data_fim"
+                  value={contrato.data_fim}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* CARD 4 - FINANCEIRO */}
+          <div className="card">
+            <h2 className="card-title">Financeiro</h2>
+
+            <div className="form-grid">
+              <div>
+                <label>Valor Total (R$)</label>
+                <input
+                  type="number"
+                  name="valor_total"
+                  step="0.01"
+                  value={contrato.valor_total}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <label>Valor Mensal (R$)</label>
+                <input
+                  type="number"
+                  name="valor_mensal"
+                  step="0.01"
+                  value={contrato.valor_mensal}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="card">
+            <h2 className="card-title">Arquivo Anexado</h2>
+            <input type="file" name="arquivo" onChange={handleChange} />
+          </div>
+
+          <div className="footer-resumo">
+            <div className="acoes">
+              <button type="submit" className="btn-salvar">
+                💾 Salvar Alterações
+              </button>
 
               <button
                 type="button"
-                className="btn-delete-item"
-                onClick={() => removerItem(index)}
+                className="btn-voltar"
+                onClick={() => navigate("/contrato")}
               >
-                ❌
+                ⬅ Voltar
               </button>
             </div>
-          ))}
-
-          <button
-            type="button"
-            className="btn-adicionar-item"
-            onClick={adicionarItem}
-          >
-            ➕ Adicionar Item
-          </button>
-
-          {/* Observação */}
-          <div className="form-group">
-            <label>Observação:</label>
-            <textarea
-              value={contrato.observacao}
-              onChange={(e) =>
-                setContrato({ ...contrato, observacao: e.target.value })
-              }
-            />
-          </div>
-
-          {/* Total */}
-          <div className="form-group">
-            <label>Total (R$):</label>
-            <input type="text" value={contrato.valor_total} readOnly />
-          </div>
-
-          {/* Botões */}
-          <div className="botoes-acoes">
-            <button className="btn-salvar" disabled={loading} type="submit">
-              💾 {loading ? "Salvando..." : "Salvar Alterações"}
-            </button>
-
-            <button
-              type="button"
-              className="btn-voltar"
-              onClick={() => navigate("/contrato")}
-            >
-              ⬅️ Voltar
-            </button>
-
-            <button
-              type="button"
-              className="btn-excluir"
-              onClick={excluirContrato}
-              style={{ marginLeft: 8 }}
-            >
-              🗑️ Excluir Contrato
-            </button>
           </div>
         </form>
-      </section>
+      </div>
     </section>
   );
 }

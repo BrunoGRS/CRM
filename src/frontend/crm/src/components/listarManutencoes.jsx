@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import "./css/listarManutencoes.css";
 import { Navbar } from "./navbar";
 import MenuAcoes from "./menuAcoes.jsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export const ListarManutencoes = () => {
   const [manutencoes, setManutencoes] = useState([]);
@@ -17,7 +19,75 @@ export const ListarManutencoes = () => {
 
   const navigate = useNavigate();
 
-  // Buscar lista
+  const gerarPDF = (m) => {
+    try {
+      const doc = new jsPDF("portrait", "pt", "a4");
+
+      // Paleta Brasitália Café Chapecó
+      const marrom = "#4B2E1E";
+      const dourado = "#C6A667";
+
+      // Cabeçalho
+      doc.setFillColor(marrom);
+      doc.rect(0, 0, 595, 70, "F");
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(20);
+      doc.setTextColor("#ffffff");
+      doc.text("Relatório de Manutenção", 30, 40);
+
+      doc.setFontSize(12);
+      doc.text("Brasitália Café Chapecó", 30, 58);
+
+      // Dados básicos
+      doc.setTextColor("#000000");
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text(`Manutenção #${m.id}`, 30, 110);
+
+      const dados = [
+        ["Equipamento", m.maquina || "-"],
+        ["Cliente", m.cliente || "-"],
+        ["Tipo de Manutenção", m.tipo_manutencao || "-"],
+        ["Status", m.status || "-"],
+        ["Técnico", m.nome || "-"],
+        ["Data Solicitação", formatarData(m.data_solicitacao)],
+        ["Data Execução", formatarData(m.data_execucao)],
+      ];
+
+      // Tabela de dados
+      autoTable(doc, {
+        startY: 130,
+        head: [["Campo", "Valor"]],
+        body: dados,
+        headStyles: {
+          fillColor: marrom,
+          textColor: "#ffffff",
+          fontStyle: "bold",
+        },
+        styles: {
+          fontSize: 12,
+        },
+        alternateRowStyles: {
+          fillColor: "#f9f5f0",
+        },
+      });
+
+      // Rodapé
+      doc.setFontSize(10);
+      doc.setTextColor("#444");
+      doc.text(
+        "Gerado automaticamente pelo sistema Brasitália Café",
+        30,
+        doc.internal.pageSize.height - 30
+      );
+
+      doc.save(`manutencao_${m.id}.pdf`);
+    } catch (error) {
+      toast.error("Erro ao gerar PDF!");
+    }
+  };
+
   const fetchManutencoes = async () => {
     try {
       const response = await fetch(
@@ -206,6 +276,7 @@ export const ListarManutencoes = () => {
                       <MenuAcoes
                         onEditar={() => navigate(`/manutencao/editar/${m.id}`)}
                         onExcluir={() => abrirModalExclusao(m.id)}
+                        onPDF={() => gerarPDF(m)}
                       />
                     </td>
                   </tr>

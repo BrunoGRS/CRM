@@ -3,10 +3,12 @@ import "./css/usuario.css";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { Navbar } from "./navbar";
+import MenuAcoes from "./menuAcoes.jsx";
 
 export const Produtos = () => {
   const { id } = useParams();
   const [produtos, setProdutos] = useState([]);
+
   const [formData, setFormData] = useState({
     nome: "",
     preco: "",
@@ -14,15 +16,61 @@ export const Produtos = () => {
     categoria_id: "",
     marca_id: "",
   });
-  const [botao, setBotao] = useState(true);
-  const [IdProduto, setIdProduto] = useState("");
+
+  const [isCriar, setIsCriar] = useState(true);
+  const [produtoId, setProdutoId] = useState("");
+
+  // MODAIS
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
-  // Novo estado para o modal de opções
-  const [mostrarOpcoes, setMostrarOpcoes] = useState(false);
-  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
+  // ==========================
+  // PAGINAÇÃO
+  // ==========================
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const itensPorPagina = 10;
 
-  // Criar Produto
+  // Busca (se quiser adicionar depois)
+  const [busca, setBusca] = useState("");
+
+  const filtrar = (p) => {
+    const t = busca.toLowerCase();
+    return (
+      p.id.toString().includes(t) ||
+      p.nome?.toLowerCase().includes(t) ||
+      p.preco?.toString().includes(t) ||
+      p.estoque?.toString().includes(t)
+    );
+  };
+
+  const dadosFiltrados = produtos.filter(filtrar);
+  const totalPaginas = Math.ceil(dadosFiltrados.length / itensPorPagina);
+  const inicio = (paginaAtual - 1) * itensPorPagina;
+  const fim = inicio + itensPorPagina;
+
+  const exibidos = dadosFiltrados.slice(inicio, fim);
+
+  // ===============================
+  // BUSCAR LISTA
+  // ===============================
+  const fetchProdutos = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/produto/listar");
+      const inf = await response.json();
+      const lista = Array.isArray(inf.msg) ? inf.msg : [];
+      setProdutos(lista);
+    } catch {
+      toast.error("Erro ao listar produtos");
+    }
+  };
+
+  useEffect(() => {
+    fetchProdutos();
+  }, []);
+
+  // ===============================
+  // CRIAR
+  // ===============================
   const criarProduto = async (e) => {
     e.preventDefault();
     try {
@@ -34,15 +82,8 @@ export const Produtos = () => {
 
       if (response.status === 201) {
         toast.success("Produto criado com sucesso!");
-        setFormData({
-          nome: "",
-          preco: "",
-          estoque: "",
-          categoria_id: "",
-          marca_id: "",
-        });
-        fetchProdutos();
         setMostrarModal(false);
+        fetchProdutos();
       } else {
         toast.error("Erro ao criar produto");
       }
@@ -51,49 +92,14 @@ export const Produtos = () => {
     }
   };
 
-  const fetchProdutos = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/produto/listar");
-      const inf = await response.json();
-      const listaProdutos = Array.isArray(inf.msg) ? inf.msg : [];
-      setProdutos(listaProdutos);
-    } catch {
-      toast.error("Erro ao listar produtos");
-    }
-  };
-
-  useEffect(() => {
-    fetchProdutos();
-  }, []);
-
-  // Excluir
-  const excluirProduto = async (id) => {
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/produto/delete/${id}`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-
-      if (response.status === 200) {
-        toast.success("Produto deletado com sucesso!");
-        fetchProdutos();
-      } else {
-        toast.error("Erro ao deletar produto");
-      }
-    } catch {
-      toast.error("Erro ao deletar produto");
-    }
-  };
-
-  // Editar
-  const editarProduto = async (e, id) => {
+  // ===============================
+  // EDITAR
+  // ===============================
+  const editarProduto = async (e) => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `http://localhost:3000/api/produto/editar/${id}`,
+        `http://localhost:3000/api/produto/editar/${produtoId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -102,17 +108,9 @@ export const Produtos = () => {
       );
 
       if (response.status === 200) {
-        toast.success("Produto atualizado com sucesso!");
-        setFormData({
-          nome: "",
-          preco: "",
-          estoque: "",
-          categoria_id: "",
-          marca_id: "",
-        });
-        setBotao(true);
-        fetchProdutos();
+        toast.success("Produto atualizado!");
         setMostrarModal(false);
+        fetchProdutos();
       } else {
         toast.error("Erro ao atualizar produto");
       }
@@ -121,61 +119,105 @@ export const Produtos = () => {
     }
   };
 
+  // ===============================
+  // EXCLUIR
+  // ===============================
+  const deletar = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/produto/delete/${deleteId}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("Produto excluído!");
+        fetchProdutos();
+        setDeleteId(null);
+      } else {
+        toast.error("Erro ao excluir produto");
+      }
+    } catch {
+      toast.error("Erro ao excluir produto");
+    }
+  };
+
   return (
     <div className="layout">
       <Navbar />
+
       <main className="content">
         <h2>Gerenciamento de Produtos</h2>
 
-        {/* Botão principal */}
-        <button
-          className="btn-criar-novo"
-          onClick={() => {
-            setMostrarModal(true);
-            setBotao(true);
-            setFormData({
-              nome: "",
-              preco: "",
-              estoque: "",
-              categoria_id: "",
-              marca_id: "",
-            });
-          }}
-        >
-          + Criar Novo Produto
-        </button>
+        {/* AÇÕES SUPERIORES */}
+        <div className="top-actions">
+          <button
+            className="btn-criar-novo"
+            onClick={() => {
+              setIsCriar(true);
+              setFormData({
+                nome: "",
+                preco: "",
+                estoque: "",
+                categoria_id: "",
+                marca_id: "",
+              });
+              setMostrarModal(true);
+            }}
+          >
+            + Novo Produto
+          </button>
 
-        {/* Tabela */}
-        {produtos.length === 0 ? (
-          <p>Nenhum Produto encontrado.</p>
+          {/* Campo de busca */}
+          <input
+            className="campo-busca"
+            type="text"
+            placeholder="Buscar produtos..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
+        </div>
+
+        {/* TABELA */}
+        {exibidos.length === 0 ? (
+          <p>Nenhum produto encontrado.</p>
         ) : (
           <table className="user-table">
             <thead>
               <tr>
-                <th>Código</th>
-                <th>Nome</th>
-                <th>Preço</th>
-                <th>Estoque</th>
-                <th>Ações</th>
+                <td>Código</td>
+                <td>Nome</td>
+                <td>Preço</td>
+                <td>Estoque</td>
+                <td>Ações</td>
               </tr>
             </thead>
+
             <tbody>
-              {produtos.map((p) => (
+              {exibidos.map((p) => (
                 <tr key={p.id}>
                   <td>{p.id}</td>
                   <td>{p.nome}</td>
                   <td>{p.preco}</td>
                   <td>{p.estoque}</td>
                   <td>
-                    <button
-                      className="button-opcoes"
-                      onClick={() => {
-                        setProdutoSelecionado(p);
-                        setMostrarOpcoes(true);
+                    <MenuAcoes
+                      onEditar={() => {
+                        setIsCriar(false);
+                        setProdutoId(p.id);
+                        setFormData({
+                          nome: p.nome,
+                          preco: p.preco,
+                          estoque: p.estoque,
+                          categoria_id: p.categoria_id || "",
+                          marca_id: p.marca_id || "",
+                        });
+                        setMostrarModal(true);
                       }}
-                    >
-                      •••
-                    </button>
+                      onExcluir={() => setDeleteId(p.id)}
+                    />
                   </td>
                 </tr>
               ))}
@@ -183,61 +225,63 @@ export const Produtos = () => {
           </table>
         )}
 
-        {/* MODAL OPÇÕES */}
-        {mostrarOpcoes && produtoSelecionado && (
+        {/* PAGINAÇÃO */}
+        <div className="paginacao">
+          <button
+            disabled={paginaAtual === 1}
+            onClick={() => setPaginaAtual((p) => p - 1)}
+          >
+            ← Anterior
+          </button>
+          {Array.from({ length: totalPaginas }, (_, i) => (
+            <button
+              key={i + 1}
+              className={`btn-paginacao ${
+                paginaAtual === i + 1 ? "ativo" : ""
+              }`}
+              onClick={() => setPaginaAtual(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            disabled={paginaAtual === totalPaginas}
+            onClick={() => setPaginaAtual((p) => p + 1)}
+          >
+            Próxima →
+          </button>
+        </div>
+
+        {/* MODAL CONFIRMAR EXCLUSÃO */}
+        {deleteId && (
           <div className="modal-overlay">
-            <div className="modal-content modal-opcoes">
-              <div className="modal-header">
-                <h3>Opções</h3>
-                <button
-                  className="modal-close"
-                  onClick={() => setMostrarOpcoes(false)}
-                >
-                  ×
-                </button>
-              </div>
+            <div className="modal-container">
+              <h2 className="modal-header">Confirmar Exclusão</h2>
 
-              <div className="opcoes-container">
-                <button
-                  className="btn-opcao"
-                  onClick={() => {
-                    setFormData({
-                      nome: produtoSelecionado.nome,
-                      preco: produtoSelecionado.preco,
-                      estoque: produtoSelecionado.estoque,
-                      categoria_id: produtoSelecionado.categoria_id || "",
-                      marca_id: produtoSelecionado.marca_id || "",
-                    });
+              <p>Tem certeza que deseja excluir este produto?</p>
 
-                    setIdProduto(produtoSelecionado.id);
-                    setBotao(false);
-                    setMostrarOpcoes(false);
-                    setMostrarModal(true);
-                  }}
+              <div className="modal-footer">
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setDeleteId(null)}
                 >
-                  ✏ Editar
+                  Cancelar
                 </button>
 
-                <button
-                  className="btn-opcao btn-excluir"
-                  onClick={() => {
-                    excluirProduto(produtoSelecionado.id);
-                    setMostrarOpcoes(false);
-                  }}
-                >
-                  🗑 Excluir
+                <button className="btn btn-danger" onClick={deletar}>
+                  Excluir
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* MODAL CRIAÇÃO/EDIÇÃO */}
+        {/* MODAL FORM */}
         {mostrarModal && (
           <div className="modal-overlay">
             <div className="modal-content">
               <div className="modal-header">
-                <h3>{botao ? "Novo Produto" : "Editar Produto"}</h3>
+                <h3>{isCriar ? "Novo Produto" : "Editar Produto"}</h3>
                 <button
                   className="modal-close"
                   onClick={() => setMostrarModal(false)}
@@ -248,9 +292,7 @@ export const Produtos = () => {
 
               <form
                 className="produto-form"
-                onSubmit={
-                  botao ? criarProduto : (e) => editarProduto(e, IdProduto)
-                }
+                onSubmit={isCriar ? criarProduto : editarProduto}
               >
                 <label>Nome</label>
                 <input
@@ -288,7 +330,10 @@ export const Produtos = () => {
                   type="text"
                   value={formData.categoria_id}
                   onChange={(e) =>
-                    setFormData({ ...formData, categoria_id: e.target.value })
+                    setFormData({
+                      ...formData,
+                      categoria_id: e.target.value,
+                    })
                   }
                 />
 
@@ -303,8 +348,9 @@ export const Produtos = () => {
 
                 <div className="botoes-form">
                   <button type="submit">
-                    {botao ? "Salvar Produto" : "Salvar Alterações"}
+                    {isCriar ? "Salvar Produto" : "Salvar Alterações"}
                   </button>
+
                   <button
                     type="button"
                     className="btn-cancelar"
