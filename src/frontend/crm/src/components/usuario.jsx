@@ -3,7 +3,7 @@ import "./css/usuario.css";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { Navbar } from "./navbar";
-import MenuAcoes from "./menuAcoes";
+import MenuAcoesSemPdf from "./menuAcoesSemPdf.jsx";
 
 export const Usuarios = () => {
   const { id } = useParams();
@@ -293,7 +293,7 @@ export const Usuarios = () => {
                   <th>{u.telefone ? formatPhone(u.telefone) : "-"}</th>
                   <th>{u.Permissao}</th>
                   <th>
-                    <MenuAcoes
+                    <MenuAcoesSemPdf
                       onEditar={() => {
                         setFormData({
                           nome: u.nome,

@@ -93,7 +93,7 @@ body {
   max-height: 90vh; /* 🔹 impede que o modal ultrapasse a tela */
   overflow-y: auto; /* 🔹 ativa rolagem vertical */
   border-radius: 12px;
-  padding: 1.8rem;
+  padding: 60px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   animation: modalFade 0.25s ease-in-out;
 }

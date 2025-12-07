@@ -248,7 +248,6 @@ export const ListarManutencoes = () => {
                 <tr>
                   <th>ID</th>
                   <th>Equipamento</th>
-                  <th>Cliente</th>
                   <th>Execução</th>
                   <th>Tipo</th>
                   <th>Status</th>
@@ -262,12 +261,11 @@ export const ListarManutencoes = () => {
                   <tr key={m.id}>
                     <td>{m.id}</td>
                     <td>{m.maquina}</td>
-                    <td>{formatarData(m.data_solicitacao)}</td>
                     <td>{formatarData(m.data_execucao)}</td>
                     <td>{m.tipo_manutencao}</td>
 
                     <td>
-                      <span className={m.status}>{m.Status}</span>
+                      <span className={m.status}>{m.Status.toUpperCase()}</span>
                     </td>
 
                     <td>{m.nome}</td>

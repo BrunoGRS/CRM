@@ -71,7 +71,7 @@ async function listarGeralManutencao(req, res) {
         m.data_execucao
       FROM manutencoes m
       INNER JOIN produto p ON p.id = m.equipamento_id
-      inner join usuario u on u.id = m.responsavel_id
+      INNER JOIN usuario u on u.id = m.responsavel_id
       ORDER BY m.id DESC;
     `);
 

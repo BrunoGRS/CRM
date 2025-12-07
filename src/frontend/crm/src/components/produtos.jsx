@@ -3,7 +3,7 @@ import "./css/usuario.css";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { Navbar } from "./navbar";
-import MenuAcoes from "./menuAcoes.jsx";
+import MenuAcoesSemPDF from "./menuAcoesSemPdf.jsx";
 
 export const Produtos = () => {
   const { id } = useParams();
@@ -203,7 +203,7 @@ export const Produtos = () => {
                   <td>{p.preco}</td>
                   <td>{p.estoque}</td>
                   <td>
-                    <MenuAcoes
+                    <MenuAcoesSemPDF
                       onEditar={() => {
                         setIsCriar(false);
                         setProdutoId(p.id);
@@ -231,7 +231,7 @@ export const Produtos = () => {
             disabled={paginaAtual === 1}
             onClick={() => setPaginaAtual((p) => p - 1)}
           >
-            ← Anterior
+            Anterior
           </button>
           {Array.from({ length: totalPaginas }, (_, i) => (
             <button
@@ -248,7 +248,7 @@ export const Produtos = () => {
             disabled={paginaAtual === totalPaginas}
             onClick={() => setPaginaAtual((p) => p + 1)}
           >
-            Próxima →
+            Próxima
           </button>
         </div>
 
@@ -323,27 +323,6 @@ export const Produtos = () => {
                     setFormData({ ...formData, estoque: e.target.value })
                   }
                   required
-                />
-
-                <label>Categoria</label>
-                <input
-                  type="text"
-                  value={formData.categoria_id}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      categoria_id: e.target.value,
-                    })
-                  }
-                />
-
-                <label>Marca</label>
-                <input
-                  type="text"
-                  value={formData.marca_id}
-                  onChange={(e) =>
-                    setFormData({ ...formData, marca_id: e.target.value })
-                  }
                 />
 
                 <div className="botoes-form">

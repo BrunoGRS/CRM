@@ -213,7 +213,7 @@ export const ListarContratos = () => {
                     <td>{c.tipo_contrato}</td>
                     <td>{c.inicio}</td>
                     <td>R$ {Number(c.valor_total)}</td>
-                    <td>{c.status || "-"}</td>
+                    <td>{c.status.toUpperCase() || "-"}</td>
 
                     <td>
                       <MenuAcoes

@@ -211,12 +211,12 @@ const ListaAlocacoes = () => {
                 <td>{item.cliente}</td>
                 <td>{item.data_inicio}</td>
                 <td>{item.data_fim || "-"}</td>
-                <td>{item.status}</td>
+                <td>{item.status.toUpperCase()}</td>
                 <td>
                   <MenuAcoes
                     onEditar={() => navigate(`/alocacao/editar/${item.id}`)}
                     onExcluir={() => setDeleteId(item.id)}
-                    onPDF={() => gerarPDF(item.id)}
+                    onPDF={() => gerarPDF(item)}
                   />
                 </td>
               </tr>
