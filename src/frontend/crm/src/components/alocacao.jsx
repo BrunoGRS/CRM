@@ -15,9 +15,6 @@ const ListaAlocacoes = () => {
   const [paginaAtual, setPaginaAtual] = useState(1);
   const itensPorPagina = 10;
 
-  // =========================
-  // CARREGAR ALOCAÇÕES
-  // =========================
   const carregarAlocacoes = async () => {
     try {
       const response = await fetch("http://localhost:3000/api/alocacao/listar");
@@ -32,14 +29,10 @@ const ListaAlocacoes = () => {
     carregarAlocacoes();
   }, []);
 
-  // RESETAR PÁGINA AO BUSCAR
   useEffect(() => {
     setPaginaAtual(1);
   }, [busca]);
 
-  // =========================
-  // FILTRO
-  // =========================
   const filtrar = (item) => {
     const texto = busca.toLowerCase();
     return (
@@ -52,17 +45,11 @@ const ListaAlocacoes = () => {
 
   const listaFiltrada = alocacoes.filter(filtrar);
 
-  // =========================
-  // PAGINAÇÃO
-  // =========================
   const indexUltimo = paginaAtual * itensPorPagina;
   const indexPrimeiro = indexUltimo - itensPorPagina;
   const listaAtual = listaFiltrada.slice(indexPrimeiro, indexUltimo);
   const totalPaginas = Math.ceil(listaFiltrada.length / itensPorPagina);
 
-  // =========================
-  // GERAR PDF
-  // =========================
   const gerarPDF = (aloc) => {
     const doc = new jsPDF();
 
@@ -101,9 +88,6 @@ const ListaAlocacoes = () => {
     doc.save(`alocacao_${aloc.id}.pdf`);
   };
 
-  // =========================
-  // EXCLUIR
-  // =========================
   const deletar = async () => {
     try {
       await fetch(`http://localhost:3000/api/alocacao/delete/${deleteId}`, {
@@ -117,9 +101,6 @@ const ListaAlocacoes = () => {
     }
   };
 
-  // =========================
-  // EXPORTAR CSV
-  // =========================
   const exportarCSV = () => {
     if (!alocacoes.length) {
       alert("Nenhuma alocação encontrada para exportar.");
@@ -166,7 +147,6 @@ const ListaAlocacoes = () => {
       <main className="content">
         <h1 className="titulo">Lista de Alocações</h1>
 
-        {/* ✅ TOPO PADRÃO MANUTENÇÕES */}
         <div className="top-actions">
           <div>
             <button
@@ -180,15 +160,15 @@ const ListaAlocacoes = () => {
               📄 Exportar CSV
             </button>
           </div>
-
-          <input
-            type="text"
-            className="campo-busca"
-            placeholder="Buscar por código, cliente, máquina..."
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-          />
         </div>
+
+        <input
+          type="text"
+          className="campo-busca"
+          placeholder="Buscar por código, cliente, máquina..."
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+        />
 
         <table className="tabela">
           <thead>
@@ -225,7 +205,6 @@ const ListaAlocacoes = () => {
           </tbody>
         </table>
 
-        {/* ✅ PAGINAÇÃO PADRÃO */}
         <div className="paginacao-container">
           <button
             onClick={() => setPaginaAtual(paginaAtual - 1)}
@@ -257,7 +236,6 @@ const ListaAlocacoes = () => {
         </div>
       </main>
 
-      {/* ✅ MODAL DE CONFIRMAÇÃO */}
       {deleteId && (
         <div className="modal-overlay">
           <div className="modal-container">

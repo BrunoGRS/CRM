@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import "./css/usuario.css";
 import { toast } from "react-toastify";
-import { useParams } from "react-router-dom";
 import { Navbar } from "./navbar";
 import MenuAcoesSemPdf from "./menuAcoesSemPdf.jsx";
 
 export const Usuarios = () => {
-  const { id } = useParams();
   const [users, setUsers] = useState([]);
+  const [busca, setBusca] = useState("");
+
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const [itensPorPagina] = useState(10);
+
   const [formData, setFormData] = useState({
     nome: "",
     usuario: "",
@@ -16,36 +19,69 @@ export const Usuarios = () => {
     telefone: "",
     IdPermissao: "",
   });
+
   const [botao, setBotao] = useState(true);
   const [IdUser, setIdUser] = useState("");
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [value, setValue] = useState("");
 
   const onlyNumbers = (value) => value.replace(/\D/g, "");
 
-  // Máscara simples de telefone (aceita formatos 8 e 9 dígitos)
   const formatPhone = (value) => {
-    const digits = onlyNumbers(value);
+    const digits = onlyNumbers(value || "");
 
     if (digits.length <= 10) {
-      // (99) 9999-9999
       return digits
         .replace(/^(\d{2})(\d)/, "($1) $2")
         .replace(/(\d{4})(\d)/, "$1-$2");
     } else {
-      // (99) 99999-9999
       return digits
         .replace(/^(\d{2})(\d)/, "($1) $2")
         .replace(/(\d{5})(\d)/, "$1-$2");
     }
   };
 
+  const fetchUsuarios = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/usuario/listar");
+      const inf = await response.json();
+      const listaUsuarios = Array.isArray(inf.msg) ? inf.msg : [];
+      setUsers(listaUsuarios);
+    } catch {
+      toast.error("Erro ao listar usuários");
+    }
+  };
+
+  useEffect(() => {
+    fetchUsuarios();
+  }, []);
+
+  useEffect(() => {
+    setPaginaAtual(1);
+  }, [busca]);
+
+  const listaFiltrada = users.filter((u) => {
+    const txt = busca.toLowerCase();
+    return (
+      String(u.id).includes(txt) ||
+      (u.nome || "").toLowerCase().includes(txt) ||
+      (u.usuario || "").toLowerCase().includes(txt) ||
+      (u.email || "").toLowerCase().includes(txt) ||
+      (u.Permissao || "").toLowerCase().includes(txt)
+    );
+  });
+
+  const indexUltimo = paginaAtual * itensPorPagina;
+  const indexPrimeiro = indexUltimo - itensPorPagina;
+  const listaAtual = listaFiltrada.slice(indexPrimeiro, indexUltimo);
+  const totalPaginas = Math.ceil(listaFiltrada.length / itensPorPagina);
+
   const criarUsuario = async (e) => {
     e.preventDefault();
+
     try {
       const payload = {
         ...formData,
-        telefone: onlyNumbers(formData.telefone), // envia só números
+        telefone: onlyNumbers(formData.telefone),
       };
 
       const response = await fetch("http://localhost:3000/api/usuario/criar", {
@@ -66,6 +102,7 @@ export const Usuarios = () => {
         });
         fetchUsuarios();
         setMostrarFormulario(false);
+        toast.success("Usuário criado com sucesso!");
       } else {
         toast.error("Erro ao criar usuário");
       }
@@ -74,29 +111,11 @@ export const Usuarios = () => {
     }
   };
 
-  const fetchUsuarios = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/usuario/listar");
-      const inf = await response.json();
-      const listaUsuarios = Array.isArray(inf.msg) ? inf.msg : [];
-      setUsers(listaUsuarios);
-    } catch {
-      toast.error("Erro ao listar usuários");
-    }
-  };
-
-  useEffect(() => {
-    fetchUsuarios();
-  }, []);
-
   const excluirUsuario = async (id) => {
     try {
       const response = await fetch(
         `http://localhost:3000/api/usuario/delete/${id}`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        }
+        { method: "DELETE" }
       );
 
       if (response.status === 200) {
@@ -110,8 +129,9 @@ export const Usuarios = () => {
     }
   };
 
-  const editarUsuario = async (e, id) => {
+  const editarUsuario = async (e) => {
     e.preventDefault();
+
     try {
       const payload = {
         ...formData,
@@ -119,7 +139,7 @@ export const Usuarios = () => {
       };
 
       const response = await fetch(
-        `http://localhost:3000/api/usuario/editar/${id}`,
+        `http://localhost:3000/api/usuario/editar/${IdUser}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -151,26 +171,37 @@ export const Usuarios = () => {
   return (
     <div className="layout">
       <Navbar />
+
       <main className="content">
         <h2>Gerenciamento de Usuários</h2>
+
         {!mostrarFormulario && (
-          <button
-            className="btn-criar-novo"
-            onClick={() => {
-              setMostrarFormulario(true);
-              setBotao(true);
-              setFormData({
-                nome: "",
-                usuario: "",
-                email: "",
-                senha: "",
-                telefone: "",
-                IdPermissao: "",
-              });
-            }}
-          >
-            + Criar Novo Usuário
-          </button>
+          <>
+            <button
+              className="btn-criar-novo"
+              onClick={() => {
+                setMostrarFormulario(true);
+                setBotao(true);
+                setFormData({
+                  nome: "",
+                  usuario: "",
+                  email: "",
+                  senha: "",
+                  telefone: "",
+                  IdPermissao: "",
+                });
+              }}
+            >
+              + Criar Novo Usuário
+            </button>
+            <input
+              type="text"
+              className="input-busca"
+              placeholder="Buscar por código, nome, usuário, email ou permissão..."
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+            />
+          </>
         )}
 
         {mostrarFormulario && (
@@ -180,9 +211,7 @@ export const Usuarios = () => {
 
               <form
                 className="produto-form"
-                onSubmit={
-                  botao ? criarUsuario : (e) => editarUsuario(e, IdUser)
-                }
+                onSubmit={botao ? criarUsuario : editarUsuario}
               >
                 <input
                   type="text"
@@ -254,6 +283,7 @@ export const Usuarios = () => {
                   <button type="submit">
                     {botao ? "Criar Usuário" : "Salvar Alterações"}
                   </button>
+
                   <button
                     type="button"
                     className="btn-cancelar"
@@ -267,53 +297,85 @@ export const Usuarios = () => {
           </div>
         )}
 
-        {/* Lista de usuários */}
-        {users.length === 0 ? (
+        {listaFiltrada.length === 0 ? (
           <p>Nenhum usuário encontrado.</p>
         ) : (
-          <table className="user-table">
-            <thead>
-              <tr>
-                <th>Código</th>
-                <th>Nome</th>
-                <th>Usuário</th>
-                <th>Email</th>
-                <th>Telefone</th>
-                <th>Permissão</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((u) => (
-                <tr key={u.id}>
-                  <th>{u.id}</th>
-                  <th>{u.nome}</th>
-                  <th>{u.usuario}</th>
-                  <th>{u.email}</th>
-                  <th>{u.telefone ? formatPhone(u.telefone) : "-"}</th>
-                  <th>{u.Permissao}</th>
-                  <th>
-                    <MenuAcoesSemPdf
-                      onEditar={() => {
-                        setFormData({
-                          nome: u.nome,
-                          usuario: u.usuario,
-                          email: u.email,
-                          senha: u.senha || null,
-                          telefone: u.telefone || null,
-                          IdPermissao: u.Permissao,
-                        });
-                        setBotao(false);
-                        setIdUser(u.id);
-                        setMostrarFormulario(true);
-                      }}
-                      onExcluir={() => excluirUsuario(u.id)}
-                    />
-                  </th>
+          <>
+            <table className="user-table">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Nome</th>
+                  <th>Usuário</th>
+                  <th>Email</th>
+                  <th>Telefone</th>
+                  <th>Permissão</th>
+                  <th>Ações</th>
                 </tr>
+              </thead>
+
+              <tbody>
+                {listaAtual.map((u) => (
+                  <tr key={u.id}>
+                    <td>{u.id}</td>
+                    <td>{u.nome}</td>
+                    <td>{u.usuario}</td>
+                    <td>{u.email}</td>
+                    <td>{u.telefone ? formatPhone(u.telefone) : "-"}</td>
+                    <td>{u.Permissao}</td>
+                    <td>
+                      <MenuAcoesSemPdf
+                        onEditar={() => {
+                          setFormData({
+                            nome: u.nome,
+                            usuario: u.usuario,
+                            email: u.email,
+                            senha: u.senha,
+                            telefone: u.telefone || "",
+                            IdPermissao: u.Permissao,
+                          });
+                          setBotao(false);
+                          setIdUser(u.id);
+                          setMostrarFormulario(true);
+                        }}
+                        onExcluir={() => excluirUsuario(u.id)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="paginacao-container">
+              <button
+                onClick={() => setPaginaAtual(paginaAtual - 1)}
+                disabled={paginaAtual === 1}
+                className="btn-paginacao"
+              >
+                Anterior
+              </button>
+
+              {Array.from({ length: totalPaginas }, (_, i) => (
+                <button
+                  key={i + 1}
+                  className={`btn-paginacao ${
+                    paginaAtual === i + 1 ? "ativo" : ""
+                  }`}
+                  onClick={() => setPaginaAtual(i + 1)}
+                >
+                  {i + 1}
+                </button>
               ))}
-            </tbody>
-          </table>
+
+              <button
+                onClick={() => setPaginaAtual(paginaAtual + 1)}
+                disabled={paginaAtual === totalPaginas}
+                className="btn-paginacao"
+              >
+                Próximo
+              </button>
+            </div>
+          </>
         )}
       </main>
     </div>

@@ -25,9 +25,6 @@ body {
   padding: 0;
 }
 
-/* ============================================
-   📌 ÁREA PRINCIPAL
-   ============================================ */
 .main-content .content {
   padding: 2rem;
   width: 100%;
@@ -36,9 +33,6 @@ body {
   flex-direction: column;
 }
 
-/* ============================================
-   🏷 TÍTULO
-   ============================================ */
 .content h2 {
   font-size: 1.7rem;
   font-weight: 600;
@@ -47,9 +41,6 @@ body {
   margin-left: 50px;
 }
 
-/* ============================================
-   ➕ BOTÃO CRIAR NOVO — PADRÃO DE VENDAS
-   ============================================ */
 .btn-criar-novo {
   padding: 10px 20px;
   font-size: 1rem;
@@ -70,9 +61,6 @@ body {
   transform: scale(1.03);
 }
 
-/* ============================================
-   🪟 MODAL
-   ============================================ */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -131,9 +119,6 @@ body {
   color: var(--danger);
 }
 
-/* ============================================
-   📝 FORMULÁRIO
-   ============================================ */
 .produto-form {
   display: flex;
   flex-direction: column;
@@ -158,9 +143,6 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(93, 58, 34, 0.25);
 }
 
-/* ============================================
-   🧭 BOTÕES DO FORMULÁRIO
-   ============================================ */
 .botoes-form {
   display: flex;
   justify-content: flex-end;
@@ -196,9 +178,6 @@ select:focus {
   background: #ccc;
 }
 
-/* ============================================
-   📊 TABELA — MESMO VISUAL DA TELA DE VENDAS
-   ============================================ */
 .user-table {
   width: 90%;
   margin: 0 auto;

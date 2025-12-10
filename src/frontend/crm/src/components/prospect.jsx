@@ -284,7 +284,6 @@ export const Prospect = () => {
           📄 Exportar CSV
         </button>
 
-        {/* Modal */}
         {mostrarFormulario && (
           <div className="modal-overlay">
             <div className="modal-content">

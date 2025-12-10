@@ -4,10 +4,29 @@ import logo from "../assets/mini-logo.jpg";
 
 export function Navbar() {
   const navigate = useNavigate();
+  const codigoPermissao = localStorage.getItem("codigoPermissao");
 
   const logout = () => {
-    localStorage.removeItem("auth"); // remove sessão
-    navigate("/"); // volta para login
+    localStorage.clear();
+    navigate("/");
+  };
+
+  const mapaPermissoes = {
+    1: [
+      "home",
+      "usuarios",
+      "prospect",
+      "produtos",
+      "contrato",
+      "alocacao",
+      "manutencao",
+    ], // Admin
+    3: ["home", "manutencao"], // Manutenção
+    2: ["home", "contrato"], // Contrato
+  };
+
+  const temPermissao = (rota) => {
+    return mapaPermissoes[codigoPermissao]?.includes(rota);
   };
 
   return (
@@ -20,31 +39,50 @@ export function Navbar() {
 
       <nav>
         <ul className="nav-links">
-          <li>
-            <Link to="/home">Inicio</Link>
-          </li>
-          <li>
-            <Link to="/usuarios">Usuarios</Link>
-          </li>
-          <li>
-            <Link to="/prospect">Prospect</Link>
-          </li>
-          <li>
-            <Link to="/produtos">Produtos</Link>
-          </li>
-          <li>
-            <Link to="/contrato">Contratos</Link>
-          </li>
-          <li>
-            <Link to="/alocacao">Alocações</Link>
-          </li>
-          <li>
-            <Link to="/manutencao">Manutenções</Link>
-          </li>
+          {temPermissao("home") && (
+            <li>
+              <Link to="/home">Inicio</Link>
+            </li>
+          )}
+
+          {temPermissao("usuarios") && (
+            <li>
+              <Link to="/usuarios">Usuarios</Link>
+            </li>
+          )}
+
+          {temPermissao("prospect") && (
+            <li>
+              <Link to="/prospect">Prospect</Link>
+            </li>
+          )}
+
+          {temPermissao("produtos") && (
+            <li>
+              <Link to="/produtos">Produtos</Link>
+            </li>
+          )}
+
+          {temPermissao("contrato") && (
+            <li>
+              <Link to="/contrato">Contratos</Link>
+            </li>
+          )}
+
+          {temPermissao("alocacao") && (
+            <li>
+              <Link to="/alocacao">Alocações</Link>
+            </li>
+          )}
+
+          {temPermissao("manutencao") && (
+            <li>
+              <Link to="/manutencao">Manutenções</Link>
+            </li>
+          )}
         </ul>
       </nav>
 
-      {/* 🔹 Botão de Logout */}
       <button className="btn-logout" onClick={logout}>
         Sair
       </button>

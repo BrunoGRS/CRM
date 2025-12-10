@@ -47,12 +47,13 @@ export const ListarManutencoes = () => {
 
       const dados = [
         ["Equipamento", m.maquina || "-"],
-        ["Cliente", m.cliente || "-"],
         ["Tipo de Manutenção", m.tipo_manutencao || "-"],
-        ["Status", m.status || "-"],
+        ["Status", m.Status || "-"],
         ["Técnico", m.nome || "-"],
         ["Data Solicitação", formatarData(m.data_solicitacao)],
         ["Data Execução", formatarData(m.data_execucao)],
+        ["Observações", m.observacoes || "-"],
+        ["Descrição", m.descricao || "-"],
       ];
 
       // Tabela de dados

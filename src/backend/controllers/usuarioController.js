@@ -105,29 +105,38 @@ async function deleteUser(req, res) {
 
 async function validarUser(req, res) {
   try {
-    let info = [];
+    const { usuario, senha } = req.body;
 
-    const user = {
-      usuario: req.body.usuario,
-      senha: req.body.senha,
-    };
-
-    info = await db.query(
-      `SELECT usuario, senha FROM usuario WHERE usuario = ? AND senha = ? and IdPermissao = 1`,
+    const info = await db.query(
+      `
+      SELECT 
+        u.usuario, 
+        u.IdPermissao AS Codigo,
+        u.senha,
+        p.Nome AS Permissao
+      FROM usuario u
+      LEFT JOIN permissao p ON p.id = u.IdPermissao
+      WHERE u.usuario = ? AND u.senha = ?
+      `,
       {
-        replacements: [user.usuario, user.senha],
+        replacements: [usuario, senha],
         type: Sequelize.QueryTypes.SELECT,
       }
     );
 
     if (info.length > 0) {
-      res.status(200).send({ msg: true });
+      res.status(200).send({
+        msg: true,
+        usuario: info[0].usuario,
+        codigoPermissao: info[0].Codigo,
+        nomePermissao: info[0].Permissao,
+      });
     } else {
       res.status(404).send({ msg: false });
     }
   } catch (error) {
-    res.status(500).send({ msg: `Erro: ${error}` });
     console.log(error);
+    res.status(500).send({ msg: `Erro: ${error}` });
   }
 }
 

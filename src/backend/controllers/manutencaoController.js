@@ -68,7 +68,10 @@ async function listarGeralManutencao(req, res) {
         m.custo_total,
         u.nome,
         m.status as Status,
-        m.data_execucao
+        m.data_execucao,
+        m.data_solicitacao,
+        m.descricao,
+        m.observacoes
       FROM manutencoes m
       INNER JOIN produto p ON p.id = m.equipamento_id
       INNER JOIN usuario u on u.id = m.responsavel_id

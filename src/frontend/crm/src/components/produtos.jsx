@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "./css/usuario.css";
 import { toast } from "react-toastify";
-import { useParams } from "react-router-dom";
 import { Navbar } from "./navbar";
 import MenuAcoesSemPDF from "./menuAcoesSemPdf.jsx";
 
 export const Produtos = () => {
-  const { id } = useParams();
   const [produtos, setProdutos] = useState([]);
+  const [busca, setBusca] = useState("");
+
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const [itensPorPagina] = useState(10);
 
   const [formData, setFormData] = useState({
     nome: "",
@@ -19,37 +21,14 @@ export const Produtos = () => {
 
   const [isCriar, setIsCriar] = useState(true);
   const [produtoId, setProdutoId] = useState("");
-
   const [mostrarModal, setMostrarModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-
-  const [paginaAtual, setPaginaAtual] = useState(1);
-  const itensPorPagina = 10;
-
-  const [busca, setBusca] = useState("");
-
-  const filtrar = (p) => {
-    const t = busca.toLowerCase();
-    return (
-      p.id.toString().includes(t) ||
-      p.nome?.toLowerCase().includes(t) ||
-      p.preco?.toString().includes(t) ||
-      p.estoque?.toString().includes(t)
-    );
-  };
-
-  const dadosFiltrados = produtos.filter(filtrar);
-  const totalPaginas = Math.ceil(dadosFiltrados.length / itensPorPagina);
-  const inicio = (paginaAtual - 1) * itensPorPagina;
-  const fim = inicio + itensPorPagina;
-
-  const exibidos = dadosFiltrados.slice(inicio, fim);
 
   const fetchProdutos = async () => {
     try {
       const response = await fetch("http://localhost:3000/api/produto/listar");
-      const inf = await response.json();
-      const lista = Array.isArray(inf.msg) ? inf.msg : [];
+      const data = await response.json();
+      const lista = Array.isArray(data.msg) ? data.msg : [];
       setProdutos(lista);
     } catch {
       toast.error("Erro ao listar produtos");
@@ -60,8 +39,34 @@ export const Produtos = () => {
     fetchProdutos();
   }, []);
 
+  useEffect(() => {
+    setPaginaAtual(1);
+  }, [busca]);
+
+  // ===============================
+  // FILTRO
+  // ===============================
+  const listaFiltrada = produtos.filter((p) => {
+    const txt = busca.toLowerCase();
+    return (
+      String(p.id).includes(txt) ||
+      (p.nome || "").toLowerCase().includes(txt) ||
+      String(p.preco || "").includes(txt) ||
+      String(p.estoque || "").includes(txt)
+    );
+  });
+
+  // ===============================
+  // PAGINAÇÃO (IGUAL MANUTENÇÕES)
+  // ===============================
+  const indexUltimo = paginaAtual * itensPorPagina;
+  const indexPrimeiro = indexUltimo - itensPorPagina;
+  const listaAtual = listaFiltrada.slice(indexPrimeiro, indexUltimo);
+  const totalPaginas = Math.ceil(listaFiltrada.length / itensPorPagina);
+
   const criarProduto = async (e) => {
     e.preventDefault();
+
     try {
       const response = await fetch("http://localhost:3000/api/produto/criar", {
         method: "POST",
@@ -83,6 +88,7 @@ export const Produtos = () => {
 
   const editarProduto = async (e) => {
     e.preventDefault();
+
     try {
       const response = await fetch(
         `http://localhost:3000/api/produto/editar/${produtoId}`,
@@ -109,10 +115,7 @@ export const Produtos = () => {
     try {
       const response = await fetch(
         `http://localhost:3000/api/produto/delete/${deleteId}`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        }
+        { method: "DELETE" }
       );
 
       if (response.status === 200) {
@@ -151,88 +154,84 @@ export const Produtos = () => {
           >
             + Novo Produto
           </button>
-
-          <input
-            className="campo-busca"
-            type="text"
-            placeholder="Buscar produtos..."
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-          />
         </div>
 
-        {exibidos.length === 0 ? (
+        {listaFiltrada.length === 0 ? (
           <p>Nenhum produto encontrado.</p>
         ) : (
-          <table className="user-table">
-            <thead>
-              <tr>
-                <td>Código</td>
-                <td>Nome</td>
-                <td>Preço</td>
-                <td>Estoque</td>
-                <td>Ações</td>
-              </tr>
-            </thead>
-
-            <tbody>
-              {exibidos.map((p) => (
-                <tr key={p.id}>
-                  <td>{p.id}</td>
-                  <td>{p.nome}</td>
-                  <td>{p.preco}</td>
-                  <td>{p.estoque}</td>
-                  <td>
-                    <MenuAcoesSemPDF
-                      onEditar={() => {
-                        setIsCriar(false);
-                        setProdutoId(p.id);
-                        setFormData({
-                          nome: p.nome,
-                          preco: p.preco,
-                          estoque: p.estoque,
-                          categoria_id: p.categoria_id || "",
-                          marca_id: p.marca_id || "",
-                        });
-                        setMostrarModal(true);
-                      }}
-                      onExcluir={() => setDeleteId(p.id)}
-                    />
-                  </td>
+          <>
+            <table className="user-table">
+              <thead>
+                <tr>
+                  <td>Código</td>
+                  <td>Nome</td>
+                  <td>Preço</td>
+                  <td>Estoque</td>
+                  <td>Ações</td>
                 </tr>
+              </thead>
+
+              <tbody>
+                {listaAtual.map((p) => (
+                  <tr key={p.id}>
+                    <td>{p.id}</td>
+                    <td>{p.nome}</td>
+                    <td>{p.preco}</td>
+                    <td>{p.estoque}</td>
+                    <td>
+                      <MenuAcoesSemPDF
+                        onEditar={() => {
+                          setIsCriar(false);
+                          setProdutoId(p.id);
+                          setFormData({
+                            nome: p.nome,
+                            preco: p.preco,
+                            estoque: p.estoque,
+                            categoria_id: p.categoria_id || "",
+                            marca_id: p.marca_id || "",
+                          });
+                          setMostrarModal(true);
+                        }}
+                        onExcluir={() => setDeleteId(p.id)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="paginacao-container">
+              <button
+                onClick={() => setPaginaAtual(paginaAtual - 1)}
+                disabled={paginaAtual === 1}
+                className="btn-paginacao"
+              >
+                Anterior
+              </button>
+
+              {Array.from({ length: totalPaginas }, (_, i) => (
+                <button
+                  key={i + 1}
+                  className={`btn-paginacao ${
+                    paginaAtual === i + 1 ? "ativo" : ""
+                  }`}
+                  onClick={() => setPaginaAtual(i + 1)}
+                >
+                  {i + 1}
+                </button>
               ))}
-            </tbody>
-          </table>
+
+              <button
+                onClick={() => setPaginaAtual(paginaAtual + 1)}
+                disabled={paginaAtual === totalPaginas}
+                className="btn-paginacao"
+              >
+                Próximo
+              </button>
+            </div>
+          </>
         )}
 
-        {/* PAGINAÇÃO */}
-        <div className="paginacao">
-          <button
-            disabled={paginaAtual === 1}
-            onClick={() => setPaginaAtual((p) => p - 1)}
-          >
-            Anterior
-          </button>
-          {Array.from({ length: totalPaginas }, (_, i) => (
-            <button
-              key={i + 1}
-              className={`btn-paginacao ${
-                paginaAtual === i + 1 ? "ativo" : ""
-              }`}
-              onClick={() => setPaginaAtual(i + 1)}
-            >
-              {i + 1}
-            </button>
-          ))}
-          <button
-            disabled={paginaAtual === totalPaginas}
-            onClick={() => setPaginaAtual((p) => p + 1)}
-          >
-            Próxima
-          </button>
-        </div>
-
-        {/* MODAL CONFIRMAR EXCLUSÃO */}
         {deleteId && (
           <div className="modal-overlay">
             <div className="modal-container">
@@ -256,7 +255,6 @@ export const Produtos = () => {
           </div>
         )}
 
-        {/* MODAL FORM */}
         {mostrarModal && (
           <div className="modal-overlay">
             <div className="modal-content">

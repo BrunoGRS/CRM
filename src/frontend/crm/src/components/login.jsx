@@ -21,20 +21,35 @@ export const Login = () => {
           body: JSON.stringify({ usuario, senha }),
         }
       );
-      return response.status;
+
+      const data = await response.json();
+      return { status: response.status, data };
     } catch (error) {
       console.error(error);
-      return null;
+      return { status: null, data: null };
     }
   };
 
   const login = async (e) => {
     e.preventDefault();
-    const status = await validarUsuario();
 
-    if (status === 200) {
-      localStorage.setItem("auth", "true"); // ← salva login
-      navigate("/home");
+    const { status, data } = await validarUsuario();
+
+    if (status === 200 && data?.msg === true) {
+      localStorage.setItem("auth", "true");
+      localStorage.setItem("usuario", data.usuario);
+      localStorage.setItem("codigoPermissao", data.codigoPermissao);
+      localStorage.setItem("nomePermissao", data.nomePermissao);
+
+      if (data.codigoPermissao === 1) {
+        navigate("/home");
+      } else if (data.codigoPermissao === 3) {
+        navigate("/manutencao");
+      } else if (data.codigoPermissao === 2) {
+        navigate("/contrato");
+      } else {
+        navigate("/home"); // fallback
+      }
     } else {
       toast.error("Usuário ou Senha Inválidos.");
     }
@@ -45,7 +60,9 @@ export const Login = () => {
       <div className="container-login">
         <h3>Entrar na sua conta</h3>
         <p>Digite suas credenciais para acessar</p>
+
         <form onSubmit={login}>
+          {/* USUÁRIO */}
           <label className="form-label">Usuário</label>
           <input
             type="text"
@@ -56,6 +73,7 @@ export const Login = () => {
             required
           />
 
+          {/* SENHA */}
           <label className="form-label">Senha</label>
           <div className="senha-container">
             <input
@@ -77,12 +95,9 @@ export const Login = () => {
           <button type="submit" className="btn btn-login">
             Entrar
           </button>
-
-          <div className="box-esqueceu">
-            <a href="#">Esqueceu a Senha?</a>
-          </div>
         </form>
       </div>
+
       <ToastContainer />
     </div>
   );
