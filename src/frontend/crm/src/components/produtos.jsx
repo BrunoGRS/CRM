@@ -20,17 +20,12 @@ export const Produtos = () => {
   const [isCriar, setIsCriar] = useState(true);
   const [produtoId, setProdutoId] = useState("");
 
-  // MODAIS
   const [mostrarModal, setMostrarModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
-  // ==========================
-  // PAGINAÇÃO
-  // ==========================
   const [paginaAtual, setPaginaAtual] = useState(1);
   const itensPorPagina = 10;
 
-  // Busca (se quiser adicionar depois)
   const [busca, setBusca] = useState("");
 
   const filtrar = (p) => {
@@ -50,9 +45,6 @@ export const Produtos = () => {
 
   const exibidos = dadosFiltrados.slice(inicio, fim);
 
-  // ===============================
-  // BUSCAR LISTA
-  // ===============================
   const fetchProdutos = async () => {
     try {
       const response = await fetch("http://localhost:3000/api/produto/listar");
@@ -68,9 +60,6 @@ export const Produtos = () => {
     fetchProdutos();
   }, []);
 
-  // ===============================
-  // CRIAR
-  // ===============================
   const criarProduto = async (e) => {
     e.preventDefault();
     try {
@@ -92,9 +81,6 @@ export const Produtos = () => {
     }
   };
 
-  // ===============================
-  // EDITAR
-  // ===============================
   const editarProduto = async (e) => {
     e.preventDefault();
     try {
@@ -119,9 +105,6 @@ export const Produtos = () => {
     }
   };
 
-  // ===============================
-  // EXCLUIR
-  // ===============================
   const deletar = async () => {
     try {
       const response = await fetch(
@@ -151,7 +134,6 @@ export const Produtos = () => {
       <main className="content">
         <h2>Gerenciamento de Produtos</h2>
 
-        {/* AÇÕES SUPERIORES */}
         <div className="top-actions">
           <button
             className="btn-criar-novo"
@@ -170,7 +152,6 @@ export const Produtos = () => {
             + Novo Produto
           </button>
 
-          {/* Campo de busca */}
           <input
             className="campo-busca"
             type="text"
@@ -180,7 +161,6 @@ export const Produtos = () => {
           />
         </div>
 
-        {/* TABELA */}
         {exibidos.length === 0 ? (
           <p>Nenhum produto encontrado.</p>
         ) : (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./css/listarVenda.css"; // pode renomear depois se quiser
+import "./css/listarVenda.css";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "./navbar.jsx";
@@ -9,7 +9,6 @@ import MenuAcoes from "./menuAcoes.jsx";
 export const ListarContratos = () => {
   const [contratos, setContratos] = useState([]);
   const [busca, setBusca] = useState("");
-
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [itensPorPagina] = useState(10);
 
@@ -33,16 +32,64 @@ export const ListarContratos = () => {
     fecharModal();
   };
 
+  // ===============================
+  // EXPORTAR CSV
+  // ===============================
+  const exportarCSV = () => {
+    if (!contratos.length) {
+      return toast.warn("Nenhum contrato para exportar.");
+    }
+
+    const cabecalho = [
+      "Código",
+      "Cliente",
+      "Número Contrato",
+      "Título",
+      "Tipo",
+      "Data Início",
+      "Data Fim",
+      "Valor Total",
+      "Status",
+    ];
+
+    const linhas = contratos.map((c) => [
+      c.id,
+      c.cliente || "",
+      c.numero_contrato || "",
+      c.titulo || "",
+      c.tipo_contrato || "",
+      c.inicio || "",
+      c.fim || "",
+      c.valor_total || "",
+      c.status || "",
+    ]);
+
+    const csv = [cabecalho, ...linhas]
+      .map((l) => l.map((i) => `"${i}"`).join(","))
+      .join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "contratos.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // ===============================
+  // PDF
+  // ===============================
   const gerarPDFContrato = (contrato) => {
     if (!contrato) {
-      console.log(contrato);
-      toast.error("Erro: Dados do contrato não carregados.");
+      toast.error("Erro ao gerar PDF.");
       return;
     }
 
     const doc = new jsPDF();
 
-    // Cabeçalho
     doc.setFillColor(40, 40, 40);
     doc.rect(0, 0, 210, 20, "F");
 
@@ -71,15 +118,14 @@ export const ListarContratos = () => {
     titulo("Dados do Contrato");
     linha("Código", contrato.id);
     linha("Cliente", contrato.cliente);
-    linha("Número do Contrato", contrato.numero_contrato);
+    linha("Número", contrato.numero_contrato);
     linha("Título", contrato.titulo);
-    linha("Tipo de Contrato", contrato.tipo_contrato);
+    linha("Tipo", contrato.tipo_contrato);
 
     doc.line(10, y, 200, y);
     y += 8;
 
     titulo("Datas");
-    linha("Assinatura", contrato.data_assinatura);
     linha("Início", contrato.inicio);
     linha("Fim", contrato.fim);
 
@@ -87,20 +133,13 @@ export const ListarContratos = () => {
     y += 8;
 
     titulo("Valores");
-    linha("Valor Mensal", `R$ ${Number(contrato.valor_mensal).toFixed(2)}`);
     linha("Valor Total", `R$ ${Number(contrato.valor_total).toFixed(2)}`);
 
     doc.line(10, y, 200, y);
     y += 8;
 
-    titulo("Informações Gerais");
+    titulo("Status");
     linha("Status", contrato.status);
-    linha("Responsável", contrato.nome);
-
-    // Rodapé
-    doc.setFontSize(10);
-    doc.setTextColor(120, 120, 120);
-    doc.text("Documento gerado automaticamente", 10, 290);
 
     doc.save(`contrato_${contrato.id}.pdf`);
   };
@@ -147,10 +186,10 @@ export const ListarContratos = () => {
     const txt = busca.toLowerCase();
     return (
       String(c.id).includes(txt) ||
-      String(c.cliente_nome || "")
+      String(c.cliente || "")
         .toLowerCase()
         .includes(txt) ||
-      String(c.data_inicio || "")
+      String(c.inicio || "")
         .toLowerCase()
         .includes(txt)
     );
@@ -173,20 +212,29 @@ export const ListarContratos = () => {
       <main className="content">
         <h2>Lista de Contratos</h2>
 
-        <button
-          className="btn-criar-novo"
-          onClick={() => navigate("/contrato/nova")}
-        >
-          + Novo Contrato
-        </button>
+        {/* TOPO PADRÃO MANUTENÇÃO */}
+        <div className="topo-acoes">
+          <div>
+            <button
+              className="btn-criar-novo"
+              onClick={() => navigate("/contrato/nova")}
+            >
+              + Novo Contrato
+            </button>
 
-        <input
-          type="text"
-          className="input-busca"
-          placeholder="Buscar por código, cliente ou data..."
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-        />
+            <button className="btn-exportar" onClick={exportarCSV}>
+              📄 Exportar CSV
+            </button>
+          </div>
+
+          <input
+            type="text"
+            className="input-busca"
+            placeholder="Buscar por código, cliente ou data..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
+        </div>
 
         {contratosFiltrados.length === 0 ? (
           <p>Nenhum contrato encontrado.</p>
@@ -199,8 +247,8 @@ export const ListarContratos = () => {
                   <th>Cliente</th>
                   <th>Tipo de Contrato</th>
                   <th>Data Início</th>
-                  <th>Valor Mensal</th>
-                  <th>Observações</th>
+                  <th>Valor Total</th>
+                  <th>Status</th>
                   <th>Ações</th>
                 </tr>
               </thead>
@@ -213,18 +261,13 @@ export const ListarContratos = () => {
                     <td>{c.tipo_contrato}</td>
                     <td>{c.inicio}</td>
                     <td>R$ {Number(c.valor_total)}</td>
-                    <td>{c.status.toUpperCase() || "-"}</td>
+                    <td>{c.status?.toUpperCase()}</td>
 
                     <td>
                       <MenuAcoes
                         onEditar={() => navigate(`/contrato/editar/${c.id}`)}
                         onExcluir={() => abrirModalExclusao(c.id)}
-                        onPDF={() => {
-                          const dados = contratosAtuais.find(
-                            (x) => x.id === c.id
-                          );
-                          gerarPDFContrato(dados);
-                        }}
+                        onPDF={() => gerarPDFContrato(c)}
                       />
                     </td>
                   </tr>
@@ -232,7 +275,7 @@ export const ListarContratos = () => {
               </tbody>
             </table>
 
-            {/* paginação */}
+            {/* PAGINAÇÃO */}
             <div className="paginacao-container">
               <button
                 onClick={() => setPaginaAtual(paginaAtual - 1)}

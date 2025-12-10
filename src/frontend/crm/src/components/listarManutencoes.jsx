@@ -246,7 +246,7 @@ export const ListarManutencoes = () => {
             <table className="venda-table">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th>Código</th>
                   <th>Equipamento</th>
                   <th>Execução</th>
                   <th>Tipo</th>

@@ -10,17 +10,19 @@ const ListaAlocacoes = () => {
   const navigate = useNavigate();
   const [alocacoes, setAlocacoes] = useState([]);
   const [busca, setBusca] = useState("");
-
   const [deleteId, setDeleteId] = useState(null);
 
   const [paginaAtual, setPaginaAtual] = useState(1);
   const itensPorPagina = 10;
 
+  // =========================
+  // CARREGAR ALOCAÇÕES
+  // =========================
   const carregarAlocacoes = async () => {
     try {
       const response = await fetch("http://localhost:3000/api/alocacao/listar");
       const data = await response.json();
-      setAlocacoes(data);
+      setAlocacoes(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Erro ao carregar alocações:", error);
     }
@@ -30,11 +32,14 @@ const ListaAlocacoes = () => {
     carregarAlocacoes();
   }, []);
 
-  // RESETAR PÁGINA AO DIGITAR NA BUSCA
+  // RESETAR PÁGINA AO BUSCAR
   useEffect(() => {
     setPaginaAtual(1);
   }, [busca]);
 
+  // =========================
+  // FILTRO
+  // =========================
   const filtrar = (item) => {
     const texto = busca.toLowerCase();
     return (
@@ -45,22 +50,24 @@ const ListaAlocacoes = () => {
     );
   };
 
-  // FILTRO + PAGINAÇÃO
   const listaFiltrada = alocacoes.filter(filtrar);
 
+  // =========================
+  // PAGINAÇÃO
+  // =========================
   const indexUltimo = paginaAtual * itensPorPagina;
   const indexPrimeiro = indexUltimo - itensPorPagina;
   const listaAtual = listaFiltrada.slice(indexPrimeiro, indexUltimo);
-
   const totalPaginas = Math.ceil(listaFiltrada.length / itensPorPagina);
 
+  // =========================
+  // GERAR PDF
+  // =========================
   const gerarPDF = (aloc) => {
     const doc = new jsPDF();
 
     const marrom = "#4B2E1E";
-    const dourado = "#C6A667";
 
-    // Cabeçalho
     doc.setFillColor(marrom);
     doc.rect(0, 0, 210, 30, "F");
 
@@ -68,15 +75,10 @@ const ListaAlocacoes = () => {
     doc.setTextColor(255, 255, 255);
     doc.text("Relatório de Alocação de Máquina", 14, 18);
 
-    doc.setFontSize(12);
-    doc.text("Brasitália Café Chapecó", 150, 18);
-
-    // Título
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(14);
     doc.text(`Alocação #${aloc.id}`, 14, 45);
 
-    // Tabela principal
     autoTable(doc, {
       startY: 55,
       head: [["Campo", "Detalhes"]],
@@ -88,28 +90,20 @@ const ListaAlocacoes = () => {
       body: [
         ["Máquina", aloc.maquina || "-"],
         ["Cliente", aloc.cliente || "-"],
-        ["Data Início", aloc.data_inicio],
-        ["Data Fim", aloc.data_fim],
+        ["Data Início", aloc.data_inicio || "-"],
+        ["Data Fim", aloc.data_fim || "-"],
         ["Status", aloc.status || "-"],
       ],
       styles: { fontSize: 11, cellPadding: 4 },
-      alternateRowStyles: { fillColor: "#f8f3ed" },
       theme: "grid",
     });
-
-    // Rodapé
-    doc.setFontSize(10);
-    doc.setTextColor(marrom);
-    doc.text(
-      "Relatório gerado automaticamente pelo sistema Brasitália Café.",
-      14,
-      doc.internal.pageSize.height - 10
-    );
 
     doc.save(`alocacao_${aloc.id}.pdf`);
   };
 
+  // =========================
   // EXCLUIR
+  // =========================
   const deletar = async () => {
     try {
       await fetch(`http://localhost:3000/api/alocacao/delete/${deleteId}`, {
@@ -123,9 +117,11 @@ const ListaAlocacoes = () => {
     }
   };
 
+  // =========================
   // EXPORTAR CSV
+  // =========================
   const exportarCSV = () => {
-    if (!alocacoes || alocacoes.length === 0) {
+    if (!alocacoes.length) {
       alert("Nenhuma alocação encontrada para exportar.");
       return;
     }
@@ -166,20 +162,24 @@ const ListaAlocacoes = () => {
   return (
     <div className="lista-container">
       <Navbar />
+
       <main className="content">
         <h1 className="titulo">Lista de Alocações</h1>
 
+        {/* ✅ TOPO PADRÃO MANUTENÇÕES */}
         <div className="top-actions">
-          <button
-            className="btn-novo"
-            onClick={() => navigate("/alocacao/nova")}
-          >
-            + Nova Alocação
-          </button>
+          <div>
+            <button
+              className="btn-novo"
+              onClick={() => navigate("/alocacao/nova")}
+            >
+              + Nova Alocação
+            </button>
 
-          <button className="btn-exportar" onClick={exportarCSV}>
-            📄 Exportar CSV
-          </button>
+            <button className="btn-exportar" onClick={exportarCSV}>
+              📄 Exportar CSV
+            </button>
+          </div>
 
           <input
             type="text"
@@ -211,7 +211,8 @@ const ListaAlocacoes = () => {
                 <td>{item.cliente}</td>
                 <td>{item.data_inicio}</td>
                 <td>{item.data_fim || "-"}</td>
-                <td>{item.status.toUpperCase()}</td>
+                <td>{item.status?.toUpperCase()}</td>
+
                 <td>
                   <MenuAcoes
                     onEditar={() => navigate(`/alocacao/editar/${item.id}`)}
@@ -224,7 +225,7 @@ const ListaAlocacoes = () => {
           </tbody>
         </table>
 
-        {/* PAGINAÇÃO IGUAL A MANUTENÇÕES */}
+        {/* ✅ PAGINAÇÃO PADRÃO */}
         <div className="paginacao-container">
           <button
             onClick={() => setPaginaAtual(paginaAtual - 1)}
@@ -256,7 +257,7 @@ const ListaAlocacoes = () => {
         </div>
       </main>
 
-      {/* MODAL DE CONFIRMAÇÃO */}
+      {/* ✅ MODAL DE CONFIRMAÇÃO */}
       {deleteId && (
         <div className="modal-overlay">
           <div className="modal-container">

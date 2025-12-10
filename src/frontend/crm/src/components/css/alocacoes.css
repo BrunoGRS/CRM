@@ -46,7 +46,6 @@
   background: #ffffff;
   font-size: 0.9rem;
   color: #444;
-  outline: none;
   transition: 0.25s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
