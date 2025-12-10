@@ -21,7 +21,7 @@ export function Navbar() {
       "alocacao",
       "manutencao",
     ], // Admin
-    3: ["home", "manutencao"], // Manutenção
+    3: ["home", "manutencao", "alocacao"], // Manutenção
     2: ["home", "contrato"], // Contrato
   };
 

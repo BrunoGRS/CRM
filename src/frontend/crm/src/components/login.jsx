@@ -4,6 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { Eye, EyeOff } from "lucide-react";
 import "react-toastify/dist/ReactToastify.css";
 import "./css/login.css";
+import LogoPrimeFlow from "../assets/primeFlow.png";
 
 export const Login = () => {
   const [usuario, setUsuario] = useState("");
@@ -62,7 +63,6 @@ export const Login = () => {
         <p>Digite suas credenciais para acessar</p>
 
         <form onSubmit={login}>
-          {/* USUÁRIO */}
           <label className="form-label">Usuário</label>
           <input
             type="text"

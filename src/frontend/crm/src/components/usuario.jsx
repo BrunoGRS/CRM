@@ -148,7 +148,6 @@ export const Usuarios = () => {
       );
 
       if (response.status === 200) {
-        toast.success("Usuário atualizado com sucesso!");
         setFormData({
           nome: "",
           usuario: "",
@@ -160,6 +159,7 @@ export const Usuarios = () => {
         setBotao(true);
         fetchUsuarios();
         setMostrarFormulario(false);
+        toast.success("Usuário atualizado com sucesso!");
       } else {
         toast.error("Erro ao atualizar usuário");
       }
