@@ -9,10 +9,9 @@
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
   display: grid;
-  grid-template-columns: 1fr 1fr; /* DUAS COLUNAS = mais organizado */
-  gap: 18px 28px; /* espaço entre campos */
-  margin-top: 50px;
-  margin-left: 170px;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 28px;
+  margin: 50px auto 60px auto; /* ✅ topo, centro e espaço no final */
   max-width: 1300px;
 }
 

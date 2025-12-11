@@ -3,7 +3,7 @@ import "./css/usuario.css";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { Navbar } from "./navbar";
-import MenuAcoes from "./menuAcoes";
+import MenuAcoesSemPdf from "./menuAcoesSemPdf.jsx";
 
 export const Prospect = () => {
   const { id } = useParams();
@@ -467,7 +467,7 @@ export const Prospect = () => {
                   <td>{p.bairro}</td>
 
                   <td>
-                    <MenuAcoes
+                    <MenuAcoesSemPdf
                       onEditar={() => {
                         setFormData({
                           nome_contato: p.nome_contato || "",

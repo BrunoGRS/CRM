@@ -304,13 +304,13 @@ export const Usuarios = () => {
             <table className="user-table">
               <thead>
                 <tr>
-                  <th>Código</th>
-                  <th>Nome</th>
-                  <th>Usuário</th>
-                  <th>Email</th>
-                  <th>Telefone</th>
-                  <th>Permissão</th>
-                  <th>Ações</th>
+                  <td>Código</td>
+                  <td>Nome</td>
+                  <td>Usuário</td>
+                  <td>Email</td>
+                  <td>Telefone</td>
+                  <td>Permissão</td>
+                  <td>Ações</td>
                 </tr>
               </thead>
 

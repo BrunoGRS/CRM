@@ -172,8 +172,8 @@ export function EditarAlocacao() {
         return;
       }
 
-      toast.success("Alocação atualizada!");
       navigate("/alocacao");
+      toast.success("Alocação atualizada!");
     } catch {
       toast.error("Erro ao salvar");
     }
@@ -319,12 +319,6 @@ export function EditarAlocacao() {
           value={form.observacoes}
           onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
         ></textarea>
-
-        {/* ANEXOS */}
-        <div className="file-input-container">
-          <label>Anexos</label>
-          <input type="file" multiple className="file-input" />
-        </div>
 
         <div className="aloc-btns">
           <button className="btn-save" onClick={salvar}>
